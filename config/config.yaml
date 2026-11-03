@@ -1,0 +1,148 @@
+# 黄金白银价格监控配置
+# 说明：所有价格均为行情快照，仅供个人参考，不构成投资建议。
+
+timezone: Asia/Shanghai
+
+http:
+  timeout: 20
+  retries: 3
+
+# 金店饰品（黄金 / 铂金 报价代码，来自金投网行情接口）
+brands:
+  - { name: 周大福, gold: JO_42660, platinum: JO_42661, stock: hk01929 }
+  - { name: 老凤祥, gold: JO_42657, platinum: JO_42658 }
+  - { name: 周六福, gold: JO_42653, platinum: JO_42654 }
+  - { name: 周生生, gold: JO_42625, platinum: JO_42626 }
+  - { name: 六福珠宝, gold: JO_42646, platinum: JO_42647 }
+  - { name: 老庙黄金, gold: JO_42634, platinum: JO_42635 }
+  - { name: 菜百首饰, gold: JO_42638, platinum: JO_42639 }
+  - { name: 金至尊, gold: JO_42632, platinum: JO_42633 }
+
+# 上海黄金交易所
+sge:
+  - { name: 黄金9999(Au99.99), code: JO_71, metal: gold }
+  - { name: 黄金9995(Au99.95), code: JO_70, metal: gold }
+  - { name: 黄金T+D, code: JO_9753, metal: gold }
+  - { name: 白银T+D, code: JO_9754, metal: silver }
+
+# 银行纸贵金属
+bank_paper:
+  - { name: 工行纸黄金(人民币), code: JO_42760, metal: gold }
+  - { name: 工行纸白银(人民币), code: JO_42761, metal: silver }
+  - { name: 工行纸铂金(人民币), code: JO_42762, metal: platinum }
+  - { name: 工行纸钯金(人民币), code: JO_52644, metal: palladium }
+  - { name: 中行纸黄金(人民币), code: JO_283982, metal: gold }
+  - { name: 中行纸白银(人民币), code: JO_283985, metal: silver }
+  - { name: 中行纸黄金(美元), code: JO_283981, metal: gold, unit: 美元/盎司 }
+  - { name: 中行纸白银(美元), code: JO_283983, metal: silver, unit: 美元/盎司 }
+  - { name: 农行纸黄金(人民币), code: JO_283972, metal: gold }
+  - { name: 农行纸白银(人民币), code: JO_283973, metal: silver }
+  - { name: 农行纸黄金(美元), code: JO_283974, metal: gold, unit: 美元/盎司 }
+  - { name: 农行纸白银(美元), code: JO_283975, metal: silver, unit: 美元/盎司 }
+  - { name: 建行纸白银(人民币), code: JO_62285, metal: silver }
+  - { name: 建行纸铂金(人民币), code: JO_62291, metal: platinum }
+  - { name: 建行纸黄金(美元), code: JO_62289, metal: gold, unit: 美元/盎司 }
+
+# 投资金条与回收价
+bars:
+  - { name: 工行如意金条, code: JO_78650, metal: gold }
+  - { name: 建行龙鼎金条, code: JO_78648, metal: gold }
+  - { name: 农行传世之宝金条, code: JO_321178, metal: gold }
+  - { name: 和谐平安金条, code: JO_78656, metal: gold }
+  - { name: 中国黄金基础金价, code: JO_52683, metal: gold, type: base }
+  - { name: 中国黄金投资金条(零售), code: JO_52684, metal: gold }
+  - { name: 黄金回收价, code: JO_321453, metal: gold, type: recycle }
+  - { name: 足银回收价, code: JO_321465, metal: silver, type: recycle }
+  - { name: 铂金回收价, code: JO_321457, metal: platinum, type: recycle }
+  - { name: 钯金回收价, code: JO_321461, metal: palladium, type: recycle }
+
+# 黄金相关股票 / ETF（腾讯行情）
+stocks:
+  - { name: 山东黄金, code: sh600547 }
+  - { name: 中金黄金, code: sh600489 }
+  - { name: 紫金矿业, code: sh601899 }
+  - { name: 湖南黄金, code: sz002155 }
+  - { name: 赤峰黄金, code: sh600988 }
+  - { name: 西部黄金, code: sh601069 }
+  - { name: 四川黄金, code: sz001337 }
+  - { name: 山金国际, code: sz000975 }
+  - { name: 豫光金铅, code: sz002237 }
+  - { name: 老铺黄金, code: hk06181 }
+  - { name: 周大福, code: hk01929 }
+  - { name: 招金矿业, code: hk01818 }
+  - { name: 中国黄金国际, code: hk02899 }
+  - { name: 灵宝黄金, code: hk03330 }
+  - { name: 山东黄金(港股), code: hk01787 }
+
+etfs:
+  - { name: 黄金ETF华安, code: sh518880 }
+  - { name: 黄金ETF易方达, code: sz159934 }
+  - { name: 黄金股ETF, code: sh517520 }
+  - { name: 白银LOF, code: sz161226 }
+
+# 评分分析的标的（live 为实时价，history 为日线）
+analysis:
+  history_days: 260
+  rsi_period: 14
+  weights:
+    metal: { valuation: 30, rsi: 24, trend: 16, ratio: 12, volatility: 8, momentum: 10 }
+    equity: { valuation: 30, rsi: 25, trend: 20, volatility: 10, momentum: 15 }
+  thresholds:
+    strong: 75
+    buy: 65
+    small: 55
+    watch: 45
+  assets:
+    - key: au_cn
+      name: 国内黄金 Au99.99
+      kind: metal_gold
+      unit: 元/克
+      live: { source: sina, symbol: gds_AU9999 }
+      history: { source: sina_inner, symbol: AU0 }
+    - key: ag_cn
+      name: 国内白银 Ag(T+D)
+      kind: metal_silver
+      unit: 元/千克
+      live: { source: sina, symbol: gds_AGTD }
+      history: { source: sina_inner, symbol: AG0 }
+    - key: au_intl
+      name: 国际黄金 COMEX
+      kind: metal_gold
+      unit: 美元/盎司
+      live: { source: sina, symbol: hf_GC }
+      history: { source: sina_global, symbol: GC }
+    - key: ag_intl
+      name: 国际白银 COMEX
+      kind: metal_silver
+      unit: 美元/盎司
+      live: { source: sina, symbol: hf_SI }
+      history: { source: sina_global, symbol: SI }
+    - key: stock_sd
+      name: 山东黄金(600547)
+      kind: equity
+      unit: 元/股
+      live: { source: tencent, symbol: sh600547 }
+      history: { source: sina_stock, symbol: sh600547 }
+    - key: etf_gold
+      name: 黄金ETF华安(518880)
+      kind: fund
+      unit: 元/份
+      live: { source: tencent, symbol: sh518880 }
+      history: { source: sina_stock, symbol: sh518880 }
+
+notify:
+  # always = 每个时段都推送；signal = 仅在评分达到 buy 阈值或信号发生变化时推送
+  slots:
+    morning: always
+    noon: signal
+    close: always
+    evening: always
+  # 也可以在 config 中直接填写（不建议提交到公开仓库，推荐使用环境变量）
+  channels:
+    pushplus: []
+    serverchan: []
+    wxpusher:
+      app_token: ""
+      uids: []
+      topic_ids: []
+    wecom: []

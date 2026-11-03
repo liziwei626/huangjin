@@ -1,0 +1,109 @@
+name: 黄金白银价格监控
+
+on:
+  schedule:
+    # 以下均为 UTC 时间，对应北京时间 08:30 / 12:00 / 15:30 / 20:30
+    - cron: "30 0 * * *"
+    - cron: "0 4 * * *"
+    - cron: "30 7 * * *"
+    - cron: "30 12 * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "运行时段（manual 为手动全天候）"
+        required: false
+        default: manual
+        type: choice
+        options:
+          - manual
+          - morning
+          - noon
+          - close
+          - evening
+      push:
+        description: "是否推送微信通知"
+        required: false
+        default: true
+        type: boolean
+      test_push:
+        description: "只发送一条测试推送"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gold-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 发送测试推送
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.test_push }}
+        env:
+          PUSHPLUS_TOKENS: ${{ secrets.PUSHPLUS_TOKENS }}
+          SERVERCHAN_KEYS: ${{ secrets.SERVERCHAN_KEYS }}
+          WXPUSHER_APP_TOKEN: ${{ secrets.WXPUSHER_APP_TOKEN }}
+          WXPUSHER_UIDS: ${{ secrets.WXPUSHER_UIDS }}
+          WXPUSHER_TOPIC_IDS: ${{ secrets.WXPUSHER_TOPIC_IDS }}
+          WECOM_WEBHOOKS: ${{ secrets.WECOM_WEBHOOKS }}
+        run: python -m gold_monitor test-push
+
+      - name: 抓取行情并推送
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.test_push) }}
+        env:
+          PUSHPLUS_TOKENS: ${{ secrets.PUSHPLUS_TOKENS }}
+          SERVERCHAN_KEYS: ${{ secrets.SERVERCHAN_KEYS }}
+          WXPUSHER_APP_TOKEN: ${{ secrets.WXPUSHER_APP_TOKEN }}
+          WXPUSHER_UIDS: ${{ secrets.WXPUSHER_UIDS }}
+          WXPUSHER_TOPIC_IDS: ${{ secrets.WXPUSHER_TOPIC_IDS }}
+          WECOM_WEBHOOKS: ${{ secrets.WECOM_WEBHOOKS }}
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.slot }}" ]; then
+            SLOT="${{ inputs.slot }}"
+          else
+            H=$(TZ=Asia/Shanghai date +%H%M)
+            case "$H" in
+              08*|09*|10*) SLOT=morning ;;
+              11*|12*|13*) SLOT=noon ;;
+              14*|15*|16*) SLOT=close ;;
+              *) SLOT=evening ;;
+            esac
+          fi
+          ARGS="--slot $SLOT"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.push }}" != "true" ]; then
+            ARGS="$ARGS --no-push"
+          fi
+          echo "run: python -m gold_monitor run $ARGS"
+          python -m gold_monitor run $ARGS
+
+      - name: 提交数据更新
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.test_push) }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/latest.json data/latest.md data/history.csv data/state.json
+          if git diff --staged --quiet; then
+            echo "没有数据变化，跳过提交"
+          else
+            git commit -m "chore: 更新金银行情 $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M') [skip ci]"
+            git push
+          fi

@@ -1,0 +1,1993 @@
+{
+  "generated_at": "2026-11-04T00:02:39.898495+08:00",
+  "generated_at_display": "2026-11-04 00:02:39",
+  "date": "2026-11-04",
+  "slot": "manual",
+  "timezone": "Asia/Shanghai",
+  "market": {
+    "sge": [
+      {
+        "name": "黄金9999(Au99.99)",
+        "metal": "gold",
+        "quote": {
+          "key": "JO_71",
+          "name": "黄金9999",
+          "price": 846.99,
+          "unit": "元/克",
+          "prev_close": 840.01,
+          "open": null,
+          "high": 853.0,
+          "low": 839.0,
+          "change": 6.98,
+          "change_pct": 0.83,
+          "time": "23:58:09",
+          "date": "2026-11-03",
+          "source": "jijinhao",
+          "raw_code": "JO_71",
+          "extra": {}
+        }
+      },
+      {
+        "name": "黄金9995(Au99.95)",
+        "metal": "gold",
+        "quote": {
+          "key": "JO_70",
+          "name": "黄金9995",
+          "price": 840.7,
+          "unit": "元/克",
+          "prev_close": 840.7,
+          "open": null,
+          "high": 0.0,
+          "low": 0.0,
+          "change": 5.7,
+          "change_pct": 0.68,
+          "time": "15:30:01",
+          "date": "2026-11-03",
+          "source": "jijinhao",
+          "raw_code": "JO_70",
+          "extra": {}
+        }
+      },
+      {
+        "name": "黄金T+D",
+        "metal": "gold",
+        "quote": {
+          "key": "JO_9753",
+          "name": "黄金T+D",
+          "price": 844.56,
+          "unit": "元/克",
+          "prev_close": 839.81,
+          "open": null,
+          "high": 852.21,
+          "low": 838.45,
+          "change": 1.09,
+          "change_pct": 0.13,
+          "time": "00:02:38",
+          "date": "2026-11-04",
+          "source": "jijinhao",
+          "raw_code": "JO_9753",
+          "extra": {}
+        }
+      },
+      {
+        "name": "白银T+D",
+        "metal": "silver",
+        "quote": {
+          "key": "JO_9754",
+          "name": "白银T+D",
+          "price": 11847.0,
+          "unit": "元/千克",
+          "prev_close": 11650.0,
+          "open": null,
+          "high": 12032.0,
+          "low": 11600.0,
+          "change": -17.0,
+          "change_pct": -0.14,
+          "time": "00:02:34",
+          "date": "2026-11-04",
+          "source": "jijinhao",
+          "raw_code": "JO_9754",
+          "extra": {}
+        }
+      }
+    ],
+    "intl": [
+      {
+        "name": "COMEX 黄金",
+        "symbol": "hf_GC",
+        "quote": {
+          "key": "hf_GC",
+          "name": "纽约黄金",
+          "price": 3948.592,
+          "unit": "美元/盎司",
+          "prev_close": 3969.6,
+          "open": 3960.5,
+          "high": 3981.7,
+          "low": 3904.1,
+          "change": -21.008,
+          "change_pct": -0.53,
+          "time": "00:02:37",
+          "date": "2026-11-04",
+          "source": "sina",
+          "raw_code": "hf_GC",
+          "extra": {}
+        }
+      },
+      {
+        "name": "COMEX 白银",
+        "symbol": "hf_SI",
+        "quote": {
+          "key": "hf_SI",
+          "name": "纽约白银",
+          "price": 49.964,
+          "unit": "美元/盎司",
+          "prev_close": 50.888,
+          "open": 50.745,
+          "high": 50.915,
+          "low": 48.62,
+          "change": -0.924,
+          "change_pct": -1.82,
+          "time": "00:02:33",
+          "date": "2026-11-04",
+          "source": "sina",
+          "raw_code": "hf_SI",
+          "extra": {}
+        }
+      },
+      {
+        "name": "伦敦金现",
+        "symbol": "hf_XAU",
+        "quote": {
+          "key": "hf_XAU",
+          "name": "伦敦金（现货黄金）",
+          "price": 3935.21,
+          "unit": "美元/盎司",
+          "prev_close": 3946.47,
+          "open": 3948.82,
+          "high": 3970.9,
+          "low": 3895.36,
+          "change": -11.26,
+          "change_pct": -0.29,
+          "time": "00:02:00",
+          "date": "2026-11-04",
+          "source": "sina",
+          "raw_code": "hf_XAU",
+          "extra": {}
+        }
+      },
+      {
+        "name": "伦敦银现",
+        "symbol": "hf_XAG",
+        "quote": {
+          "key": "hf_XAG",
+          "name": "伦敦银（现货白银）",
+          "price": 49.83,
+          "unit": "美元/盎司",
+          "prev_close": 50.62,
+          "open": 50.64,
+          "high": 50.85,
+          "low": 48.59,
+          "change": -0.79,
+          "change_pct": -1.56,
+          "time": "00:02:00",
+          "date": "2026-11-04",
+          "source": "sina",
+          "raw_code": "hf_XAG",
+          "extra": {}
+        }
+      }
+    ],
+    "usdcny": {
+      "key": "fx_susdcny",
+      "name": "在岸人民币",
+      "price": 6.6714,
+      "unit": "人民币",
+      "prev_close": 6.6623,
+      "open": null,
+      "high": null,
+      "low": null,
+      "change": 0.0091,
+      "change_pct": 0.14,
+      "time": "00:02:00",
+      "date": "2026-11-04",
+      "source": "sina",
+      "raw_code": "fx_susdcny",
+      "extra": {}
+    },
+    "gold_silver_ratio": {
+      "value": 79.03,
+      "rank": 96.4
+    },
+    "intraday_change_pct": null
+  },
+  "brands": [
+    {
+      "name": "周大福",
+      "gold": {
+        "key": "JO_42660",
+        "name": "黄金价格",
+        "price": 1185.0,
+        "unit": "元/克",
+        "prev_close": 1185.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:30:08",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42660",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42661",
+        "name": "铂金价格",
+        "price": 557.0,
+        "unit": "元/克",
+        "prev_close": 557.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:30:07",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42661",
+        "extra": {}
+      },
+      "premium_pct": 39.91,
+      "score": 30.3,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "老凤祥",
+      "gold": {
+        "key": "JO_42657",
+        "name": "黄金价格",
+        "price": 1183.0,
+        "unit": "元/克",
+        "prev_close": 1183.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:56:53",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42657",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42658",
+        "name": "铂金价格",
+        "price": 600.0,
+        "unit": "元/克",
+        "prev_close": 600.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:56:52",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42658",
+        "extra": {}
+      },
+      "premium_pct": 39.67,
+      "score": 30.7,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "周六福",
+      "gold": {
+        "key": "JO_42653",
+        "name": "黄金价格",
+        "price": 1180.0,
+        "unit": "元/克",
+        "prev_close": 1180.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:33:50",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42653",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42654",
+        "name": "铂金价格",
+        "price": 577.0,
+        "unit": "元/克",
+        "prev_close": 577.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:33:50",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42654",
+        "extra": {}
+      },
+      "premium_pct": 39.32,
+      "score": 31.2,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "周生生",
+      "gold": {
+        "key": "JO_42625",
+        "name": "黄金价格",
+        "price": 1184.0,
+        "unit": "元/克",
+        "prev_close": 1184.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:58:23",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42625",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42626",
+        "name": "铂金价格",
+        "price": 557.0,
+        "unit": "元/克",
+        "prev_close": 557.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:58:23",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42626",
+        "extra": {}
+      },
+      "premium_pct": 39.79,
+      "score": 30.5,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "六福珠宝",
+      "gold": {
+        "key": "JO_42646",
+        "name": "黄金价格",
+        "price": 1183.0,
+        "unit": "元/克",
+        "prev_close": 1183.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:34:44",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42646",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42647",
+        "name": "铂金价格",
+        "price": 557.0,
+        "unit": "元/克",
+        "prev_close": 557.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:34:42",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42647",
+        "extra": {}
+      },
+      "premium_pct": 39.67,
+      "score": 30.7,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "老庙黄金",
+      "gold": {
+        "key": "JO_42634",
+        "name": "黄金价格",
+        "price": 1182.0,
+        "unit": "元/克",
+        "prev_close": 1182.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "11:24:37",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42634",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42635",
+        "name": "铂金价格",
+        "price": 557.0,
+        "unit": "元/克",
+        "prev_close": 557.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "14:28:32",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42635",
+        "extra": {}
+      },
+      "premium_pct": 39.55,
+      "score": 30.8,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "菜百首饰",
+      "gold": {
+        "key": "JO_42638",
+        "name": "黄金价格",
+        "price": 1172.0,
+        "unit": "元/克",
+        "prev_close": 1172.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:36:45",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42638",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42639",
+        "name": "铂金价格",
+        "price": 525.0,
+        "unit": "元/克",
+        "prev_close": 525.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:36:44",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42639",
+        "extra": {}
+      },
+      "premium_pct": 38.37,
+      "score": 32.6,
+      "rating": "不建议现在买"
+    },
+    {
+      "name": "金至尊",
+      "gold": {
+        "key": "JO_42632",
+        "name": "黄金价格",
+        "price": 1183.0,
+        "unit": "元/克",
+        "prev_close": 1183.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:39:11",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42632",
+        "extra": {}
+      },
+      "platinum": {
+        "key": "JO_42633",
+        "name": "铂金价格",
+        "price": 557.0,
+        "unit": "元/克",
+        "prev_close": 557.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:39:11",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_42633",
+        "extra": {}
+      },
+      "premium_pct": 39.67,
+      "score": 30.7,
+      "rating": "不建议现在买"
+    }
+  ],
+  "brand_gold_avg": 1181.5,
+  "brand_premium_pct": 39.49,
+  "banks": [
+    {
+      "name": "工行纸黄金(人民币)",
+      "metal": "gold",
+      "quote": {
+        "key": "JO_42760",
+        "name": "工行纸黄金(人民币)",
+        "price": 843.7,
+        "unit": "元/克",
+        "prev_close": 843.95,
+        "open": null,
+        "high": 844.08,
+        "low": 843.7,
+        "change": -0.25,
+        "change_pct": -0.03,
+        "time": "00:02:38",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_42760",
+        "extra": {}
+      },
+      "spread_pct": -0.39
+    },
+    {
+      "name": "工行纸白银(人民币)",
+      "metal": "silver",
+      "quote": {
+        "key": "JO_42761",
+        "name": "工行纸白银(人民币)",
+        "price": 10.68,
+        "unit": "元/克",
+        "prev_close": 10.684,
+        "open": null,
+        "high": 10.693,
+        "low": 10.68,
+        "change": -0.004,
+        "change_pct": -0.04,
+        "time": "00:02:38",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_42761",
+        "extra": {}
+      },
+      "spread_pct": -9.85
+    },
+    {
+      "name": "工行纸铂金(人民币)",
+      "metal": "platinum",
+      "quote": {
+        "key": "JO_42762",
+        "name": "工行纸铂金(人民币)",
+        "price": 306.46,
+        "unit": "元/克",
+        "prev_close": 306.44,
+        "open": null,
+        "high": 306.85,
+        "low": 306.46,
+        "change": 0.02,
+        "change_pct": 0.01,
+        "time": "00:02:38",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_42762",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "工行纸钯金(人民币)",
+      "metal": "palladium",
+      "quote": {
+        "key": "JO_52644",
+        "name": "工行纸钯金(人民币)",
+        "price": 198.24,
+        "unit": "元/克",
+        "prev_close": 198.09,
+        "open": null,
+        "high": 198.26,
+        "low": 198.07,
+        "change": 0.15,
+        "change_pct": 0.08,
+        "time": "00:02:38",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_52644",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "中行纸黄金(人民币)",
+      "metal": "gold",
+      "quote": {
+        "key": "JO_283982",
+        "name": "中行纸黄金(人民币)",
+        "price": 843.81,
+        "unit": "元/克",
+        "prev_close": 844.1,
+        "open": null,
+        "high": 844.28,
+        "low": 843.81,
+        "change": -0.29,
+        "change_pct": -0.03,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283982",
+        "extra": {}
+      },
+      "spread_pct": -0.38
+    },
+    {
+      "name": "中行纸白银(人民币)",
+      "metal": "silver",
+      "quote": {
+        "key": "JO_283985",
+        "name": "中行纸白银(人民币)",
+        "price": 10.684,
+        "unit": "元/克",
+        "prev_close": 10.687,
+        "open": null,
+        "high": 10.695,
+        "low": 10.683,
+        "change": -0.003,
+        "change_pct": -0.03,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283985",
+        "extra": {}
+      },
+      "spread_pct": -9.82
+    },
+    {
+      "name": "中行纸黄金(美元)",
+      "metal": "gold",
+      "quote": {
+        "key": "JO_283981",
+        "name": "中行纸黄金(美元)",
+        "price": 3933.64,
+        "unit": "美元/盎司",
+        "prev_close": 3935.05,
+        "open": null,
+        "high": 3935.85,
+        "low": 3933.64,
+        "change": -1.4102,
+        "change_pct": -0.04,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283981",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "中行纸白银(美元)",
+      "metal": "silver",
+      "quote": {
+        "key": "JO_283983",
+        "name": "中行纸白银(美元)",
+        "price": 49.779,
+        "unit": "美元/盎司",
+        "prev_close": 49.798,
+        "open": null,
+        "high": 49.834,
+        "low": 49.775,
+        "change": -0.019,
+        "change_pct": -0.04,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283983",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "农行纸黄金(人民币)",
+      "metal": "gold",
+      "quote": {
+        "key": "JO_283972",
+        "name": "农行纸黄金(人民币)",
+        "price": 844.25,
+        "unit": "元/克",
+        "prev_close": 844.43,
+        "open": null,
+        "high": 844.65,
+        "low": 844.17,
+        "change": -0.18,
+        "change_pct": -0.02,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283972",
+        "extra": {}
+      },
+      "spread_pct": -0.32
+    },
+    {
+      "name": "农行纸白银(人民币)",
+      "metal": "silver",
+      "quote": {
+        "key": "JO_283973",
+        "name": "农行纸白银(人民币)",
+        "price": 10.702,
+        "unit": "元/克",
+        "prev_close": 10.705,
+        "open": null,
+        "high": 10.711,
+        "low": 10.701,
+        "change": -0.003,
+        "change_pct": -0.03,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283973",
+        "extra": {}
+      },
+      "spread_pct": -9.66
+    },
+    {
+      "name": "农行纸黄金(美元)",
+      "metal": "gold",
+      "quote": {
+        "key": "JO_283974",
+        "name": "农行纸黄金(美元)",
+        "price": 3936.99,
+        "unit": "美元/盎司",
+        "prev_close": 3937.77,
+        "open": null,
+        "high": 3938.74,
+        "low": 3936.6,
+        "change": -0.78,
+        "change_pct": -0.02,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283974",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "农行纸白银(美元)",
+      "metal": "silver",
+      "quote": {
+        "key": "JO_283975",
+        "name": "农行纸白银(美元)",
+        "price": 49.922,
+        "unit": "美元/盎司",
+        "prev_close": 49.938,
+        "open": null,
+        "high": 49.967,
+        "low": 49.92,
+        "change": -0.016,
+        "change_pct": -0.03,
+        "time": "00:02:36",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_283975",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "建行纸白银(人民币)",
+      "metal": "silver",
+      "quote": {
+        "key": "JO_62285",
+        "name": "建行人民币银",
+        "price": 10.701,
+        "unit": "元/克",
+        "prev_close": 10.695,
+        "open": null,
+        "high": 10.701,
+        "low": 10.701,
+        "change": 0.006,
+        "change_pct": 0.06,
+        "time": "00:00:59",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_62285",
+        "extra": {}
+      },
+      "spread_pct": -9.67
+    },
+    {
+      "name": "建行纸铂金(人民币)",
+      "metal": "platinum",
+      "quote": {
+        "key": "JO_62291",
+        "name": "建行人民币铂",
+        "price": 308.11,
+        "unit": "元/克",
+        "prev_close": 307.8,
+        "open": null,
+        "high": 308.11,
+        "low": 308.11,
+        "change": 0.31,
+        "change_pct": 0.1,
+        "time": "00:00:58",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_62291",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "建行纸黄金(美元)",
+      "metal": "gold",
+      "quote": {
+        "key": "JO_62289",
+        "name": "建行美元金(钞)",
+        "price": 3936.36,
+        "unit": "美元/盎司",
+        "prev_close": 3936.68,
+        "open": null,
+        "high": 3936.36,
+        "low": 3936.36,
+        "change": -0.3198,
+        "change_pct": -0.01,
+        "time": "00:00:59",
+        "date": "2026-11-04",
+        "source": "jijinhao",
+        "raw_code": "JO_62289",
+        "extra": {}
+      },
+      "spread_pct": null
+    }
+  ],
+  "bars": [
+    {
+      "name": "工行如意金条",
+      "metal": "gold",
+      "type": "buy",
+      "quote": {
+        "key": "JO_78650",
+        "name": "工商银行如意金条",
+        "price": 865.29,
+        "unit": "元/克",
+        "prev_close": 865.29,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:10:17",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_78650",
+        "extra": {}
+      },
+      "spread_pct": 2.16
+    },
+    {
+      "name": "建行龙鼎金条",
+      "metal": "gold",
+      "type": "buy",
+      "quote": {
+        "key": "JO_78648",
+        "name": "建设银行龙鼎金条价格",
+        "price": 863.5,
+        "unit": "元/克",
+        "prev_close": 863.5,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:08:19",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_78648",
+        "extra": {}
+      },
+      "spread_pct": 1.95
+    },
+    {
+      "name": "农行传世之宝金条",
+      "metal": "gold",
+      "type": "buy",
+      "quote": {
+        "key": "JO_321178",
+        "name": "农业银行传世之宝金条价格",
+        "price": 863.29,
+        "unit": "元/克",
+        "prev_close": 863.29,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:12:44",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_321178",
+        "extra": {}
+      },
+      "spread_pct": 1.92
+    },
+    {
+      "name": "和谐平安金条",
+      "metal": "gold",
+      "type": "buy",
+      "quote": {
+        "key": "JO_78656",
+        "name": "和谐平安金条",
+        "price": 866.7,
+        "unit": "元/克",
+        "prev_close": 866.7,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "10:13:38",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_78656",
+        "extra": {}
+      },
+      "spread_pct": 2.33
+    },
+    {
+      "name": "中国黄金基础金价",
+      "metal": "gold",
+      "type": "base",
+      "quote": {
+        "key": "JO_52683",
+        "name": "中国黄金基础金价",
+        "price": 846.9,
+        "unit": "元/克",
+        "prev_close": 846.9,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "11:14:38",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_52683",
+        "extra": {}
+      },
+      "spread_pct": -0.01
+    },
+    {
+      "name": "中国黄金投资金条(零售)",
+      "metal": "gold",
+      "type": "buy",
+      "quote": {
+        "key": "JO_52684",
+        "name": "投资金条/储值金条/元宝金：零售价",
+        "price": 853.4,
+        "unit": "元/克",
+        "prev_close": 853.4,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "11:15:43",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_52684",
+        "extra": {}
+      },
+      "spread_pct": 0.76
+    },
+    {
+      "name": "黄金回收价",
+      "metal": "gold",
+      "type": "recycle",
+      "quote": {
+        "key": "JO_321453",
+        "name": "黄金回收价格",
+        "price": 839.0,
+        "unit": "元/克",
+        "prev_close": 839.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:30:17",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_321453",
+        "extra": {}
+      },
+      "spread_pct": -0.94
+    },
+    {
+      "name": "足银回收价",
+      "metal": "silver",
+      "type": "recycle",
+      "quote": {
+        "key": "JO_321465",
+        "name": "足银回收价格",
+        "price": 10.67,
+        "unit": "元/克",
+        "prev_close": 10.67,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:05:18",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_321465",
+        "extra": {}
+      },
+      "spread_pct": -9.94
+    },
+    {
+      "name": "铂金回收价",
+      "metal": "platinum",
+      "type": "recycle",
+      "quote": {
+        "key": "JO_321457",
+        "name": "pt999铂金回收价格",
+        "price": 303.0,
+        "unit": "元/克",
+        "prev_close": 303.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:31:00",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_321457",
+        "extra": {}
+      },
+      "spread_pct": null
+    },
+    {
+      "name": "钯金回收价",
+      "metal": "palladium",
+      "type": "recycle",
+      "quote": {
+        "key": "JO_321461",
+        "name": "pd999钯金回收价格",
+        "price": 182.0,
+        "unit": "元/克",
+        "prev_close": 182.0,
+        "open": null,
+        "high": 0.0,
+        "low": 0.0,
+        "change": 0.0,
+        "change_pct": 0.0,
+        "time": "09:32:17",
+        "date": "2026-11-03",
+        "source": "jijinhao",
+        "raw_code": "JO_321461",
+        "extra": {}
+      },
+      "spread_pct": null
+    }
+  ],
+  "stocks": [
+    {
+      "name": "山东黄金",
+      "quote": {
+        "key": "sh600547",
+        "name": "山东黄金",
+        "price": 23.19,
+        "unit": "元/股",
+        "prev_close": 22.81,
+        "open": null,
+        "high": 23.91,
+        "low": 22.96,
+        "change": 0.38,
+        "change_pct": 1.67,
+        "time": "16:14:48",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh600547",
+        "extra": {}
+      }
+    },
+    {
+      "name": "中金黄金",
+      "quote": {
+        "key": "sh600489",
+        "name": "中金黄金",
+        "price": 18.63,
+        "unit": "元/股",
+        "prev_close": 18.52,
+        "open": null,
+        "high": 19.53,
+        "low": 18.42,
+        "change": 0.11,
+        "change_pct": 0.59,
+        "time": "16:14:54",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh600489",
+        "extra": {}
+      }
+    },
+    {
+      "name": "紫金矿业",
+      "quote": {
+        "key": "sh601899",
+        "name": "紫金矿业",
+        "price": 27.45,
+        "unit": "元/股",
+        "prev_close": 26.84,
+        "open": null,
+        "high": 27.74,
+        "low": 26.68,
+        "change": 0.61,
+        "change_pct": 2.27,
+        "time": "16:14:55",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh601899",
+        "extra": {}
+      }
+    },
+    {
+      "name": "湖南黄金",
+      "quote": {
+        "key": "sz002155",
+        "name": "湖南黄金",
+        "price": 17.56,
+        "unit": "元/股",
+        "prev_close": 17.77,
+        "open": null,
+        "high": 18.25,
+        "low": 17.4,
+        "change": -0.21,
+        "change_pct": -1.18,
+        "time": "16:14:51",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sz002155",
+        "extra": {}
+      }
+    },
+    {
+      "name": "赤峰黄金",
+      "quote": {
+        "key": "sh600988",
+        "name": "赤峰黄金",
+        "price": 31.4,
+        "unit": "元/股",
+        "prev_close": 31.04,
+        "open": null,
+        "high": 33.1,
+        "low": 31.22,
+        "change": 0.36,
+        "change_pct": 1.16,
+        "time": "16:14:44",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh600988",
+        "extra": {}
+      }
+    },
+    {
+      "name": "西部黄金",
+      "quote": {
+        "key": "sh601069",
+        "name": "西部黄金",
+        "price": 21.29,
+        "unit": "元/股",
+        "prev_close": 21.3,
+        "open": null,
+        "high": 22.26,
+        "low": 21.12,
+        "change": -0.01,
+        "change_pct": -0.05,
+        "time": "16:14:53",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh601069",
+        "extra": {}
+      }
+    },
+    {
+      "name": "四川黄金",
+      "quote": {
+        "key": "sz001337",
+        "name": "四川黄金",
+        "price": 33.8,
+        "unit": "元/股",
+        "prev_close": 34.57,
+        "open": null,
+        "high": 35.62,
+        "low": 33.64,
+        "change": -0.77,
+        "change_pct": -2.23,
+        "time": "16:14:30",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sz001337",
+        "extra": {}
+      }
+    },
+    {
+      "name": "山金国际",
+      "quote": {
+        "key": "sz000975",
+        "name": "山金国际",
+        "price": 20.98,
+        "unit": "元/股",
+        "prev_close": 20.26,
+        "open": null,
+        "high": 21.86,
+        "low": 20.55,
+        "change": 0.72,
+        "change_pct": 3.55,
+        "time": "16:14:45",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sz000975",
+        "extra": {}
+      }
+    },
+    {
+      "name": "豫光金铅",
+      "quote": {
+        "key": "sz002237",
+        "name": "恒邦股份",
+        "price": 10.97,
+        "unit": "元/股",
+        "prev_close": 10.92,
+        "open": null,
+        "high": 11.22,
+        "low": 10.93,
+        "change": 0.05,
+        "change_pct": 0.46,
+        "time": "16:14:30",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sz002237",
+        "extra": {}
+      }
+    },
+    {
+      "name": "老铺黄金",
+      "quote": {
+        "key": "hk06181",
+        "name": "老铺黄金",
+        "price": 274.0,
+        "unit": "港元/股",
+        "prev_close": 269.0,
+        "open": null,
+        "high": 280.6,
+        "low": 268.6,
+        "change": 5.0,
+        "change_pct": 1.86,
+        "time": "",
+        "date": "",
+        "source": "tencent",
+        "raw_code": "hk06181",
+        "extra": {}
+      }
+    },
+    {
+      "name": "周大福",
+      "quote": {
+        "key": "hk01929",
+        "name": "周大福",
+        "price": 11.58,
+        "unit": "港元/股",
+        "prev_close": 11.25,
+        "open": null,
+        "high": 11.66,
+        "low": 11.23,
+        "change": 0.33,
+        "change_pct": 2.93,
+        "time": "",
+        "date": "",
+        "source": "tencent",
+        "raw_code": "hk01929",
+        "extra": {}
+      }
+    },
+    {
+      "name": "招金矿业",
+      "quote": {
+        "key": "hk01818",
+        "name": "招金矿业",
+        "price": 15.29,
+        "unit": "港元/股",
+        "prev_close": 15.14,
+        "open": null,
+        "high": 15.73,
+        "low": 15.0,
+        "change": 0.15,
+        "change_pct": 0.99,
+        "time": "",
+        "date": "",
+        "source": "tencent",
+        "raw_code": "hk01818",
+        "extra": {}
+      }
+    },
+    {
+      "name": "中国黄金国际",
+      "quote": {
+        "key": "hk02899",
+        "name": "紫金矿业",
+        "price": 27.3,
+        "unit": "港元/股",
+        "prev_close": 27.24,
+        "open": null,
+        "high": 27.94,
+        "low": 27.14,
+        "change": 0.06,
+        "change_pct": 0.22,
+        "time": "",
+        "date": "",
+        "source": "tencent",
+        "raw_code": "hk02899",
+        "extra": {}
+      }
+    },
+    {
+      "name": "灵宝黄金",
+      "quote": {
+        "key": "hk03330",
+        "name": "灵宝黄金",
+        "price": 14.32,
+        "unit": "港元/股",
+        "prev_close": 14.34,
+        "open": null,
+        "high": 15.02,
+        "low": 13.98,
+        "change": -0.02,
+        "change_pct": -0.14,
+        "time": "",
+        "date": "",
+        "source": "tencent",
+        "raw_code": "hk03330",
+        "extra": {}
+      }
+    },
+    {
+      "name": "山东黄金(港股)",
+      "quote": {
+        "key": "hk01787",
+        "name": "山东黄金",
+        "price": 15.73,
+        "unit": "港元/股",
+        "prev_close": 15.56,
+        "open": null,
+        "high": 16.39,
+        "low": 15.55,
+        "change": 0.17,
+        "change_pct": 1.09,
+        "time": "",
+        "date": "",
+        "source": "tencent",
+        "raw_code": "hk01787",
+        "extra": {}
+      }
+    }
+  ],
+  "etfs": [
+    {
+      "name": "黄金ETF华安",
+      "quote": {
+        "key": "sh518880",
+        "name": "黄金ETF华安",
+        "price": 7.989,
+        "unit": "元/股",
+        "prev_close": 7.941,
+        "open": null,
+        "high": 8.07,
+        "low": 7.988,
+        "change": 0.048,
+        "change_pct": 0.6,
+        "time": "16:14:54",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh518880",
+        "extra": {}
+      }
+    },
+    {
+      "name": "黄金ETF易方达",
+      "quote": {
+        "key": "sz159934",
+        "name": "黄金ETF易方达",
+        "price": 8.343,
+        "unit": "元/股",
+        "prev_close": 8.296,
+        "open": null,
+        "high": 8.428,
+        "low": 8.343,
+        "change": 0.047,
+        "change_pct": 0.57,
+        "time": "16:14:45",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sz159934",
+        "extra": {}
+      }
+    },
+    {
+      "name": "黄金股ETF",
+      "quote": {
+        "key": "sh517520",
+        "name": "黄金股ETF永赢",
+        "price": 1.557,
+        "unit": "元/股",
+        "prev_close": 1.552,
+        "open": null,
+        "high": 1.613,
+        "low": 1.55,
+        "change": 0.005,
+        "change_pct": 0.32,
+        "time": "16:14:47",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sh517520",
+        "extra": {}
+      }
+    },
+    {
+      "name": "白银LOF",
+      "quote": {
+        "key": "sz161226",
+        "name": "国投白银LOF",
+        "price": 1.415,
+        "unit": "元/股",
+        "prev_close": 1.441,
+        "open": null,
+        "high": 1.45,
+        "low": 1.411,
+        "change": -0.026,
+        "change_pct": -1.8,
+        "time": "16:14:57",
+        "date": "2026-11-03",
+        "source": "tencent",
+        "raw_code": "sz161226",
+        "extra": {}
+      }
+    }
+  ],
+  "analyses": [
+    {
+      "key": "au_cn",
+      "name": "国内黄金 Au99.99",
+      "kind": "metal_gold",
+      "price": 846.99,
+      "unit": "元/克",
+      "score": 64.2,
+      "rating": "可小仓位试买",
+      "components": {
+        "valuation": 99.2,
+        "rsi": 83.9,
+        "trend": 25.0,
+        "volatility": 84.5,
+        "momentum": 31.0,
+        "ratio": 3.6
+      },
+      "metrics": {
+        "last": 846.99,
+        "ma20": 881.808,
+        "ma60": 927.7487,
+        "rsi": 28.0552,
+        "pct_rank": 0.7937,
+        "vol20": 1.0786,
+        "vol_rank": 15.4762,
+        "chg20": -6.3397,
+        "high252": 1249.12,
+        "low252": 836.76,
+        "q20": 907.02,
+        "q80": 1041.32,
+        "drawdown": -32.6086,
+        "samples": 252,
+        "change_pct": 0.8309,
+        "ratio": 79.0287,
+        "ratio_rank": 96.4286
+      },
+      "signals": [
+        "价格处于近一年低位（分位 1%）",
+        "RSI 超卖（28.1）",
+        "价格位于 MA20、MA60 下方，趋势偏弱",
+        "金银比 79.0，处于历史高位，黄金相对白银偏贵"
+      ],
+      "advice": "买入方式（按费率从低到高）：①银行积存金/纸黄金（工行、中行、建行等，按克买，点差较低）；②黄金 ETF（518880、159934 等，场内按份买，费率低、紧跟金价）；③上金所 Au99.99（需开通贵金属账户）；④银行投资金条（如意、龙鼎、传世之宝），注意回购折价与工费。金饰溢价高，不适合投资。",
+      "timing": "MA20 881.81、MA60 927.75、近一年 20% 分位 907.02、80% 分位 1,041.32（元/克）。可小仓位试买（不超过计划仓位 20%）。加仓需满足其中两项：评分升至 65 以上、价格重新站上 MA20、RSI 回升至 40 上方；若继续跌破近一年低点则暂停加仓。 RSI>70 或价格分位>85% 时不要追高。"
+    },
+    {
+      "key": "ag_cn",
+      "name": "国内白银 Ag(T+D)",
+      "kind": "metal_silver",
+      "price": 11847.0,
+      "unit": "元/千克",
+      "score": 74.3,
+      "rating": "适合分批买入",
+      "components": {
+        "valuation": 94.4,
+        "rsi": 96.0,
+        "trend": 25.0,
+        "volatility": 91.7,
+        "momentum": 0,
+        "ratio": 96.4
+      },
+      "metrics": {
+        "last": 11847.0,
+        "ma20": 13566.5,
+        "ma60": 15146.5167,
+        "rsi": 21.9786,
+        "pct_rank": 5.5556,
+        "vol20": 2.1703,
+        "vol_rank": 8.3333,
+        "chg20": -21.5046,
+        "high252": 30891.0,
+        "low252": 11049.0,
+        "q20": 13937.0,
+        "q80": 19570.0,
+        "drawdown": -62.2706,
+        "samples": 252,
+        "change_pct": 1.691,
+        "ratio": 79.0287,
+        "ratio_rank": 96.4286
+      },
+      "signals": [
+        "价格处于近一年低位（分位 6%）",
+        "RSI 超卖（22.0）",
+        "价格位于 MA20、MA60 下方，趋势偏弱",
+        "近 20 日跌幅 -21.5%，下跌动能较强",
+        "金银比 79.0，处于历史高位，白银相对黄金便宜"
+      ],
+      "advice": "买入方式：①银行纸白银（工行、中行、建行，门槛低）；②白银 T+D（带杠杆，新手不要碰）；③白银 LOF（161226，场外/场内均可）。白银波动约为黄金的 1.5-2 倍，仓位控制在黄金的一半以内，分批买入。",
+      "timing": "MA20 13,566、MA60 15,147、近一年 20% 分位 13,937、80% 分位 19,570（元/千克）。评分已进入分批区间，但价格仍在 MA20 下方：先建计划仓位的 20%-30% 试仓，等重新站上 MA20 后再补 30%，剩余仓位等 RSI 回升至 50 上方确认趋势。 RSI>70 或价格分位>85% 时不要追高。"
+    },
+    {
+      "key": "au_intl",
+      "name": "国际黄金 COMEX",
+      "kind": "metal_gold",
+      "price": 3948.592,
+      "unit": "美元/盎司",
+      "score": 59.8,
+      "rating": "可小仓位试买",
+      "components": {
+        "valuation": 99.2,
+        "rsi": 71.4,
+        "trend": 25.0,
+        "volatility": 65.1,
+        "momentum": 32.4,
+        "ratio": 3.6
+      },
+      "metrics": {
+        "last": 3948.592,
+        "ma20": 4095.875,
+        "ma60": 4304.6617,
+        "rsi": 35.7208,
+        "pct_rank": 0.7937,
+        "vol20": 1.3924,
+        "vol_rank": 34.9206,
+        "chg20": -5.8721,
+        "high252": 5446.5,
+        "low252": 3884.4,
+        "q20": 4160.2,
+        "q80": 4758.2,
+        "drawdown": -27.5406,
+        "samples": 252,
+        "change_pct": -0.5292,
+        "ratio": 79.0287,
+        "ratio_rank": 96.4286,
+        "cny_per_gram": 846.9348,
+        "internal_spread_pct": -0.0065
+      },
+      "signals": [
+        "价格处于近一年低位（分位 1%）",
+        "价格位于 MA20、MA60 下方，趋势偏弱",
+        "金银比 79.0，处于历史高位，黄金相对白银偏贵"
+      ],
+      "advice": "买入方式（按费率从低到高）：①银行积存金/纸黄金（工行、中行、建行等，按克买，点差较低）；②黄金 ETF（518880、159934 等，场内按份买，费率低、紧跟金价）；③上金所 Au99.99（需开通贵金属账户）；④银行投资金条（如意、龙鼎、传世之宝），注意回购折价与工费。金饰溢价高，不适合投资。",
+      "timing": "MA20 4,095.88、MA60 4,304.66、近一年 20% 分位 4,160.20、80% 分位 4,758.20（美元/盎司）。可小仓位试买（不超过计划仓位 20%）。加仓需满足其中两项：评分升至 65 以上、价格重新站上 MA20、RSI 回升至 40 上方；若继续跌破近一年低点则暂停加仓。 RSI>70 或价格分位>85% 时不要追高。"
+    },
+    {
+      "key": "ag_intl",
+      "name": "国际白银 COMEX",
+      "kind": "metal_silver",
+      "price": 49.964,
+      "unit": "美元/盎司",
+      "score": 69.3,
+      "rating": "适合分批买入",
+      "components": {
+        "valuation": 99.2,
+        "rsi": 81.6,
+        "trend": 25.0,
+        "volatility": 55.2,
+        "momentum": 0,
+        "ratio": 96.4
+      },
+      "metrics": {
+        "last": 49.964,
+        "ma20": 55.8832,
+        "ma60": 62.2766,
+        "rsi": 29.1826,
+        "pct_rank": 0.7937,
+        "vol20": 2.7949,
+        "vol_rank": 44.8413,
+        "chg20": -19.0048,
+        "high252": 116.55,
+        "low252": 49.13,
+        "q20": 59.035,
+        "q80": 79.0,
+        "drawdown": -57.1257,
+        "samples": 252,
+        "change_pct": -1.8158,
+        "ratio": 79.0287,
+        "ratio_rank": 96.4286,
+        "cny_per_gram": 10.7168,
+        "internal_spread_pct": -9.54
+      },
+      "signals": [
+        "价格处于近一年低位（分位 1%）",
+        "RSI 超卖（29.2）",
+        "价格位于 MA20、MA60 下方，趋势偏弱",
+        "近 20 日跌幅 -19.0%，下跌动能较强",
+        "金银比 79.0，处于历史高位，白银相对黄金便宜"
+      ],
+      "advice": "买入方式：①银行纸白银（工行、中行、建行，门槛低）；②白银 T+D（带杠杆，新手不要碰）；③白银 LOF（161226，场外/场内均可）。白银波动约为黄金的 1.5-2 倍，仓位控制在黄金的一半以内，分批买入。",
+      "timing": "MA20 55.883、MA60 62.277、近一年 20% 分位 59.035、80% 分位 79.000（美元/盎司）。评分已进入分批区间，但价格仍在 MA20 下方：先建计划仓位的 20%-30% 试仓，等重新站上 MA20 后再补 30%，剩余仓位等 RSI 回升至 50 上方确认趋势。 RSI>70 或价格分位>85% 时不要追高。"
+    },
+    {
+      "key": "stock_sd",
+      "name": "山东黄金(600547)",
+      "kind": "equity",
+      "price": 23.19,
+      "unit": "元/股",
+      "score": 65.3,
+      "rating": "适合分批买入",
+      "components": {
+        "valuation": 98.4,
+        "rsi": 82.5,
+        "trend": 25.0,
+        "volatility": 82.9,
+        "momentum": 12.6
+      },
+      "metrics": {
+        "last": 23.19,
+        "ma20": 25.674,
+        "ma60": 30.6035,
+        "rsi": 28.7358,
+        "pct_rank": 1.5873,
+        "vol20": 2.4659,
+        "vol_rank": 17.0635,
+        "chg20": -12.4575,
+        "high252": 60.61,
+        "low252": 22.81,
+        "q20": 27.29,
+        "q80": 40.69,
+        "drawdown": -61.739,
+        "samples": 252,
+        "change_pct": 1.67,
+        "ratio": null,
+        "ratio_rank": null
+      },
+      "signals": [
+        "价格处于近一年低位（分位 2%）",
+        "RSI 超卖（28.7）",
+        "价格位于 MA20、MA60 下方，趋势偏弱",
+        "近 20 日跌幅 -12.5%，下跌动能较强"
+      ],
+      "advice": "买入方式：股票账户直接买入，优选矿端成本低、产量稳定的龙头；单只不超过总仓位 10%，分 3 次建仓。黄金股弹性大，但会受大盘、成本、汇率影响，等金价企稳后再买更稳。",
+      "timing": "关键价位：MA20 25.674、MA60 30.604、近一年 20% 分位 27.290、80% 分位 40.690（元/股）。评分已达分批区间，但价格仍在 MA20 下方：可先建 1/3 试仓，等重新站上 MA20 后再补；跌破近一年低点则减仓。"
+    },
+    {
+      "key": "etf_gold",
+      "name": "黄金ETF华安(518880)",
+      "kind": "fund",
+      "price": 7.989,
+      "unit": "元/份",
+      "score": 69.0,
+      "rating": "适合分批买入",
+      "components": {
+        "valuation": 99.2,
+        "rsi": 83.7,
+        "trend": 25.0,
+        "volatility": 85.7,
+        "momentum": 31.3
+      },
+      "metrics": {
+        "last": 7.989,
+        "ma20": 8.3632,
+        "ma60": 8.7996,
+        "rsi": 28.1391,
+        "pct_rank": 0.7937,
+        "vol20": 1.0641,
+        "vol_rank": 14.2857,
+        "chg20": -6.2214,
+        "high252": 11.904,
+        "low252": 7.941,
+        "q20": 8.599,
+        "q80": 9.908,
+        "drawdown": -32.8881,
+        "samples": 252,
+        "change_pct": 0.6,
+        "ratio": null,
+        "ratio_rank": null
+      },
+      "signals": [
+        "价格处于近一年低位（分位 1%）",
+        "RSI 超卖（28.1）",
+        "价格位于 MA20、MA60 下方，趋势偏弱"
+      ],
+      "advice": "买入方式：场内按份买入黄金 ETF，费率低、跟踪误差小；避免在溢价明显时买入，可分批定投。",
+      "timing": "关键价位：MA20 8.3632、MA60 8.7996、近一年 20% 分位 8.5990、80% 分位 9.9080（元/份）。评分已达分批区间，但价格仍在 MA20 下方：可先建 1/3 试仓，等重新站上 MA20 后再补；跌破近一年低点则减仓。"
+    }
+  ],
+  "jewelry_analyses": [
+    {
+      "key": "jewelry_周大福",
+      "name": "周大福 金饰",
+      "kind": "jewelry",
+      "price": 1185.0,
+      "unit": "元/克",
+      "score": 30.3,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 7.7,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1185.0,
+        "base_price": 846.99,
+        "premium_pct": 39.9072,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.9%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,185.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.9%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_老凤祥",
+      "name": "老凤祥 金饰",
+      "kind": "jewelry",
+      "price": 1183.0,
+      "unit": "元/克",
+      "score": 30.7,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 8.3,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1183.0,
+        "base_price": 846.99,
+        "premium_pct": 39.6711,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.7%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,183.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.7%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_周六福",
+      "name": "周六福 金饰",
+      "kind": "jewelry",
+      "price": 1180.0,
+      "unit": "元/克",
+      "score": 31.2,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 9.2,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1180.0,
+        "base_price": 846.99,
+        "premium_pct": 39.3169,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.3%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,180.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.3%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_周生生",
+      "name": "周生生 金饰",
+      "kind": "jewelry",
+      "price": 1184.0,
+      "unit": "元/克",
+      "score": 30.5,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 8.0,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1184.0,
+        "base_price": 846.99,
+        "premium_pct": 39.7891,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.8%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,184.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.8%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_六福珠宝",
+      "name": "六福珠宝 金饰",
+      "kind": "jewelry",
+      "price": 1183.0,
+      "unit": "元/克",
+      "score": 30.7,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 8.3,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1183.0,
+        "base_price": 846.99,
+        "premium_pct": 39.6711,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.7%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,183.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.7%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_老庙黄金",
+      "name": "老庙黄金 金饰",
+      "kind": "jewelry",
+      "price": 1182.0,
+      "unit": "元/克",
+      "score": 30.8,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 8.6,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1182.0,
+        "base_price": 846.99,
+        "premium_pct": 39.553,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.6%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,182.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.6%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_菜百首饰",
+      "name": "菜百首饰 金饰",
+      "kind": "jewelry",
+      "price": 1172.0,
+      "unit": "元/克",
+      "score": 32.6,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 11.6,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1172.0,
+        "base_price": 846.99,
+        "premium_pct": 38.3724,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 38.4%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,172.00 元/克，较 Au99.99 基准 846.99 元/克溢价 38.4%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    },
+    {
+      "key": "jewelry_金至尊",
+      "name": "金至尊 金饰",
+      "kind": "jewelry",
+      "price": 1183.0,
+      "unit": "元/克",
+      "score": 30.7,
+      "rating": "不建议现在买",
+      "components": {
+        "premium": 8.3,
+        "valuation": 64.2
+      },
+      "metrics": {
+        "last": 1183.0,
+        "base_price": 846.99,
+        "premium_pct": 39.6711,
+        "recycle_price": 839.0,
+        "gold_score": 64.184,
+        "gold_pct_rank": 0.7937,
+        "gold_rsi": 28.0552,
+        "change_pct": 0.0
+      },
+      "signals": [
+        "品牌溢价 39.7%，远高于基准金价",
+        "金价处于近一年低位（分位 1%）",
+        "金价 RSI 超卖，可关注刚需入手机会"
+      ],
+      "advice": "金饰是消费品，不是投资品。刚需购买优先选按克计价、工费低、有促销的门店；投资请选金条、积存金或黄金 ETF，回收时按原料金价折价，品牌溢价无法收回。",
+      "timing": "品牌金价 1,183.00 元/克，较 Au99.99 基准 846.99 元/克溢价 39.7%；今日黄金回收价约 839.00 元/克。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
+    }
+  ],
+  "summary": {
+    "best_asset_key": "ag_cn",
+    "best_asset_name": "国内白银 Ag(T+D)",
+    "best_asset_score": 74.3,
+    "best_asset_rating": "适合分批买入"
+  },
+  "errors": [],
+  "slot_label": "手动"
+}
