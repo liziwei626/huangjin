@@ -57,8 +57,19 @@ def _wxpusher(
     )
     response.raise_for_status()
     data = response.json()
-    ok = data.get("code") == 1000
-    return ok, str(data.get("msg") or data.get("code"))
+    if data.get("code") != 1000:
+        return False, str(data.get("msg") or data.get("code"))
+    items = data.get("data") or []
+    failures = [item for item in items if item.get("code") != 1000]
+    if failures:
+        details = "；".join(
+            f"{item.get('uid') or item.get('topicId')}: {item.get('status') or item.get('code')}"
+            for item in failures
+        )
+        return False, f"部分失败（成功 {len(items) - len(failures)}，失败 {len(failures)}）：{details[:300]}"
+    if items:
+        return True, f"处理成功（{len(items)} 个接收目标）"
+    return True, str(data.get("msg") or "处理成功")
 
 
 def _wecom(webhook: str, content: str) -> tuple[bool, str]:
