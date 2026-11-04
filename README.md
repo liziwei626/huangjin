@@ -44,6 +44,19 @@ python -m gold_monitor test-push
 
 四种渠道都提供免费额度（具体配额以官方为准），可同时配置多个，互相备份。
 
+### 当前方案：PushPlus + WxPusher
+
+代码与工作流已同时支持这两个渠道，无需改代码，只在 GitHub 仓库添加 Secrets：
+
+| Secret | 必填 | 说明 |
+| --- | --- | --- |
+| `PUSHPLUS_TOKENS` | 使用 PushPlus 时必填 | 多个用户 token 用英文逗号分隔 |
+| `WXPUSHER_APP_TOKEN` | 使用 WxPusher 时必填 | WxPusher 应用的 appToken |
+| `WXPUSHER_UIDS` | 与 Topic 至少填一项 | 多个接收人 UID，逗号分隔 |
+| `WXPUSHER_TOPIC_IDS` | 可选 | 推送到主题时填写 |
+
+> 只配置 `PUSHPLUS_TOKENS` 即可先跑通 PushPlus；WxPusher 必须同时有 `WXPUSHER_APP_TOKEN` 和 `WXPUSHER_UIDS`（或 `WXPUSHER_TOPIC_IDS`）。
+
 ### 方式一：PushPlus（推荐，一人一个 token）
 
 1. 微信扫码登录 <https://www.pushplus.plus/>，在“发送消息”页面复制 token。
@@ -95,6 +108,14 @@ python -m gold_monitor run --slot evening
 也可以直接写在 `config/config.yaml` 的 `notify.channels` 中，但**不要把真实 token 提交到公开仓库**。
 
 ## GitHub Actions 自动运行（零成本）
+
+本仓库配置入口：
+
+- Secrets：<https://github.com/liziwei626/huangjin/settings/secrets/actions>
+- Actions 权限：<https://github.com/liziwei626/huangjin/settings/actions>
+- 工作流运行/测试：<https://github.com/liziwei626/huangjin/actions/workflows/monitor.yml>
+
+> 定时任务只读取默认分支 `main` 上的工作流。如果代码还在功能分支，请先合并到 `main`，再添加 Secrets。
 
 1. Fork 或 clone 本仓库到自己的 GitHub 账号。
 2. 进入 **Settings → Actions → General → Workflow permissions**，选择 **Read and write permissions**（工作流需要提交数据文件）。

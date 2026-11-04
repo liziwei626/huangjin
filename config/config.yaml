@@ -137,6 +137,8 @@ notify:
     noon: signal
     close: always
     evening: always
+  # 当前方案：PushPlus + WxPusher，token 通过环境变量 / GitHub Secrets 注入
+  # 环境变量：PUSHPLUS_TOKENS、WXPUSHER_APP_TOKEN、WXPUSHER_UIDS、WXPUSHER_TOPIC_IDS
   # 也可以在 config 中直接填写（不建议提交到公开仓库，推荐使用环境变量）
   channels:
     pushplus: []
