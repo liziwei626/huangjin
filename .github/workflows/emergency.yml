@@ -1,0 +1,53 @@
+name: 金价紧急提醒
+
+on:
+  schedule:
+    # UTC 0-16 点，对应北京时间 08:00-24:00，每 30 分钟检查一次
+    - cron: "*/30 0-16 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gold-emergency
+  cancel-in-progress: false
+
+jobs:
+  emergency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 检查并推送紧急提醒
+        env:
+          PUSHPLUS_TOKENS: ${{ secrets.PUSHPLUS_TOKENS }}
+          SERVERCHAN_KEYS: ${{ secrets.SERVERCHAN_KEYS }}
+          WXPUSHER_APP_TOKEN: ${{ secrets.WXPUSHER_APP_TOKEN }}
+          WXPUSHER_UIDS: ${{ secrets.WXPUSHER_UIDS }}
+          WXPUSHER_TOPIC_IDS: ${{ secrets.WXPUSHER_TOPIC_IDS }}
+          WECOM_WEBHOOKS: ${{ secrets.WECOM_WEBHOOKS }}
+        run: python -m gold_monitor check-emergency
+
+      - name: 提交紧急状态
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/state.json
+          if git diff --staged --quiet; then
+            echo "紧急状态无变化，跳过提交"
+          else
+            git commit -m "chore: 更新金价紧急状态 [skip ci]"
+            git push
+          fi

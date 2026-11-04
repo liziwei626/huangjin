@@ -11,7 +11,7 @@ from .analysis import (
 )
 from .config import DATA_DIR
 from .models import Quote
-from .sources import jijinhao, sina, tencent
+from .sources import cngold, jijinhao, sina, tencent
 from .storage import latest_price_from_history
 from .util import now_cst, pct_change, percentile_rank
 
@@ -150,6 +150,13 @@ def collect(config: dict[str, Any], slot: str = "manual") -> dict[str, Any]:
     if tencent_codes and not quotes_tencent:
         errors.append("腾讯行情返回空数据")
 
+    # 金店品牌：优先使用今日金价网的 14 家主流品牌报价
+    quotes_cngold: dict[str, Quote] = {}
+    try:
+        quotes_cngold = cngold.fetch_brands(timeout=timeout, retries=retries)
+    except Exception as exc:  # noqa: BLE001
+        _error(errors, "今日金价网品牌报价", exc)
+
     histories: dict[str, list[dict[str, Any]]] = {}
     for asset in assets:
         try:
@@ -225,8 +232,21 @@ def collect(config: dict[str, Any], slot: str = "manual") -> dict[str, Any]:
     brand_rows = []
     brand_prices = []
     for brand in config.get("brands", []):
-        gold_quote = quotes_jj.get(brand.get("gold", ""))
+        if isinstance(brand, str):
+            brand = {"name": brand}
+        brand_name = brand.get("name", "")
+        gold_quote = quotes_cngold.get(brand_name)
+        if gold_quote is None:
+            gold_quote = quotes_jj.get(brand.get("gold", ""))
         platinum_quote = quotes_jj.get(brand.get("platinum", ""))
+        if gold_quote and gold_quote.extra.get("platinum"):
+            platinum_quote = Quote(
+                key=f"platinum_{brand_name}",
+                name=f"{brand_name} 铂金",
+                price=float(gold_quote.extra["platinum"]),
+                unit="元/克",
+                source="cngolddaily",
+            )
         premium_pct = (
             _spread_pct(gold_quote.price, au_base.price if au_base else None)
             if gold_quote
@@ -276,6 +296,8 @@ def collect(config: dict[str, Any], slot: str = "manual") -> dict[str, Any]:
                 "gold": gold_quote.to_dict() if gold_quote else None,
                 "platinum": platinum_quote.to_dict() if platinum_quote else None,
                 "premium_pct": round(row["premium_pct"], 2) if row["premium_pct"] is not None else None,
+                "labor_fee": gold_quote.extra.get("labor_fee") if gold_quote else None,
+                "gold_bar": gold_quote.extra.get("gold_bar") if gold_quote else None,
                 "score": round(jewelry.score, 1) if jewelry else None,
                 "rating": jewelry.rating if jewelry else "数据缺失",
             }

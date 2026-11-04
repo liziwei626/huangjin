@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from .analysis import COMPONENT_LABELS
 
-DISCLAIMER = "以上数据来自公开行情接口，可能存在延迟或误差；评分仅为量化参考，不构成投资建议，据此操作风险自负。"
+DISCLAIMER = "以上数据来自公开行情接口，可能存在延迟或误差，仅供参考，不构成投资建议。"
 
 
 def _num(value: Optional[float], digits: Optional[int] = None) -> str:
@@ -195,22 +195,22 @@ def _brands_table(snapshot: dict[str, Any]) -> list[str]:
         default=None,
     )
     lines = [
-        "| 品牌 | 黄金(元/克) | 涨跌幅 | 铂金(元/克) | 较基准溢价 | 比最低价 | 入手指数 | 建议 |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| 品牌 | 黄金(元/克) | 涨跌 | 工费(元/克) | 比最低 |",
+        "| --- | --- | --- | --- | --- |",
     ]
-    for item in snapshot.get("brands", []):
+    brands = sorted(
+        snapshot.get("brands", []),
+        key=lambda item: (item.get("gold") or {}).get("price") or float("inf"),
+    )
+    for item in brands:
         gold = item.get("gold")
-        platinum = item.get("platinum")
-        spread = item.get("premium_pct")
-        spread_text = f"{spread:+.1f}%" if spread is not None else "—"
-        score = f"{item['score']:.1f}" if item.get("score") is not None else "—"
         gap = "—"
         if gold and gold.get("price") is not None and min_price is not None:
             diff = gold["price"] - min_price
-            gap = "最低" if diff <= 0.01 else f"+{diff:.1f}"
+            gap = "最低" if diff <= 0.01 else f"+{diff:.0f}"
         lines.append(
             f"| {item['name']} | {_quote_price(gold)} | {_quote_change(gold)} | "
-            f"{_quote_price(platinum)} | {spread_text} | {gap} | {score} | {item.get('rating', '—')} |"
+            f"{item.get('labor_fee') or '—'} | {gap} |"
         )
     return lines
 
@@ -279,90 +279,79 @@ def _analysis_block(
 
 
 def render_markdown(snapshot: dict[str, Any], config: dict[str, Any]) -> str:
-    weights = config.get("analysis", {}).get("weights", {})
-    analyses = _analysis_by_key(snapshot)
     slot_text = snapshot.get("slot_label") or snapshot.get("slot", "")
     lines: list[str] = []
-    lines.append(f"# 黄金白银价格与买入时机日报（{slot_text}）")
+    lines.append(f"# 黄金白银价格日报（{slot_text}）")
     lines.append("")
     lines.append(
         f"> 更新时间：{snapshot.get('generated_at_display')}（北京时间） · "
-        f"数据源：新浪财经 / 金投网 / 腾讯证券"
+        f"数据源：新浪财经 / 今日金价网 / 金投网 / 腾讯证券"
     )
     if snapshot.get("errors"):
         lines.append(f"> ⚠️ 部分数据抓取失败：{'；'.join(snapshot['errors'])}")
     lines.append("")
-    lines.append("## 一、行情速览")
+    lines.append("## 一、黄金白银价格")
     lines.append("")
     lines.extend(_price_table(snapshot))
     lines.append("")
-    lines.append("## 二、结论与买点")
-    lines.append("")
-    lines.extend(_conclusion(snapshot, analyses))
-    lines.append("")
-    lines.append("## 三、金店饰品价格")
+    lines.append("## 二、金店黄金价（14 家主流品牌）")
     lines.append("")
     lines.extend(_brands_table(snapshot))
     lines.append("")
-    lines.append("> 品牌银饰通常按件计价并另收工费，无统一克价，白银价格请参考上金所、银行纸白银与国际白银。")
+    brands = [
+        item
+        for item in snapshot.get("brands", [])
+        if item.get("gold") and item["gold"].get("price")
+    ]
+    if brands:
+        cheapest = min(brands, key=lambda item: item["gold"]["price"])
+        highest = max(brands, key=lambda item: item["gold"]["price"])
+        top_price = highest["gold"]["price"]
+        top_count = sum(
+            1
+            for item in brands
+            if abs(item["gold"]["price"] - top_price) <= 0.01
+        )
+        highest_text = (
+            f"{_quote_price(highest['gold'])} 元/克（{top_count} 家）"
+            if top_count > 1
+            else f"{highest['name']} {_quote_price(highest['gold'])} 元/克"
+        )
+        lines.append(
+            f"> 最低：**{cheapest['name']} {_quote_price(cheapest['gold'])} 元/克**；"
+            f"最高：**{highest_text}**；"
+            f"均价 {_num(snapshot.get('brand_gold_avg'))} 元/克，"
+            f"较 Au99.99 溢价 {_plain_pct(snapshot.get('brand_premium_pct'))}。"
+        )
     lines.append("")
-    lines.append("## 四、银行纸贵金属")
+    lines.append("> 品牌银饰通常按件计价并另收工费，无统一克价；银价参考上金所白银 T+D、银行纸白银与国际白银。")
+    lines.append("")
+    lines.append("## 三、银行纸贵金属")
     lines.append("")
     lines.extend(_banks_table(snapshot))
     lines.append("")
-    lines.append("## 五、投资金条与回收")
+    lines.append("## 四、投资金条与回收")
     lines.append("")
     lines.extend(_bars_table(snapshot))
     lines.append("")
-    lines.append("## 六、黄金/白银/珠宝股票与 ETF")
+    lines.append("## 五、黄金/白银/珠宝股票与 ETF")
     lines.append("")
     lines.extend(_stocks_table(snapshot))
     lines.append("")
-    lines.append("## 七、买入时机评分（核心标的）")
-    lines.append("")
-    for key in ("au_cn", "ag_cn", "au_intl", "ag_intl", "stock_sd", "etf_gold"):
-        analysis = analyses.get(key)
-        if analysis:
-            lines.extend(_analysis_block(analysis, weights))
-    jewelry = snapshot.get("jewelry_analyses") or []
-    if jewelry:
-        lines.append("## 八、实体金饰入手建议（按今日报价排序）")
-        lines.append("")
-        gold_rank = (analyses.get("au_cn") or {}).get("metrics", {}).get("pct_rank")
-        if gold_rank is not None:
-            position = "低位" if gold_rank <= 25 else ("中位" if gold_rank <= 60 else "高位")
-            lines.append(
-                f"> 今日金价处于近一年 {gold_rank:.0f}% 分位（{position}），"
-                f"品牌均价较基准溢价 {_plain_pct(snapshot.get('brand_premium_pct'))}。"
-            )
-            lines.append("")
-        for item in sorted(jewelry, key=lambda x: x.get("price") or float("inf")):
-            lines.append(
-                f"- **{item['name']}**：入手指数 {item['score']:.1f}（{item['rating']}）；"
-                f"{item.get('timing', '')}"
-            )
-        lines.append("")
-        lines.append(
-            "> 买金饰只选按克计价，不买一口价/按件计价；工费尽量谈到 20-40 元/克；"
-            "同城比价选最低价门店，关注双11、店庆、春节前的克减和工费减免。"
-        )
-        lines.append("")
-    lines.append("## 九、操作纪律")
+    lines.append("## 六、购买提示")
     lines.append("")
     lines.append(
-        "- 分批而不是一次满仓：把计划资金分成 3-5 份，首次最多 30%，越跌越买要设总仓位上限。\n"
-        "- 不追高：RSI > 70 或价格处于近一年 80% 分位以上时暂停买入。\n"
-        "- 不梭哈金饰：金饰溢价通常 20%-40%，回收按原料价折价，品牌溢价无法收回。\n"
-        "- 设止损/止盈：短线跌破买入价 8%-10% 或金价趋势破位时减仓；长期配置可按季度再平衡。\n"
-        "- 关注信号：美联储利率决议、美元指数、实际利率、央行购金、地缘风险。"
+        "- 金饰只买按克计价，不买一口价/按件计价；工费尽量谈到 20-40 元/克。\n"
+        "- 同城比价，优先当日最低价品牌；关注双11、店庆、春节前的克减和工费减免。\n"
+        "- 金饰回收按原料价折价，品牌溢价不保值；刚需可买，不必囤货。"
     )
     lines.append("")
     lines.append("## 数据说明")
     lines.append("")
     lines.append(
         "- 国内基准：上海黄金交易所 Au99.99、Ag(T+D)；国际：COMEX 黄金/白银、伦敦金/银。\n"
-        "- 金店价格为品牌饰品挂牌价，含工费与品牌溢价；银行价格多为纸贵金属买卖报价。\n"
-        "- 评分由价格分位、RSI、均线趋势、金银比、波动率、20 日动能加权得出，仅用于横向比较。"
+        "- 金店价格为品牌饰品挂牌价，工费另计；银行价格多为纸贵金属买卖报价。\n"
+        "- 金价低于 600 元/克时触发紧急通知；数据仅供参考，不构成投资建议。"
     )
     lines.append("")
     lines.append(f"> {DISCLAIMER}")
@@ -371,69 +360,76 @@ def render_markdown(snapshot: dict[str, Any], config: dict[str, Any]) -> str:
 
 
 def render_push(snapshot: dict[str, Any]) -> tuple[str, str]:
-    analyses = _analysis_by_key(snapshot)
     market = snapshot.get("market", {})
     sge = {item["name"]: item.get("quote") for item in market.get("sge", [])}
     au = sge.get("黄金9999(Au99.99)")
     ag = sge.get("白银T+D")
-    intl_gold = next(
-        (item.get("quote") for item in market.get("intl", []) if item["name"] == "COMEX 黄金"),
-        None,
-    )
+    intl = {item["name"]: item.get("quote") for item in market.get("intl", [])}
+    intl_gold = intl.get("COMEX 黄金")
+    intl_silver = intl.get("COMEX 白银")
     ratio = market.get("gold_silver_ratio") or {}
-    gold = analyses.get("au_cn")
-    silver = analyses.get("ag_cn")
+    banks = {item["name"]: item.get("quote") for item in snapshot.get("banks", [])}
+    stocks = {item["name"]: item.get("quote") for item in snapshot.get("stocks", [])}
     title = (
-        f"金银日报 {snapshot.get('date', '')} "
+        f"金银价格 {snapshot.get('date', '')} "
         f"金 {_num(au.get('price') if au else None)} "
         f"银 {_num(ag.get('price') if ag else None)}"
     )
     slot_text = snapshot.get("slot_label") or snapshot.get("slot", "")
     lines = [
-        f"## 黄金白银提醒（{snapshot.get('date', '')} {slot_text}）",
+        f"## 黄金白银价格（{snapshot.get('date', '')} {slot_text}）",
         "",
-        f"- 国内黄金 Au99.99：**{_quote_price(au)} 元/克**（{_quote_change(au)}）",
-        f"- 白银 T+D：**{_quote_price(ag)} 元/千克**（{_quote_change(ag)}）",
-        f"- COMEX 黄金：{_quote_price(intl_gold)} 美元/盎司（{_quote_change(intl_gold)}）",
-        f"- 金银比：{ratio.get('value', '—')}"
-        + (f"（历史分位 {ratio['rank']:.0f}%）" if ratio.get("rank") is not None else ""),
-        "",
-        "### 买点评分",
+        f"**黄金** Au99.99 **{_quote_price(au)} 元/克**（{_quote_change(au)}）"
+        f"｜COMEX {_quote_price(intl_gold)} 美元/盎司（{_quote_change(intl_gold)}）",
+        f"**白银** Ag(T+D) **{_quote_price(ag)} 元/千克**（{_quote_change(ag)}）"
+        f"｜COMEX {_quote_price(intl_silver)} 美元/盎司（{_quote_change(intl_silver)}）",
+        f"金银比 **{ratio.get('value', '—')}**"
+        + (f"（近一年 {ratio['rank']:.0f}% 分位）" if ratio.get("rank") is not None else ""),
+        f"银行：工行纸黄金 {_quote_price(banks.get('工行纸黄金(人民币)'))} 元/克"
+        f"｜纸白银 {_quote_price(banks.get('工行纸白银(人民币)'))} 元/克",
     ]
-    for label, item in (("黄金", gold), ("白银", silver)):
-        if item:
-            lines.append(f"- {label}：**{item['score']:.1f} 分**，{item['rating']}")
-            if item.get("signals"):
-                lines.append(f"  - 信号：{'；'.join(item['signals'][:2])}")
-    if snapshot.get("brand_gold_avg"):
+    stock_parts = []
+    for name in ("山东黄金", "紫金矿业", "盛达资源", "周大福"):
+        quote = stocks.get(name)
+        if quote:
+            stock_parts.append(f"{name} {_quote_price(quote)}（{_quote_change(quote)}）")
+    if stock_parts:
+        lines.append("股票：" + "｜".join(stock_parts))
+    lines.append("")
+
+    brands = sorted(
+        [
+            item
+            for item in snapshot.get("brands", [])
+            if item.get("gold") and item["gold"].get("price")
+        ],
+        key=lambda item: item["gold"]["price"],
+    )
+    if brands:
+        lines.append("### 金店黄金价（元/克，从低到高）")
+        parts = []
+        cheapest = brands[0]["gold"]["price"]
+        for item in brands:
+            price = item["gold"]["price"]
+            label = f"{item['name']} {price:,.0f}"
+            if abs(price - cheapest) <= 0.01:
+                label += "（最低）"
+            parts.append(label)
+        for start in range(0, len(parts), 4):
+            lines.append("｜".join(parts[start : start + 4]))
+        avg = snapshot.get("brand_gold_avg")
+        premium = snapshot.get("brand_premium_pct")
+        if avg and premium is not None:
+            lines.append(
+                f"> 14 家均价 **{avg:,.0f} 元/克**，较 Au99.99 溢价 **{premium:.1f}%**；工费另计。"
+            )
+        lines.append("")
         lines.append(
-            f"- 金店均价：{_num(snapshot['brand_gold_avg'])} 元/克，"
-            f"较基准溢价 {_plain_pct(snapshot.get('brand_premium_pct'))}"
-        )
-    jewelry = snapshot.get("jewelry_analyses") or []
-    if jewelry:
-        cheapest = min(jewelry, key=lambda item: item.get("price") or float("inf"))
-        cheapest_name = cheapest["name"].replace(" 金饰", "")
-        rank = (gold or {}).get("metrics", {}).get("pct_rank")
-        if rank is not None and rank <= 25:
-            window = "金价低位，刚需可以入手"
-        elif rank is not None and rank <= 60:
-            window = "金价中位，刚需可买"
-        else:
-            window = "金价偏高，等回调或大促"
-        lines.append(
-            f"- 金饰最低：{cheapest_name} **{_num(cheapest.get('price'))} 元/克**（{window}）"
+            "> 只买按克计价，不买一口价；工费谈到 20-40 元/克，关注克减/工费减免。"
+            "银饰多按件计价，银价参考上金所与银行纸白银。"
         )
     lines.append("")
-    lines.append("### 操作提示")
-    if gold:
-        lines.append(f"- 黄金：{gold.get('timing', '')}")
-    if silver:
-        lines.append(f"- 白银：{silver.get('timing', '')}")
-    lines.append(
-        "- 金饰：优先最低价品牌，只买按克计价，工费谈到 20-40 元/克；"
-        "溢价高时不必囤货，关注克减/工费减免。"
-    )
+    lines.append("> 金价（Au99.99）低于 **600 元/克** 时触发紧急通知。")
     lines.append("")
     lines.append(f"> {DISCLAIMER}")
     return title[:100], "\n".join(lines)

@@ -7,16 +7,22 @@ http:
   timeout: 20
   retries: 3
 
-# 金店饰品（黄金 / 铂金 报价代码，来自金投网行情接口）
+# 金店饰品（主数据：今日金价网 14 家品牌；金投代码仅作备用）
 brands:
   - { name: 周大福, gold: JO_42660, platinum: JO_42661, stock: hk01929 }
-  - { name: 老凤祥, gold: JO_42657, platinum: JO_42658 }
+  - { name: 老凤祥, gold: JO_42657, platinum: JO_42658, stock: sh600612 }
   - { name: 周六福, gold: JO_42653, platinum: JO_42654 }
-  - { name: 周生生, gold: JO_42625, platinum: JO_42626 }
-  - { name: 六福珠宝, gold: JO_42646, platinum: JO_42647 }
-  - { name: 老庙黄金, gold: JO_42634, platinum: JO_42635 }
+  - { name: 周生生, gold: JO_42625, platinum: JO_42626, stock: hk00116 }
+  - { name: 六福珠宝, gold: JO_42646, platinum: JO_42647, stock: hk00590 }
+  - { name: 老庙黄金, gold: JO_42634, platinum: JO_42635, stock: sh600655 }
   - { name: 菜百首饰, gold: JO_42638, platinum: JO_42639 }
   - { name: 金至尊, gold: JO_42632, platinum: JO_42633 }
+  - { name: 中国黄金, stock: sh600916 }
+  - { name: 周大生, stock: sz002867 }
+  - { name: 潮宏基, stock: sz002345 }
+  - { name: 谢瑞麟 }
+  - { name: 金大福 }
+  - { name: 亚一金店 }
 
 # 上海黄金交易所
 sge:
@@ -145,6 +151,8 @@ analysis:
       history: { source: sina_stock, symbol: sh518880 }
 
 notify:
+  # 金价（Au99.99，元/克）低于该值时触发紧急推送，并只提醒一次，回升后自动复位
+  emergency_gold_below: 600
   # always = 每个时段都推送；signal = 仅在评分达到 buy 阈值或信号发生变化时推送
   slots:
     morning: always

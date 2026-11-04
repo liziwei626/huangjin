@@ -11,6 +11,7 @@ from .collector import build_history_row, collect
 from .config import DATA_DIR, has_push_channels, load_config
 from .notify import channel_count, describe_channels, send_all
 from .report import DISCLAIMER, render_markdown, render_push
+from .sources import sina
 from .storage import (
     append_history,
     load_state,
@@ -68,8 +69,10 @@ def _detect_changes(snapshot: dict[str, Any], state: dict[str, Any]) -> list[str
     return changes
 
 
-def _make_state(snapshot: dict[str, Any]) -> dict[str, Any]:
-    return {
+def _make_state(
+    snapshot: dict[str, Any], previous: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    state = {
         "updated_at": snapshot.get("generated_at"),
         "date": snapshot.get("date"),
         "slot": snapshot.get("slot"),
@@ -82,6 +85,11 @@ def _make_state(snapshot: dict[str, Any]) -> dict[str, Any]:
             for item in snapshot.get("analyses", [])
         },
     }
+    if previous:
+        for key in ("emergency_active", "emergency_gold_below", "emergency_updated_at"):
+            if key in previous:
+                state[key] = previous[key]
+    return state
 
 
 def _print_report(title: str, content: str) -> None:
@@ -150,7 +158,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     state = load_state(DATA_DIR)
     changes = _detect_changes(snapshot, state)
-    save_state(_make_state(snapshot), DATA_DIR)
+    save_state(_make_state(snapshot, state), DATA_DIR)
 
     title, push_content = render_push(snapshot)
     _print_report(title, render_markdown(snapshot, config))
@@ -204,6 +212,85 @@ def cmd_test_push(args: argparse.Namespace) -> int:
     return 0 if results and not failed else 1
 
 
+def _quote_change_text(quote: Any) -> str:
+    if quote is None or quote.price is None:
+        return "—"
+    pct = quote.change_pct
+    if pct is None and quote.prev_close and quote.prev_close > 0:
+        pct = (quote.price / quote.prev_close - 1) * 100
+    if pct is None:
+        return "—"
+    return f"{pct:+.2f}%"
+
+
+def cmd_check_emergency(args: argparse.Namespace) -> int:
+    """轻量检查 Au99.99，跌破阈值时只在“首次跌破”推送一次。"""
+    config = load_config(args.config)
+    threshold = float(config.get("notify", {}).get("emergency_gold_below", 600))
+    http_cfg = config.get("http", {})
+    symbols = ["gds_AU9999", "gds_AGTD", "hf_GC"]
+    fields = sina.fetch_hq(
+        symbols,
+        timeout=int(http_cfg.get("timeout", 20)),
+        retries=int(http_cfg.get("retries", 3)),
+    )
+    quotes = {
+        symbol: sina.build_quote(symbol, fields.get(symbol, []))
+        for symbol in symbols
+    }
+    gold = quotes["gds_AU9999"]
+    silver = quotes["gds_AGTD"]
+    if gold is None or gold.price is None:
+        print("[emergency] 未获取到 Au99.99 报价，跳过本次检查。")
+        return 1
+
+    price = gold.price
+    state = load_state(DATA_DIR)
+    active = bool(state.get("emergency_active"))
+    if price >= threshold:
+        if active:
+            state["emergency_active"] = False
+            state["emergency_updated_at"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+            save_state(state, DATA_DIR)
+            print(f"[emergency] 金价已回升至 {price:.2f}，紧急状态复位。")
+        else:
+            print(f"[emergency] 金价 {price:.2f} >= {threshold:.0f}，无需提醒。")
+        return 0
+
+    if active:
+        print(f"[emergency] 金价 {price:.2f} 仍低于 {threshold:.0f}，已提醒过，等待回升后再复位。")
+        return 0
+    if not has_push_channels(config):
+        print("[emergency] 金价已跌破阈值，但未配置推送渠道。")
+        return 0
+
+    title = f"【紧急】金价跌破 {threshold:.0f} 元/克"
+    silver_text = (
+        f"{silver.price:,.2f} 元/千克（{_quote_change_text(silver)}）"
+        if silver and silver.price is not None
+        else "—"
+    )
+    content = (
+        f"## 【紧急】金价跌破 {threshold:.0f} 元/克\n\n"
+        f"- Au99.99：**{price:,.2f} 元/克**（{_quote_change_text(gold)}）\n"
+        f"- 白银 T+D：**{silver_text}**\n"
+        f"- 时间：{now_cst().strftime('%Y-%m-%d %H:%M:%S')}（北京时间）\n\n"
+        f"> 请复核实时行情并谨慎操作。{DISCLAIMER}"
+    )
+    print(f"[emergency] 金价 {price:.2f} < {threshold:.0f}，发送紧急通知。")
+    results = send_all(config, title, content)
+    failed = [item for item in results if not item["ok"]]
+    if failed:
+        print(f"[emergency] 推送失败：{len(failed)}/{len(results)}")
+        return 1
+    state["emergency_active"] = True
+    state["emergency_gold_below"] = threshold
+    state["emergency_updated_at"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+    save_state(state, DATA_DIR)
+    print(f"[emergency] 推送成功：{len(results)} 个渠道。")
+    return 0
+
+
 def cmd_show_config(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     print(f"配置文件：{config.get('_config_path')}")
@@ -230,6 +317,12 @@ def build_parser() -> argparse.ArgumentParser:
     test_push = subparsers.add_parser("test-push", help="发送一条测试消息")
     test_push.add_argument("--config", help="配置文件路径")
     test_push.set_defaults(func=cmd_test_push)
+
+    emergency = subparsers.add_parser(
+        "check-emergency", help="检查金价是否跌破紧急阈值，只在首次跌破时推送"
+    )
+    emergency.add_argument("--config", help="配置文件路径")
+    emergency.set_defaults(func=cmd_check_emergency)
 
     show = subparsers.add_parser("show-config", help="查看当前推送配置")
     show.add_argument("--config", help="配置文件路径")
