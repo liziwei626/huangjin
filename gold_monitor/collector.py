@@ -221,9 +221,8 @@ def collect(config: dict[str, Any], slot: str = "manual") -> dict[str, Any]:
     ag_base = quotes_sina.get("gds_AGTD")
     recycle_quote = quotes_jj.get("JO_321453")
 
-    # 金店
-    brands_data = []
-    jewelry_analyses = []
+    # 金店：先收集全部报价，再按“同城最低价”计算入手指数
+    brand_rows = []
     brand_prices = []
     for brand in config.get("brands", []):
         gold_quote = quotes_jj.get(brand.get("gold", ""))
@@ -233,9 +232,33 @@ def collect(config: dict[str, Any], slot: str = "manual") -> dict[str, Any]:
             if gold_quote
             else None
         )
+        brand_rows.append(
+            {
+                "brand": brand,
+                "gold_quote": gold_quote,
+                "platinum_quote": platinum_quote,
+                "premium_pct": premium_pct,
+            }
+        )
+        if gold_quote and gold_quote.price:
+            brand_prices.append(gold_quote.price)
+
+    brand_min = min(brand_prices) if brand_prices else None
+    brand_avg = sum(brand_prices) / len(brand_prices) if brand_prices else None
+    brand_premium = (
+        (brand_avg / au_base.price - 1) * 100
+        if brand_avg and au_base and au_base.price
+        else None
+    )
+
+    brands_data = []
+    jewelry_analyses = []
+    for row in brand_rows:
+        brand = row["brand"]
+        gold_quote = row["gold_quote"]
+        platinum_quote = row["platinum_quote"]
         jewelry = None
         if gold_quote:
-            brand_prices.append(gold_quote.price)
             jewelry = build_jewelry_analysis(
                 f"jewelry_{brand['name']}",
                 f"{brand['name']} 金饰",
@@ -244,26 +267,21 @@ def collect(config: dict[str, Any], slot: str = "manual") -> dict[str, Any]:
                 analysis_map.get("au_cn"),
                 thresholds=thresholds,
                 recycle_price=recycle_quote.price if recycle_quote else None,
+                min_brand_price=brand_min,
+                avg_premium_pct=brand_premium,
             )
         brands_data.append(
             {
                 "name": brand["name"],
                 "gold": gold_quote.to_dict() if gold_quote else None,
                 "platinum": platinum_quote.to_dict() if platinum_quote else None,
-                "premium_pct": round(premium_pct, 2) if premium_pct is not None else None,
+                "premium_pct": round(row["premium_pct"], 2) if row["premium_pct"] is not None else None,
                 "score": round(jewelry.score, 1) if jewelry else None,
                 "rating": jewelry.rating if jewelry else "数据缺失",
             }
         )
         if jewelry:
             jewelry_analyses.append(jewelry)
-
-    brand_avg = sum(brand_prices) / len(brand_prices) if brand_prices else None
-    brand_premium = (
-        (brand_avg / au_base.price - 1) * 100
-        if brand_avg and au_base and au_base.price
-        else None
-    )
 
     # 银行纸贵金属
     banks_data = []

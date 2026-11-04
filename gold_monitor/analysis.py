@@ -18,7 +18,9 @@ COMPONENT_LABELS = {
     "rsi": "RSI（低者优）",
     "trend": "均线趋势",
     "ratio": "金银比",
-    "premium": "品牌溢价（低者优）",
+    "premium": "绝对溢价（低者优）",
+    "gold_position": "金价位置（低者优）",
+    "price_advantage": "同城比价（低者优）",
     "volatility": "波动率（低者优）",
     "momentum": "20日动能",
 }
@@ -114,12 +116,6 @@ def trend_score(price: Optional[float], ma20: Optional[float], ma60: Optional[fl
     if price > ma60:
         return 55.0
     return 25.0
-
-
-def premium_score(premium_pct: Optional[float]) -> float:
-    if premium_pct is None:
-        return 50.0
-    return clamp(100 - max(0.0, premium_pct - 3) * 2.5, 5, 100)
 
 
 def momentum_score(chg20: Optional[float]) -> float:
@@ -352,7 +348,8 @@ def build_jewelry_analysis(
     *,
     thresholds: Optional[dict[str, float]] = None,
     recycle_price: Optional[float] = None,
-    weight: float = 0.6,
+    min_brand_price: Optional[float] = None,
+    avg_premium_pct: Optional[float] = None,
 ) -> Optional[Analysis]:
     if brand_quote.price is None:
         return None
@@ -362,56 +359,102 @@ def build_jewelry_analysis(
         if base_price and base_price > 0
         else None
     )
-    premium_component = premium_score(premium_pct)
-    gold_score = gold_analysis.score if gold_analysis else 50.0
-    score = premium_component * weight + gold_score * (1 - weight)
     gold_metrics = gold_analysis.metrics if gold_analysis else {}
     pct_rank = gold_metrics.get("pct_rank")
     rsi = gold_metrics.get("rsi")
+    gold_position = (
+        100 - pct_rank
+        if pct_rank is not None
+        else (gold_analysis.score if gold_analysis else 50.0)
+    )
+    price_gap = (
+        brand_quote.price - min_brand_price
+        if min_brand_price is not None and brand_quote.price is not None
+        else 0.0
+    )
+    price_component = clamp(100 - max(0.0, price_gap) * 2.0, 0, 100)
+    premium_component = (
+        clamp(100 - max(0.0, premium_pct - 30) * 6, 0, 100)
+        if premium_pct is not None
+        else 50.0
+    )
+    high_premium_penalty = -8.0 if avg_premium_pct and avg_premium_pct > 35 else 0.0
+    score = clamp(
+        gold_position * 0.55
+        + price_component * 0.20
+        + premium_component * 0.25
+        + high_premium_penalty
+    )
     metrics = {
         "last": brand_quote.price,
         "base_price": base_price,
         "premium_pct": premium_pct,
         "recycle_price": recycle_price,
-        "gold_score": gold_score,
         "gold_pct_rank": pct_rank,
         "gold_rsi": rsi,
+        "brand_min_price": min_brand_price,
+        "brand_price_gap": price_gap,
+        "avg_premium_pct": avg_premium_pct,
         "change_pct": brand_quote.change_pct,
     }
-    components = {"premium": premium_component, "valuation": gold_score}
+    components = {
+        "gold_position": gold_position,
+        "price_advantage": price_component,
+        "premium": premium_component,
+    }
 
-    if score >= 65:
-        rating = "溢价较低，适合入手"
+    if score >= 75 and price_gap <= 0.01:
+        rating = "适合入手，今日最低价"
+    elif score >= 65:
+        rating = "可以入手，优先低价品牌"
     elif score >= 55:
-        rating = "可考虑入手"
+        rating = "刚需可买，不建议囤货"
     elif score >= 45:
-        rating = "观望，等促销或金价回调"
+        rating = "等促销或金价回调"
     else:
-        rating = "不建议现在买"
+        rating = "暂缓，等金价回落"
 
     signals = []
-    if premium_pct is not None and premium_pct >= 25:
-        signals.append(f"品牌溢价 {premium_pct:.1f}%，远高于基准金价")
-    elif premium_pct is not None and premium_pct <= 8:
-        signals.append(f"品牌溢价 {premium_pct:.1f}%，处于较低水平")
-    if pct_rank is not None and pct_rank <= 20:
-        signals.append(f"金价处于近一年低位（分位 {pct_rank:.0f}%）")
-    elif pct_rank is not None and pct_rank >= 80:
+    if pct_rank is not None and pct_rank <= 25:
+        signals.append(f"金价处于近一年低位（分位 {pct_rank:.0f}%），适合关注实体金饰")
+    elif pct_rank is not None and pct_rank >= 75:
         signals.append(f"金价处于近一年高位（分位 {pct_rank:.0f}%）")
-    if rsi is not None and rsi >= 70:
-        signals.append("金价 RSI 超买，短期回调风险")
-    elif rsi is not None and rsi <= 30:
-        signals.append("金价 RSI 超卖，可关注刚需入手机会")
+    if min_brand_price is not None:
+        if price_gap <= 0.01:
+            signals.append("今日主要金店最低报价")
+        elif price_gap <= 3:
+            signals.append(f"接近最低价（高 {fmt_price(price_gap, 0)} 元/克）")
+        elif price_gap >= 10:
+            signals.append(f"比最低价高 {fmt_price(price_gap, 0)} 元/克")
+    if premium_pct is not None and premium_pct >= 40:
+        signals.append(f"绝对溢价 {premium_pct:.1f}%，偏高，等克减/工费活动")
+    elif premium_pct is not None and premium_pct <= 30:
+        signals.append(f"绝对溢价 {premium_pct:.1f}%，相对温和")
+    if rsi is not None and rsi <= 30:
+        signals.append("金价 RSI 超卖，刚需可关注入手机会")
 
     timing = (
-        f"品牌金价 {fmt_price(brand_quote.price)} 元/克，较 Au99.99 基准 {fmt_price(base_price)} 元/克"
-        f"溢价 {fmt_pct(premium_pct, 1, sign=False)}"
+        f"品牌金价 {fmt_price(brand_quote.price)} 元/克，较 Au99.99 基准 "
+        f"{fmt_price(base_price)} 元/克溢价 {fmt_pct(premium_pct, 1, sign=False)}"
     )
+    if price_gap > 0.01:
+        timing += f"，比今日最低报价高 {fmt_price(price_gap, 0)} 元/克"
+    else:
+        timing += "，为今日主要金店最低报价"
     if recycle_price:
-        timing += f"；今日黄金回收价约 {fmt_price(recycle_price)} 元/克"
-    timing += (
-        "。金价处于近一年低位且品牌溢价 <15% 时最适合买；溢价 >25% 或金价分位 >80% 时建议等促销/回调。"
-    )
+        timing += f"；回收价约 {fmt_price(recycle_price)} 元/克"
+    if pct_rank is not None and pct_rank <= 25:
+        timing += "。金价处于近一年低位，刚需可以入手"
+    elif pct_rank is not None and pct_rank <= 60:
+        timing += "。金价位置中性，刚需可买但不建议囤货"
+    else:
+        timing += "。金价偏高，建议等回调或大促"
+    if avg_premium_pct and avg_premium_pct > 35:
+        timing += "；品牌绝对溢价仍偏高，优先按克计价、把工费谈到 20-40 元/克，等克减/工费减免再下手。"
+    else:
+        timing += "；优先按克计价、工费可谈，关注门店克减活动。"
+    timing += "金饰回收按原料价折价，溢价部分不保值。"
+
     return Analysis(
         key=key,
         name=name,

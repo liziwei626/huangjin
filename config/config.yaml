@@ -56,7 +56,7 @@ bars:
   - { name: 铂金回收价, code: JO_321457, metal: platinum, type: recycle }
   - { name: 钯金回收价, code: JO_321461, metal: palladium, type: recycle }
 
-# 黄金相关股票 / ETF（腾讯行情）
+# 黄金/白银/珠宝股票与 ETF（腾讯行情）
 stocks:
   - { name: 山东黄金, code: sh600547 }
   - { name: 中金黄金, code: sh600489 }
@@ -67,8 +67,22 @@ stocks:
   - { name: 四川黄金, code: sz001337 }
   - { name: 山金国际, code: sz000975 }
   - { name: 豫光金铅, code: sz002237 }
+  # 白银矿业
+  - { name: 盛达资源, code: sz000603 }
+  - { name: 兴业银锡, code: sz000426 }
+  - { name: 白银有色, code: sh601212 }
+  - { name: 湖南白银, code: sz002716 }
+  # 金店 / 珠宝
   - { name: 老铺黄金, code: hk06181 }
   - { name: 周大福, code: hk01929 }
+  - { name: 周大生, code: sz002867 }
+  - { name: 中国黄金, code: sh600916 }
+  - { name: 潮宏基, code: sz002345 }
+  - { name: 老凤祥, code: sh600612 }
+  - { name: 周生生, code: hk00116 }
+  - { name: 六福集团, code: hk00590 }
+  - { name: 豫园股份, code: sh600655 }
+  # 黄金矿业（港股）
   - { name: 招金矿业, code: hk01818 }
   - { name: 中国黄金国际, code: hk02899 }
   - { name: 灵宝黄金, code: hk03330 }

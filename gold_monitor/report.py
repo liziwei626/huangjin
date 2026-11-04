@@ -122,12 +122,22 @@ def _conclusion(snapshot: dict[str, Any], analyses: dict[str, dict[str, Any]]) -
     if silver:
         lines.append(f"- **国内白银**：{silver['score']:.1f} 分，{silver['rating']}。{silver.get('timing', '')}")
     if jewelry:
-        best_jewelry = max(jewelry, key=lambda item: item["score"])
+        cheapest = min(jewelry, key=lambda item: item.get("price") or float("inf"))
+        cheapest_name = cheapest["name"].replace(" 金饰", "")
+        rank = (gold or {}).get("metrics", {}).get("pct_rank")
+        if rank is not None and rank <= 25:
+            window = "金价处于近一年低位，刚需可以入手"
+        elif rank is not None and rank <= 60:
+            window = "金价位置中性，刚需可买但不建议囤货"
+        else:
+            window = "金价偏高，建议等回调或大促"
+        if avg_premium is not None and avg_premium > 35:
+            premium_hint = "品牌绝对溢价仍偏高，优先按克计价、把工费谈到 20-40 元/克，等克减/工费减免再下手"
+        else:
+            premium_hint = "品牌溢价相对温和，优先最低价门店"
         lines.append(
-            f"- **金店饰品**：品牌金价均价 {_num(snapshot.get('brand_gold_avg'))} 元/克，"
-            f"较 Au99.99 溢价 {_plain_pct(avg_premium)}；最高评分 "
-            f"{best_jewelry['name']} {best_jewelry['score']:.1f} 分（{best_jewelry['rating']}）。"
-            "金饰是消费不是投资，溢价高时不建议买入。"
+            f"- **实体金饰**：今日最低 {cheapest_name} {_num(cheapest.get('price'))} 元/克，"
+            f"品牌均价溢价 {_plain_pct(avg_premium)}；{window}；{premium_hint}。"
         )
     stock = analyses.get("stock_sd")
     if stock:
@@ -176,9 +186,17 @@ def _price_table(snapshot: dict[str, Any]) -> list[str]:
 
 
 def _brands_table(snapshot: dict[str, Any]) -> list[str]:
+    min_price = min(
+        (
+            item["gold"]["price"]
+            for item in snapshot.get("brands", [])
+            if item.get("gold") and item["gold"].get("price")
+        ),
+        default=None,
+    )
     lines = [
-        "| 品牌 | 黄金(元/克) | 涨跌幅 | 铂金(元/克) | 较基准溢价 | 评分 | 建议 |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| 品牌 | 黄金(元/克) | 涨跌幅 | 铂金(元/克) | 较基准溢价 | 比最低价 | 入手指数 | 建议 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for item in snapshot.get("brands", []):
         gold = item.get("gold")
@@ -186,9 +204,13 @@ def _brands_table(snapshot: dict[str, Any]) -> list[str]:
         spread = item.get("premium_pct")
         spread_text = f"{spread:+.1f}%" if spread is not None else "—"
         score = f"{item['score']:.1f}" if item.get("score") is not None else "—"
+        gap = "—"
+        if gold and gold.get("price") is not None and min_price is not None:
+            diff = gold["price"] - min_price
+            gap = "最低" if diff <= 0.01 else f"+{diff:.1f}"
         lines.append(
             f"| {item['name']} | {_quote_price(gold)} | {_quote_change(gold)} | "
-            f"{_quote_price(platinum)} | {spread_text} | {score} | {item.get('rating', '—')} |"
+            f"{_quote_price(platinum)} | {spread_text} | {gap} | {score} | {item.get('rating', '—')} |"
         )
     return lines
 
@@ -292,7 +314,7 @@ def render_markdown(snapshot: dict[str, Any], config: dict[str, Any]) -> str:
     lines.append("")
     lines.extend(_bars_table(snapshot))
     lines.append("")
-    lines.append("## 六、黄金股票与 ETF")
+    lines.append("## 六、黄金/白银/珠宝股票与 ETF")
     lines.append("")
     lines.extend(_stocks_table(snapshot))
     lines.append("")
@@ -302,14 +324,28 @@ def render_markdown(snapshot: dict[str, Any], config: dict[str, Any]) -> str:
         analysis = analyses.get(key)
         if analysis:
             lines.extend(_analysis_block(analysis, weights))
-    if snapshot.get("jewelry_analyses"):
-        lines.append("## 八、金店饰品怎么买")
+    jewelry = snapshot.get("jewelry_analyses") or []
+    if jewelry:
+        lines.append("## 八、实体金饰入手建议（按今日报价排序）")
         lines.append("")
-        for item in snapshot["jewelry_analyses"]:
+        gold_rank = (analyses.get("au_cn") or {}).get("metrics", {}).get("pct_rank")
+        if gold_rank is not None:
+            position = "低位" if gold_rank <= 25 else ("中位" if gold_rank <= 60 else "高位")
             lines.append(
-                f"- **{item['name']}**：评分 {item['score']:.1f}（{item['rating']}）；"
+                f"> 今日金价处于近一年 {gold_rank:.0f}% 分位（{position}），"
+                f"品牌均价较基准溢价 {_plain_pct(snapshot.get('brand_premium_pct'))}。"
+            )
+            lines.append("")
+        for item in sorted(jewelry, key=lambda x: x.get("price") or float("inf")):
+            lines.append(
+                f"- **{item['name']}**：入手指数 {item['score']:.1f}（{item['rating']}）；"
                 f"{item.get('timing', '')}"
             )
+        lines.append("")
+        lines.append(
+            "> 买金饰只选按克计价，不买一口价/按件计价；工费尽量谈到 20-40 元/克；"
+            "同城比价选最低价门店，关注双11、店庆、春节前的克减和工费减免。"
+        )
         lines.append("")
     lines.append("## 九、操作纪律")
     lines.append("")
@@ -374,13 +410,30 @@ def render_push(snapshot: dict[str, Any]) -> tuple[str, str]:
             f"- 金店均价：{_num(snapshot['brand_gold_avg'])} 元/克，"
             f"较基准溢价 {_plain_pct(snapshot.get('brand_premium_pct'))}"
         )
+    jewelry = snapshot.get("jewelry_analyses") or []
+    if jewelry:
+        cheapest = min(jewelry, key=lambda item: item.get("price") or float("inf"))
+        cheapest_name = cheapest["name"].replace(" 金饰", "")
+        rank = (gold or {}).get("metrics", {}).get("pct_rank")
+        if rank is not None and rank <= 25:
+            window = "金价低位，刚需可以入手"
+        elif rank is not None and rank <= 60:
+            window = "金价中位，刚需可买"
+        else:
+            window = "金价偏高，等回调或大促"
+        lines.append(
+            f"- 金饰最低：{cheapest_name} **{_num(cheapest.get('price'))} 元/克**（{window}）"
+        )
     lines.append("")
     lines.append("### 操作提示")
     if gold:
         lines.append(f"- 黄金：{gold.get('timing', '')}")
     if silver:
         lines.append(f"- 白银：{silver.get('timing', '')}")
-    lines.append("- 分批买入，不追高；金饰溢价高，不适合作为投资。")
+    lines.append(
+        "- 金饰：优先最低价品牌，只买按克计价，工费谈到 20-40 元/克；"
+        "溢价高时不必囤货，关注克减/工费减免。"
+    )
     lines.append("")
     lines.append(f"> {DISCLAIMER}")
     return title[:100], "\n".join(lines)
