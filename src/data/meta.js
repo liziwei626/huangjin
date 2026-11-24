@@ -59,7 +59,7 @@ const RESTRICTIONS = [
   { key: 'beef', label: '牛肉', terms: ['牛肉', '牛腩', '牛尾', '牛骨', '牛里脊'] },
   { key: 'mutton', label: '羊肉', terms: ['羊肉', '羊排', '羊骨'] },
   { key: 'pork', label: '猪肉', terms: ['猪肉', '排骨', '猪肝', '猪蹄', '猪腰', '猪里脊', '五花肉', '肉末', '瘦肉'] },
-  { key: 'chicken', label: '鸡肉', terms: ['鸡肉', '乌鸡', '鸡胸', '鸡腿', '鸡翅'] },
+  { key: 'chicken', label: '鸡肉', terms: ['鸡肉', '乌鸡', '鸡胸', '鸡腿', '鸡翅', '鸡爪'] },
   { key: 'egg', label: '鸡蛋', terms: ['鸡蛋', '鹌鹑蛋'] },
   { key: 'dairy', label: '牛奶乳制品', terms: ['牛奶', '酸奶', '奶酪', '淡奶油', '奶粉'] },
   { key: 'peanut', label: '花生', terms: ['花生'] },
@@ -70,7 +70,7 @@ const RESTRICTIONS = [
   {
     key: 'vegetarian',
     label: '素食（不吃肉蛋水产）',
-    terms: ['鸡肉', '乌鸡', '鸡胸', '鸡腿', '猪肉', '排骨', '猪肝', '猪蹄', '猪腰', '猪里脊', '五花肉', '肉末', '瘦肉', '牛肉', '牛腩', '牛尾', '羊肉', '羊排', '鱼', '虾', '蟹', '贝', '鸡蛋', '鹌鹑蛋']
+    terms: ['鸡肉', '乌鸡', '鸡胸', '鸡腿', '鸡爪', '猪肉', '排骨', '猪肝', '猪蹄', '猪腰', '猪里脊', '五花肉', '肉末', '瘦肉', '牛肉', '牛腩', '牛尾', '羊肉', '羊排', '鱼', '虾', '蟹', '贝', '鸡蛋', '鹌鹑蛋']
   }
 ];
 
@@ -84,6 +84,29 @@ const CALORIE_PRESETS = [
   { value: 2800, label: '2800 kcal', desc: '母乳喂养' },
   { value: 3000, label: '3000 kcal', desc: '奶量较大' }
 ];
+
+const EFFECT_GROUPS = [
+  { key: 'lactation', label: '催乳', tags: ['催乳'] },
+  { key: 'blood', label: '补血补铁', tags: ['补血', '补铁', '补气养血', '补气'] },
+  { key: 'protein', label: '高蛋白', tags: ['高蛋白', '优质蛋白', '补蛋白', '植物蛋白'] },
+  { key: 'calcium', label: '补钙', tags: ['补钙', '补碘'] },
+  { key: 'digest', label: '健脾养胃', tags: ['健脾', '养胃', '易消化'] },
+  { key: 'bowel', label: '通便', tags: ['通便', '膳食纤维'] },
+  { key: 'swelling', label: '消肿利水', tags: ['消肿', '利水'] },
+  { key: 'sleep', label: '安神', tags: ['安神'] },
+  { key: 'lowfat', label: '低脂控糖', tags: ['低脂', '控糖', '轻盈'] },
+  { key: 'immune', label: '增强免疫', tags: ['增强免疫', '增强体力', '伤口愈合'] }
+];
+
+const LOG_OPTIONS = {
+  moods: ['很好', '不错', '一般', '疲惫', '低落'],
+  moodEmoji: { 很好: '😄', 不错: '🙂', 一般: '😐', 疲惫: '😪', 低落: '😔' },
+  lochia: ['无', '少量', '中等', '较多'],
+  wound: ['良好', '轻微不适', '红肿疼痛'],
+  bowel: ['正常', '便秘', '腹泻'],
+  waterCupMl: 250,
+  waterGoalMl: 2000
+};
 
 function stageInfo(stage) {
   return STAGES.find((s) => s.stage === stage) || STAGES[3];
@@ -108,6 +131,8 @@ module.exports = {
   DELIVERY_TYPES,
   FEEDINGS,
   CALORIE_PRESETS,
+  EFFECT_GROUPS,
+  LOG_OPTIONS,
   stageInfo,
   restrictionTerms
 };

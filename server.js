@@ -32,7 +32,8 @@ function sendFile(req, res, filePath) {
   const type = MIME[ext] || 'application/octet-stream';
   const stat = fs.statSync(filePath);
   const isHtml = ext === '.html';
-  const cache = isHtml ? 'no-cache' : 'public, max-age=604800';
+  const isImage = ['.png', '.jpg', '.jpeg', '.webp', '.ico'].includes(ext);
+  const cache = isHtml || !isImage ? 'no-cache' : 'public, max-age=604800';
   res.writeHead(200, {
     'Content-Type': type,
     'Content-Length': stat.size,

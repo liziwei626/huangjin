@@ -20,12 +20,19 @@ const S = {
   planDay: null,
   selectedDate: '',
   tab: 'today',
-  filter: { course: 'all', stage: 'all', q: '', fav: false },
-  grocery: { view: 'week', data: null, loading: false },
+  filter: { course: 'all', stage: 'all', effect: 'all', q: '', fav: false },
+  grocery: { view: 'week', data: null, loading: false, hideChecked: false },
   authMode: 'login',
   onb: null,
   sheet: null,
   edit: null,
+  recordDate: todayStr(),
+  logs: [],
+  logsLoaded: false,
+  log: {},
+  logDirty: false,
+  articles: null,
+  article: null,
   busy: false,
   bootError: null
 };
@@ -98,7 +105,13 @@ const ICONS = {
   sparkle: '<path d="M12 3.5 13.8 9l5.2 1.5-5.2 1.5L12 17.5 10.2 12 5 10.5 10.2 9 12 3.5Z"/>',
   leaf: '<path d="M20 4c-8 0-13 3.5-13 9a6 6 0 0 0 6 6c5.5 0 7-5 7-15Z"/><path d="M4 20c2-5 5-8 10-10"/>',
   arrowLeft: '<path d="m15 5-7 7 7 7"/>',
-  moon: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/>'
+  arrowRight: '<path d="m9 5 7 7-7 7"/>',
+  trend: '<path d="M4 19V5M4 19h16"/><path d="m7 15 3.5-4 3 2.5L20 7"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
+  download: '<path d="M12 4v11"/><path d="m8 11 4 4 4-4"/><path d="M5 19h14"/>',
+  lock: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  water: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/>',
+  bookmark: '<path d="M6 4h12v17l-6-4-6 4V4Z"/>'
 };
 
 function icon(name, size = 20) {
@@ -176,7 +189,14 @@ function clearSession() {
   S.plan = null;
   S.planDay = null;
   S.stats = null;
-  S.grocery = { view: 'week', data: null, loading: false };
+  S.grocery = { view: 'week', data: null, loading: false, hideChecked: false };
+  S.records = null;
+  S.logs = [];
+  S.logsLoaded = false;
+  S.log = {};
+  S.logDirty = false;
+  S.articles = null;
+  S.article = null;
   S.sheet = null;
 }
 
@@ -512,6 +532,7 @@ function renderMain(opts = {}) {
   let view = '';
   if (S.tab === 'today') view = todayHTML();
   else if (S.tab === 'recipes') view = recipesHTML();
+  else if (S.tab === 'records') view = recordsHTML();
   else if (S.tab === 'grocery') view = groceryHTML();
   else view = meHTML();
 
@@ -531,6 +552,7 @@ function tabbarHTML() {
   const tabs = [
     { key: 'today', label: '今日', icon: 'sun' },
     { key: 'recipes', label: '食谱', icon: 'book' },
+    { key: 'records', label: '记录', icon: 'trend' },
     { key: 'grocery', label: '清单', icon: 'basket' },
     { key: 'me', label: '我的', icon: 'user' }
   ];
@@ -554,8 +576,14 @@ function todayHTML() {
   const day = S.planDay;
   const planInfo = S.plan;
   const eaten = day?.eaten || [];
+  const skipped = day?.skipped || [];
   const mealCount = day?.meals?.length || 0;
   const kcal = day?.nutrition?.kcal || 0;
+  const weekCount = planInfo ? Math.ceil(planInfo.days / 7) : 0;
+  const weekIndex = planInfo
+    ? Math.max(0, Math.min(weekCount - 1, Math.floor(Math.max(0, daysBetween(planInfo.startDate, S.selectedDate)) / 7)))
+    : 0;
+  const weekDays = planInfo ? planInfo.dayList.slice(weekIndex * 7, weekIndex * 7 + 7) : [];
 
   const heroCard = `
     <section class="hero-card">
@@ -567,19 +595,28 @@ function todayHTML() {
         <div class="hero-meta">
           <span class="pill">${mealCount ? `已吃 ${eaten.length}/${mealCount} 餐` : '待生成餐单'}</span>
           <span class="pill">${kcal ? `约 ${kcal} kcal` : `${S.profile?.calorieGoal || 2600} kcal 目标`}</span>
+          ${skipped.length ? `<span class="pill">跳过 ${skipped.length}</span>` : ''}
         </div>
         <div class="hero-progress"><span style="width:${Math.round((stage?.progress || 0.05) * 100)}%"></span></div>
       </div>
     </section>`;
 
+  const weekTabs = weekCount > 1
+    ? `<div class="week-tabs">
+        ${Array.from({ length: weekCount }, (_, i) => `
+          <button type="button" class="week-tab ${i === weekIndex ? 'active' : ''}" data-action="week-tab" data-index="${i}">第 ${i + 1} 周</button>`).join('')}
+      </div>`
+    : '';
+
   const weekStrip = planInfo?.dayList?.length
     ? `
       <div class="section-head">
-        <h2>本周餐单</h2>
-        <button class="link-btn" type="button" data-action="generate-plan">重新生成</button>
+        <h2>${weekCount > 1 ? `第 ${weekIndex + 1} 周餐单` : '本周餐单'}</h2>
+        <button class="link-btn" type="button" data-action="open-generate">重新生成</button>
       </div>
+      ${weekTabs}
       <div class="week-strip">
-        ${planInfo.dayList.map((d) => `
+        ${weekDays.map((d) => `
           <button type="button" class="day-chip ${d.date === S.selectedDate ? 'active' : ''} ${d.complete ? 'complete' : ''}" data-action="select-date" data-date="${d.date}">
             <span class="w">${esc(d.weekday)}</span>
             <span class="d">${d.dayOfMonth}</span>
@@ -593,16 +630,16 @@ function todayHTML() {
     content = `
       <div class="empty-card">
         <h3>这一天还没有餐单</h3>
-        <p>根据你的产后阶段和忌口，重新生成一份 7 天餐单吧。</p>
-        <button class="btn btn-primary" type="button" data-action="generate-plan">生成 7 天餐单</button>
+        <p>根据你的产后阶段和忌口，生成一份新的餐单吧。</p>
+        <button class="btn btn-primary" type="button" data-action="open-generate">生成餐单</button>
       </div>`;
   } else {
     content = `
       <div class="section-head" style="padding-top:14px">
-        <h2>${dateLabelCN(day.date)} · ${esc(day.meals.length ? '今日安排' : '暂无安排')}</h2>
-        <span class="small muted">${eaten.length}/${mealCount} 已完成</span>
+        <h2>${dateLabelCN(day.date)} · 今日安排</h2>
+        <span class="small muted">${eaten.length}/${mealCount} 已吃${skipped.length ? ` · ${skipped.length} 跳过` : ''}</span>
       </div>
-      ${day.meals.map((meal) => mealCardHTML(meal, day.date, eaten)).join('')}
+      ${day.meals.map((meal) => mealCardHTML(meal, day.date, eaten, skipped)).join('')}
       ${nutritionHTML(day)}
       ${tipsHTML(stage)}`;
   }
@@ -623,8 +660,9 @@ function todayHTML() {
     ${content}`;
 }
 
-function mealCardHTML(meal, date, eaten) {
+function mealCardHTML(meal, date, eaten, skipped = []) {
   const done = eaten.includes(meal.slot);
+  const skip = skipped.includes(meal.slot);
   return `
     <section class="meal-card">
       <div class="meal-head">
@@ -632,9 +670,14 @@ function mealCardHTML(meal, date, eaten) {
           <h3>${esc(meal.label)}</h3>
           <span>${esc(meal.time)}</span>
         </div>
-        <button type="button" class="eat-btn ${done ? 'done' : ''}" data-action="eat" data-date="${date}" data-slot="${meal.slot}">
-          ${done ? icon('check', 13) + ' 已吃' : '打卡'}
-        </button>
+        <div class="meal-actions">
+          <button type="button" class="skip-btn ${skip ? 'on' : ''}" data-action="skip" data-date="${date}" data-slot="${meal.slot}">
+            ${skip ? '已跳过' : '跳过'}
+          </button>
+          <button type="button" class="eat-btn ${done ? 'done' : ''}" data-action="eat" data-date="${date}" data-slot="${meal.slot}">
+            ${done ? icon('check', 13) + ' 已吃' : '打卡'}
+          </button>
+        </div>
       </div>
       ${meal.dishes.map((d) => `
         <div class="dish">
@@ -693,10 +736,12 @@ function tipsHTML(stage) {
 function filteredRecipes() {
   const f = S.filter;
   const q = f.q.trim();
+  const effect = f.effect === 'all' ? null : (S.meta.effects || []).find((e) => e.key === f.effect);
   return S.recipes.filter((r) => {
     if (f.fav && !S.favorites.includes(r.id)) return false;
     if (f.course !== 'all' && r.course !== f.course) return false;
     if (f.stage !== 'all' && !r.stages.includes(Number(f.stage))) return false;
+    if (effect && !r.tags.some((t) => effect.tags.includes(t))) return false;
     if (q) {
       const hay = `${r.name} ${r.tags.join(' ')} ${r.ingredients.map((i) => i[0]).join(' ')}`;
       if (!hay.includes(q)) return false;
@@ -754,10 +799,300 @@ function recipesHTML() {
       <button class="chip ${f.stage === 'all' ? 'active' : ''}" type="button" data-action="filter-stage" data-value="all">全部阶段</button>
       ${(S.meta.stages || []).map((s) => `<button class="chip ${String(f.stage) === String(s.stage) ? 'active' : ''}" type="button" data-action="filter-stage" data-value="${s.stage}">${esc(s.week)}</button>`).join('')}
     </div>
+    <div class="chip-row">
+      <button class="chip ${f.effect === 'all' ? 'active' : ''}" type="button" data-action="filter-effect" data-value="all">全部功效</button>
+      ${(S.meta.effects || []).map((e) => `<button class="chip ${f.effect === e.key ? 'active' : ''}" type="button" data-action="filter-effect" data-value="${esc(e.key)}">${esc(e.label)}</button>`).join('')}
+    </div>
     <div class="recipe-grid" id="recipe-grid">${recipeGridHTML()}</div>`;
 }
 
-/* ------------------------------ 清单 ------------------------------ */
+/* ------------------------------ 记录 ------------------------------ */
+
+const EMPTY_LOG = {
+  weight: '',
+  waterMl: 0,
+  sleepHours: '',
+  mood: '',
+  lochia: '',
+  wound: '',
+  bowel: '',
+  note: ''
+};
+
+function findLog(date) {
+  return S.logs.find((l) => l.date === date) || null;
+}
+
+function logWithDefaults(log) {
+  return { ...EMPTY_LOG, ...(log || {}) };
+}
+
+async function loadLogs() {
+  try {
+    const start = addDays(todayStr(), -41);
+    const data = await api(`/logs?start=${start}&days=42`);
+    S.logs = data.logs || [];
+    S.logsLoaded = true;
+    if (!S.recordDate) S.recordDate = todayStr();
+    S.log = logWithDefaults(findLog(S.recordDate));
+    S.logDirty = false;
+    if (S.tab === 'records') renderMain({ keepScroll: true });
+  } catch (err) {
+    S.logsLoaded = true;
+    handleError(err);
+  }
+}
+
+function sortedLogs() {
+  return S.logs.filter((l) => l && l.date).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function weightChange(date, weight) {
+  if (!weight) return null;
+  const prev = sortedLogs().filter((l) => l.date < date && l.weight);
+  if (!prev.length) return null;
+  const diff = Math.round((Number(weight) - Number(prev[prev.length - 1].weight)) * 10) / 10;
+  return diff;
+}
+
+function sparklineSVG(points) {
+  if (points.length < 2) return '<div class="chart-empty">记录两次体重后，这里会出现趋势曲线</div>';
+  const w = 300;
+  const h = 78;
+  const pad = 8;
+  const values = points.map((p) => Number(p.weight));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const coords = values.map((v, i) => {
+    const x = pad + (i * (w - pad * 2)) / (values.length - 1);
+    const y = h - pad - ((v - min) / range) * (h - pad * 2);
+    return [x, y];
+  });
+  const line = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const area = `${pad},${h - pad} ${line} ${w - pad},${h - pad}`;
+  const last = coords[coords.length - 1];
+  return `
+    <svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c4704e" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#c4704e" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <polygon points="${area}" fill="url(#sparkFill)"/>
+      <polyline points="${line}" fill="none" stroke="#c4704e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.2" fill="#c4704e"/>
+    </svg>`;
+}
+
+function waterChartHTML() {
+  const days = Array.from({ length: 7 }, (_, i) => addDays(todayStr(), -6 + i));
+  const goal = S.meta.logOptions.waterGoalMl;
+  const values = days.map((d) => Number(findLog(d)?.waterMl) || 0);
+  const max = Math.max(goal, ...values, 1);
+  return `
+    <div class="mini-chart">
+      <div class="chart-title"><span>近 7 天饮水</span><em>目标 ${goal / 1000} L</em></div>
+      <div class="bar-chart">
+        ${days.map((d, i) => `
+          <div class="bar-col">
+            <div class="bar-track"><span style="height:${Math.round((values[i] / max) * 100)}%" class="${values[i] >= goal ? 'met' : ''}"></span></div>
+            <label>${weekdayShort(d).replace('周', '')}</label>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function sleepChartHTML() {
+  const days = Array.from({ length: 7 }, (_, i) => addDays(todayStr(), -6 + i));
+  const values = days.map((d) => Number(findLog(d)?.sleepHours) || 0);
+  const max = Math.max(9, ...values);
+  return `
+    <div class="mini-chart">
+      <div class="chart-title"><span>近 7 天睡眠</span><em>小时</em></div>
+      <div class="bar-chart">
+        ${days.map((d, i) => `
+          <div class="bar-col">
+            <div class="bar-track"><span style="height:${Math.round((values[i] / max) * 100)}%" class="sage"></span></div>
+            <label>${weekdayShort(d).replace('周', '')}</label>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function recordsHTML() {
+  if (!S.logsLoaded) {
+    return `
+      <header class="page-head"><h1>调养记录</h1><p>正在加载你的记录…</p></header>
+      <div class="empty-card"><h3>加载中</h3><p>正在同步体重、饮水与睡眠记录。</p></div>`;
+  }
+
+  const date = S.recordDate;
+  const log = logWithDefaults(S.log);
+  const dayNumber = postpartumDays(S.profile?.deliveryDate);
+  const dateDay = daysBetween(S.profile?.deliveryDate, date) + 1;
+  const isToday = date === todayStr();
+  const summary = S.plan?.dayList?.find((d) => d.date === date);
+  const weightLogs = sortedLogs().filter((l) => l.weight && l.date <= date).slice(-14);
+  const change = weightChange(date, log.weight);
+  const waterGoal = S.meta.logOptions.waterGoalMl;
+  const cupMl = S.meta.logOptions.waterCupMl;
+  const cups = Math.round(Number(log.waterMl || 0) / cupMl);
+  const waterPct = Math.min(100, Math.round((Number(log.waterMl || 0) / waterGoal) * 100));
+
+  return `
+    <header class="page-head">
+      <h1>调养记录</h1>
+      <p>每天一点记录，看见身体在慢慢恢复</p>
+    </header>
+
+    <div class="date-nav">
+      <button class="icon-btn nav-arrow" type="button" data-action="log-prev" aria-label="前一天">${icon('arrowLeft', 18)}</button>
+      <div class="date-nav-center">
+        <strong>${dateLabelCN(date)}</strong>
+        <span>产后第 ${dateDay > 0 ? dateDay : dayNumber} 天${isToday ? ' · 今天' : ''}</span>
+      </div>
+      <button class="icon-btn nav-arrow" type="button" data-action="log-next" ${isToday ? 'disabled' : ''} aria-label="后一天">${icon('arrowRight', 18)}</button>
+    </div>
+    ${!isToday ? `<div class="today-link"><button type="button" data-action="log-today">回到今天</button></div>` : ''}
+
+    <section class="card meal-progress-card">
+      <div class="section-head" style="padding:0 0 8px">
+        <h2>当天餐单</h2>
+        <button class="link-btn" type="button" data-action="view-day-plan" data-date="${date}">查看餐单</button>
+      </div>
+      ${summary ? `
+        <div class="meal-progress-row">
+          <div><strong>${summary.eatenCount}</strong><span>已吃</span></div>
+          <div><strong>${summary.skippedCount}</strong><span>跳过</span></div>
+          <div><strong>${summary.mealCount - summary.eatenCount - summary.skippedCount}</strong><span>待完成</span></div>
+          <div><strong>${summary.kcal}</strong><span>kcal</span></div>
+        </div>
+        <div class="bar"><span style="width:${summary.mealCount ? Math.round(((summary.eatenCount + summary.skippedCount) / summary.mealCount) * 100) : 0}%"></span></div>
+      ` : `<p class="small muted" style="line-height:1.8">这一天不在当前餐单范围内，可以回到今日重新生成 28 天餐单。</p>`}
+    </section>
+
+    <section class="card record-card">
+      <div class="record-head"><h3>体重</h3><span class="small muted">每周固定时间记录更准确</span></div>
+      <div class="weight-row">
+        <input type="number" inputmode="decimal" step="0.1" min="25" max="200" data-log="weight" value="${log.weight ?? ''}" placeholder="62.5" />
+        <span class="unit">kg</span>
+        ${change === null ? '<span class="weight-diff muted">首次记录</span>' : `<span class="weight-diff ${change > 0 ? 'up' : 'down'}">${change > 0 ? '+' : ''}${change} kg</span>`}
+      </div>
+      ${sparklineSVG(weightLogs)}
+    </section>
+
+    <section class="card record-card">
+      <div class="record-head">
+        <h3>饮水</h3>
+        <span class="water-total"><b>${log.waterMl || 0}</b> / ${waterGoal} ml</span>
+      </div>
+      <div class="water-cups">
+        ${Array.from({ length: 8 }, (_, i) => `
+          <button type="button" class="cup ${i < cups ? 'filled' : ''}" data-action="log-water" data-cups="${i + 1}" aria-label="${i + 1} 杯水">
+            ${icon('water', 18)}
+          </button>`).join('')}
+      </div>
+      <div class="bar"><span style="width:${waterPct}%"></span></div>
+      <p class="small muted" style="margin-top:8px">每杯约 ${cupMl} ml，哺乳期建议每天 ${waterGoal} ml 以上</p>
+    </section>
+
+    <section class="card record-card">
+      <div class="record-head"><h3>睡眠</h3><span class="small muted">按实际睡眠估算</span></div>
+      <div class="weight-row">
+        <input type="number" inputmode="decimal" step="0.5" min="0" max="24" data-log="sleepHours" value="${log.sleepHours ?? ''}" placeholder="6.5" />
+        <span class="unit">小时</span>
+      </div>
+      <div class="quick-chips">
+        ${[5, 6, 7, 8, 9].map((h) => `<button type="button" class="chip ${Number(log.sleepHours) === h ? 'active' : ''}" data-action="log-sleep" data-value="${h}">${h} 小时</button>`).join('')}
+      </div>
+    </section>
+
+    <section class="card record-card">
+      <div class="record-head"><h3>心情</h3><span class="small muted">允许自己偶尔低落</span></div>
+      <div class="mood-row">
+        ${S.meta.logOptions.moods.map((m) => `
+          <button type="button" class="mood ${log.mood === m ? 'active' : ''}" data-action="log-option" data-field="mood" data-value="${esc(m)}">
+            <span>${S.meta.logOptions.moodEmoji[m] || '🙂'}</span>${esc(m)}
+          </button>`).join('')}
+      </div>
+    </section>
+
+    <section class="card record-card">
+      <div class="record-head"><h3>身体感受</h3><span class="small muted">异常时请及时就医</span></div>
+      ${[
+        ['lochia', '恶露'],
+        ['wound', '伤口'],
+        ['bowel', '排便']
+      ].map(([field, label]) => `
+        <div class="feeling-row">
+          <span class="feeling-label">${label}</span>
+          <div class="option-mini-group">
+            ${S.meta.logOptions[field].map((v) => `<button type="button" class="option-mini ${log[field] === v ? 'active' : ''}" data-action="log-option" data-field="${field}" data-value="${esc(v)}">${esc(v)}</button>`).join('')}
+          </div>
+        </div>`).join('')}
+    </section>
+
+    <section class="card record-card">
+      <div class="record-head"><h3>今日备注</h3><span class="small muted">写下想记住的事</span></div>
+      <textarea class="note-input" data-log="note" maxlength="300" placeholder="例如：今天奶量不错，午后补了一觉…">${esc(log.note || '')}</textarea>
+    </section>
+
+    <div class="save-bar">
+      <span class="dirty-hint" data-dirty>${S.logDirty ? '有未保存的修改' : '记录会自动保存在本机账号'}</span>
+      <button class="btn btn-primary" type="button" data-action="save-log">保存记录</button>
+    </div>
+
+    <section class="card calendar-card">
+      <div class="section-head" style="padding:0 0 10px">
+        <h2>恢复日历</h2>
+        <span class="small muted">近 42 天</span>
+      </div>
+      ${recoveryCalendarHTML()}
+      <div class="calendar-legend">
+        <span><i class="dot log"></i>有记录</span>
+        <span><i class="dot complete"></i>餐单完成</span>
+        <span><i class="dot today"></i>今天</span>
+      </div>
+    </section>
+
+    <section class="card trend-card">
+      <div class="section-head" style="padding:0 0 6px">
+        <h2>最近趋势</h2>
+      </div>
+      ${waterChartHTML()}
+      ${sleepChartHTML()}
+    </section>`;
+}
+
+function recoveryCalendarHTML() {
+  const today = todayStr();
+  const delivery = S.profile?.deliveryDate;
+  const postpartum = delivery ? daysBetween(delivery, today) + 1 : 99;
+  const start = postpartum > 42 ? addDays(today, -41) : delivery || addDays(today, -41);
+  const cells = Array.from({ length: 42 }, (_, i) => {
+    const date = addDays(start, i);
+    const log = findLog(date);
+    const summary = S.plan?.dayList?.find((d) => d.date === date);
+    const future = date > today;
+    const classes = [
+      'calendar-cell',
+      log ? 'has-log' : '',
+      summary?.complete ? 'complete' : '',
+      date === today ? 'is-today' : '',
+      future ? 'future' : '',
+      date === S.recordDate ? 'selected' : ''
+    ].filter(Boolean).join(' ');
+    return `<button type="button" class="${classes}" ${future ? 'disabled' : ''} data-action="log-date" data-date="${date}" title="${dateLabelCN(date)}">
+      <span class="day-num">${Number(date.slice(8, 10))}</span>
+      <i class="day-dot"></i>
+    </button>`;
+  });
+  return `<div class="calendar-grid">${cells.join('')}</div>`;
+}
+
+
 
 function groceryHTML() {
   const g = S.grocery;
@@ -779,6 +1114,9 @@ function groceryHTML() {
       </div>`;
   } else {
     const pct = Math.round((g.data.checked / g.data.total) * 100);
+    const visibleGroups = g.data.groups
+      .map((group) => ({ ...group, items: group.items.filter((item) => !g.hideChecked || !item.checked) }))
+      .filter((group) => group.items.length);
     content = `
       <section class="card grocery-summary">
         <div>
@@ -787,7 +1125,13 @@ function groceryHTML() {
           <div class="bar"><span style="width:${pct}%"></span></div>
         </div>
       </section>
-      ${g.data.groups.map((group) => `
+      <div class="grocery-tools">
+        <button class="tool-btn" type="button" data-action="copy-grocery">${icon('copy', 14)} 复制清单</button>
+        <button class="tool-btn ${g.hideChecked ? 'active' : ''}" type="button" data-action="toggle-hide-checked">
+          ${icon('check', 14)} ${g.hideChecked ? '显示已购' : '隐藏已购'}
+        </button>
+      </div>
+      ${visibleGroups.length ? visibleGroups.map((group) => `
         <section class="grocery-group">
           <header><h3>${esc(group.category)}</h3><span>${group.items.length} 项</span></header>
           ${group.items.map((item) => `
@@ -796,7 +1140,7 @@ function groceryHTML() {
               <span class="name">${esc(item.name)}</span>
               <span class="amt">${esc(item.amountText)}</span>
             </label>`).join('')}
-        </section>`).join('')}
+        </section>`).join('') : '<div class="empty-card" style="padding:26px 20px"><h3>已购项目都藏起来了</h3><p>点击「显示已购」可以重新查看。</p></div>'}
       <div class="grocery-actions">
         <button class="btn btn-ghost btn-sm" type="button" data-action="clear-grocery">清空勾选</button>
       </div>`;
@@ -874,12 +1218,24 @@ function meHTML() {
         <span class="ico">${icon('heart', 18)}</span>我的收藏
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
-      <button class="menu-row" type="button" data-action="generate-plan">
-        <span class="ico">${icon('sparkle', 18)}</span>重新生成 7 天餐单
+      <button class="menu-row" type="button" data-action="open-articles">
+        <span class="ico">${icon('book', 18)}</span>月子知识库
+        <span class="chev">${icon('chevron', 16)}</span>
+      </button>
+      <button class="menu-row" type="button" data-action="open-generate">
+        <span class="ico">${icon('sparkle', 18)}</span>生成 / 重新生成餐单
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
       <button class="menu-row" type="button" data-action="open-edit">
         <span class="ico">${icon('edit', 18)}</span>偏好与忌口设置
+        <span class="chev">${icon('chevron', 16)}</span>
+      </button>
+      <button class="menu-row" type="button" data-action="open-password">
+        <span class="ico">${icon('lock', 18)}</span>修改密码
+        <span class="chev">${icon('chevron', 16)}</span>
+      </button>
+      <button class="menu-row" type="button" data-action="export-data">
+        <span class="ico">${icon('download', 18)}</span>导出我的数据
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
       <button class="menu-row" type="button" data-action="open-about">
@@ -891,7 +1247,7 @@ function meHTML() {
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
     </div>
-    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v1.0<br />饮食建议仅供参考，具体请遵医嘱</p>`;
+    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v2.0<br />饮食建议仅供参考，具体请遵医嘱</p>`;
 }
 
 /* ------------------------------ 弹层 ------------------------------ */
@@ -928,6 +1284,18 @@ function renderSheet() {
   } else if (S.sheet.type === 'about') {
     label = '关于暖月';
     inner = aboutSheetHTML();
+  } else if (S.sheet.type === 'generate') {
+    label = '生成餐单';
+    inner = generateSheetHTML();
+  } else if (S.sheet.type === 'password') {
+    label = '修改密码';
+    inner = passwordSheetHTML();
+  } else if (S.sheet.type === 'articles') {
+    label = '月子知识';
+    inner = articlesSheetHTML();
+  } else if (S.sheet.type === 'article') {
+    label = '知识详情';
+    inner = articleSheetHTML();
   }
 
   root.innerHTML = `
@@ -940,10 +1308,20 @@ function renderSheet() {
     </div>`;
 }
 
+function applyTargets(r) {
+  if (!S.plan?.dayList?.length) return [];
+  const date = S.plan.dayList.some((d) => d.date === S.selectedDate) ? S.selectedDate : S.plan.startDate;
+  const enabled = S.profile?.slots || [];
+  return S.meta.slots
+    .filter((s) => enabled.includes(s.key) && s.courses.includes(r.course) && r.slots.includes(s.key))
+    .map((s) => ({ slot: s.key, label: s.label, date, course: r.course }));
+}
+
 function recipeSheetHTML(r) {
   const fav = S.favorites.includes(r.id);
   const stageText = r.stages.map((n) => S.meta.stages.find((s) => s.stage === n)?.week || '').filter(Boolean).join('、');
   const slotText = r.slots.map((s) => slotMeta(s).label).join('、');
+  const targets = applyTargets(r);
   return `
     <img class="detail-cover" src="${r.image}" alt="${esc(r.name)}" />
     <div class="sheet-head" style="padding-bottom:0">
@@ -966,6 +1344,14 @@ function recipeSheetHTML(r) {
         <div><strong>${r.carbs}g</strong><span>碳水</span></div>
         <div><strong>${r.fat}g</strong><span>脂肪</span></div>
       </div>
+      ${targets.length ? `
+        <section class="apply-block">
+          <h3>加入餐单</h3>
+          <p class="small muted">放进 ${dateLabelCN(targets[0].date)} 的某一餐，打卡状态会重置。</p>
+          <div class="apply-buttons">
+            ${targets.map((t) => `<button class="apply-btn" type="button" data-action="apply-recipe" data-id="${r.id}" data-date="${t.date}" data-slot="${t.slot}" data-course="${t.course}">${esc(t.label)}</button>`).join('')}
+          </div>
+        </section>` : ''}
       <section class="detail-section">
         <h3>食材份量</h3>
         <ul class="ing-list">
@@ -1069,7 +1455,106 @@ function aboutSheetHTML() {
       <p><strong>免责声明：</strong>食谱、营养数据与功效说明均为日常饮食参考，不构成医疗建议。产后饮食需结合个人体质、伤口恢复、哺乳情况和医生建议调整；如出现过敏、发热、伤口异常、恶露异常等情况，请及时就医。</p>
       <p><strong>忌口说明：</strong>勾选忌口或过敏项后，生成餐单与换菜时会自动排除相关食材；母乳喂养或混合喂养会默认排除含酒精的菜品。</p>
       <p><strong>数据说明：</strong>账号、餐单与打卡记录保存在服务端实例中，仅用于功能演示。请勿填写身份证号、住址等敏感个人信息。</p>
-      <p class="muted">暖月 v1.0 · 用一日三餐，好好照顾自己。</p>
+      <p class="muted">暖月 v2.0 · 用一日三餐，好好照顾自己。</p>
+    </div>`;
+}
+
+function generateSheetHTML() {
+  return `
+    <div class="sheet-head">
+      <h2>生成餐单</h2>
+      <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
+    </div>
+    <div class="sheet-body">
+      <p class="sheet-lead">重新生成会替换当前餐单，并清空已做的打卡与跳过状态；调养记录会保留。</p>
+      <div class="generate-options">
+        <button class="gen-option" type="button" data-action="do-generate" data-days="7">
+          <span class="gen-icon">${icon('sun', 20)}</span>
+          <span><strong>7 天餐单</strong><small>一周不重样，适合先体验</small></span>
+          ${icon('chevron', 16)}
+        </button>
+        <button class="gen-option" type="button" data-action="do-generate" data-days="28">
+          <span class="gen-icon">${icon('calendar', 20)}</span>
+          <span><strong>28 天完整餐单</strong><small>覆盖四个阶段，按周推进</small></span>
+          ${icon('chevron', 16)}
+        </button>
+      </div>
+      <p class="sheet-note">生成时会自动结合你的产后阶段、忌口、喂养方式和每日餐次。</p>
+    </div>`;
+}
+
+function passwordSheetHTML() {
+  return `
+    <div class="sheet-head">
+      <h2>修改密码</h2>
+      <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
+    </div>
+    <form data-form="password">
+      <div class="edit-section" style="margin-top:4px">
+        <label class="field">
+          <span>原密码</span>
+          <input name="oldPassword" type="password" autocomplete="current-password" required />
+        </label>
+        <label class="field">
+          <span>新密码</span>
+          <input name="newPassword" type="password" autocomplete="new-password" placeholder="至少 6 位" required />
+        </label>
+        <label class="field">
+          <span>确认新密码</span>
+          <input name="confirmPassword" type="password" autocomplete="new-password" required />
+        </label>
+      </div>
+      <p class="form-error" id="password-error" style="padding:0 20px"></p>
+      <div class="sheet-actions" style="padding-bottom:8px">
+        <button class="btn btn-primary" type="submit">保存新密码</button>
+      </div>
+    </form>`;
+}
+
+function articlesSheetHTML() {
+  return `
+    <div class="sheet-head">
+      <h2>月子知识库</h2>
+      <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
+    </div>
+    <div class="sheet-body" style="padding-bottom:18px">
+      ${!S.articles ? '<p class="small muted" style="padding:24px 0;text-align:center">正在加载…</p>' : S.articles.map((a) => `
+        <button class="article-item" type="button" data-action="open-article" data-id="${a.id}">
+          <span class="article-tag">${esc(a.tag)}</span>
+          <strong>${esc(a.title)}</strong>
+          <p>${esc(a.summary)}</p>
+          <span class="article-meta">${a.minutes} 分钟阅读 ${icon('chevron', 13)}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+function articleSheetHTML() {
+  const a = S.article;
+  if (!a) {
+    return `
+      <div class="sheet-head">
+        <h2>知识详情</h2>
+        <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
+      </div>
+      <p class="small muted" style="padding:30px 20px;text-align:center">正在加载…</p>`;
+  }
+  return `
+    <div class="sheet-head">
+      <button class="sheet-back" type="button" data-action="back-articles" aria-label="返回知识列表">${icon('arrowLeft', 17)}</button>
+      <h2>知识详情</h2>
+      <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
+    </div>
+    <div class="sheet-body article-detail">
+      <span class="article-tag">${esc(a.tag)}</span>
+      <h2>${esc(a.title)}</h2>
+      <p class="article-lead">${esc(a.summary)}</p>
+      ${a.sections.map((sec) => `
+        <section>
+          <h3>${esc(sec.h)}</h3>
+          ${(sec.p || []).map((p) => `<p>${esc(p)}</p>`).join('')}
+          ${(sec.list || []).length ? `<ul class="article-list">${sec.list.map((li) => `<li>${esc(li)}</li>`).join('')}</ul>` : ''}
+        </section>`).join('')}
+      <div class="tip-box">以上内容为日常饮食与护理参考，不构成医疗建议。身体不适请及时就医。</div>
     </div>`;
 }
 
@@ -1083,6 +1568,11 @@ async function switchTab(tab) {
     S.grocery.loading = true;
     renderMain();
     await loadGrocery();
+    return;
+  }
+  if (tab === 'records') {
+    renderMain();
+    if (!S.logsLoaded) await loadLogs();
     return;
   }
   renderMain();
@@ -1147,6 +1637,57 @@ async function doEat(el) {
   }
 }
 
+async function doSkip(el) {
+  if (S.busy) return;
+  S.busy = true;
+  el.style.opacity = '0.4';
+  try {
+    const date = el.dataset.date;
+    const slot = el.dataset.slot;
+    const wasSkipped = (S.planDay?.skipped || []).includes(slot);
+    const data = await api('/plan/skip', {
+      method: 'POST',
+      body: { date, slot, skipped: !wasSkipped }
+    });
+    S.planDay = data.day;
+    S.plan = data.plan;
+    S.stats = data.stats;
+    renderMain({ keepScroll: true });
+    toast(wasSkipped ? '已取消跳过' : '这一餐已跳过');
+  } catch (err) {
+    handleError(err);
+  } finally {
+    S.busy = false;
+  }
+}
+
+async function doApplyRecipe(el) {
+  if (S.busy) return;
+  S.busy = true;
+  try {
+    const data = await api('/plan/apply', {
+      method: 'POST',
+      body: {
+        date: el.dataset.date,
+        slot: el.dataset.slot,
+        course: el.dataset.course,
+        recipeId: el.dataset.id
+      }
+    });
+    S.planDay = data.day;
+    S.plan = data.plan;
+    S.stats = data.stats;
+    S.grocery.data = null;
+    closeSheet();
+    renderMain({ keepScroll: true });
+    toast('已加入餐单');
+  } catch (err) {
+    handleError(err);
+  } finally {
+    S.busy = false;
+  }
+}
+
 async function doFavorite(id) {
   if (!S.me) {
     toast('请先登录', 'error');
@@ -1166,7 +1707,6 @@ async function doFavorite(id) {
 
 async function generatePlan(days = 7) {
   if (S.busy) return;
-  if (!window.confirm(`将按当前偏好重新生成 ${days} 天餐单，原有打卡记录会清空，确定继续吗？`)) return;
   S.busy = true;
   closeSheet();
   try {
@@ -1182,7 +1722,7 @@ async function generatePlan(days = 7) {
     S.grocery.view = 'week';
     if (S.tab === 'grocery') await loadGrocery(true);
     renderMain();
-    toast('新的 7 天餐单已准备好');
+    toast(`${days} 天餐单已准备好`);
   } catch (err) {
     handleError(err);
   } finally {
@@ -1236,6 +1776,162 @@ async function saveProfile() {
     toast(res.needsRegenerate ? '已按新偏好更新餐单' : '设置已保存');
   } catch (err) {
     handleError(err);
+  }
+}
+
+async function saveLog() {
+  if (S.busy) return;
+  S.busy = true;
+  const date = S.recordDate;
+  const payload = {
+    weight: S.log.weight === '' || S.log.weight === null ? null : Number(S.log.weight),
+    waterMl: Number(S.log.waterMl) || 0,
+    sleepHours: S.log.sleepHours === '' || S.log.sleepHours === null ? null : Number(S.log.sleepHours),
+    mood: S.log.mood || '',
+    lochia: S.log.lochia || '',
+    wound: S.log.wound || '',
+    bowel: S.log.bowel || '',
+    note: S.log.note || ''
+  };
+  try {
+    const data = await api(`/logs/${date}`, { method: 'PUT', body: payload });
+    const entry = data.log ? { date, ...data.log } : null;
+    const idx = S.logs.findIndex((l) => l.date === date);
+    if (entry) {
+      if (idx >= 0) S.logs[idx] = entry;
+      else S.logs.push(entry);
+    } else if (idx >= 0) {
+      S.logs.splice(idx, 1);
+    }
+    S.log = logWithDefaults(data.log);
+    S.logDirty = false;
+    if (data.stats) S.stats = data.stats;
+    renderMain({ keepScroll: true });
+    toast('今天的记录已保存');
+  } catch (err) {
+    handleError(err);
+  } finally {
+    S.busy = false;
+  }
+}
+
+function selectLogDate(date) {
+  if (!date || date > todayStr()) return;
+  S.recordDate = date;
+  S.log = logWithDefaults(findLog(date));
+  S.logDirty = false;
+  renderMain({ keepScroll: true });
+}
+
+function setLogField(field, value) {
+  S.log[field] = value;
+  S.logDirty = true;
+  renderMain({ keepScroll: true });
+}
+
+function updateDirtyHint() {
+  const el = $('[data-dirty]');
+  if (el) el.textContent = S.logDirty ? '有未保存的修改' : '记录会自动保存在本机账号';
+}
+
+async function copyGrocery() {
+  if (!S.grocery.data) return;
+  const viewLabel = { day: '今日', week: '本周', all: '全部餐单' }[S.grocery.view] || '本周';
+  const lines = [`暖月采购清单（${viewLabel}）`];
+  for (const group of S.grocery.data.groups) {
+    lines.push('', `【${group.category}】`);
+    for (const item of group.items) {
+      lines.push(`${item.checked ? '✓ ' : ''}${item.name} ${item.amountText}`);
+    }
+  }
+  const text = lines.join('\n');
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    toast('采购清单已复制');
+  } catch {
+    toast('复制失败，请手动选择文字复制', 'error');
+  }
+}
+
+async function exportData() {
+  try {
+    const res = await fetch('/api/export', {
+      headers: S.token ? { Authorization: `Bearer ${S.token}` } : {}
+    });
+    if (!res.ok) throw new Error('导出失败');
+    const data = await res.json();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nuanyue-data-${todayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast('数据已导出为 JSON 文件');
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+async function openArticles() {
+  openSheet({ type: 'articles' });
+  if (S.articles) return;
+  try {
+    const data = await api('/articles');
+    S.articles = data.articles || [];
+    if (S.sheet?.type === 'articles') renderSheet();
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+async function openArticle(id) {
+  S.article = null;
+  S.sheet = { type: 'article', id };
+  renderSheet();
+  try {
+    const data = await api(`/articles/${id}`);
+    S.article = data.article;
+    if (S.sheet?.type === 'article' && S.sheet.id === id) renderSheet();
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+async function submitPassword(form) {
+  const fd = new FormData(form);
+  const oldPassword = String(fd.get('oldPassword') || '');
+  const newPassword = String(fd.get('newPassword') || '');
+  const confirmPassword = String(fd.get('confirmPassword') || '');
+  const errBox = $('#password-error');
+  errBox.textContent = '';
+  if (newPassword !== confirmPassword) {
+    errBox.textContent = '两次输入的新密码不一致';
+    return;
+  }
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    await api('/auth/password', { method: 'POST', body: { oldPassword, newPassword } });
+    closeSheet();
+    toast('密码已更新');
+  } catch (err) {
+    errBox.textContent = err.message;
+  } finally {
+    btn.disabled = false;
   }
 }
 
@@ -1309,6 +2005,18 @@ async function onClick(e) {
     case 'eat':
       doEat(el);
       break;
+    case 'skip':
+      doSkip(el);
+      break;
+    case 'week-tab': {
+      if (!S.plan) break;
+      const idx = Number(el.dataset.index);
+      selectDate(addDays(S.plan.startDate, idx * 7));
+      break;
+    }
+    case 'apply-recipe':
+      doApplyRecipe(el);
+      break;
     case 'open-recipe':
       openSheet({ type: 'recipe', id: el.dataset.id });
       break;
@@ -1326,6 +2034,10 @@ async function onClick(e) {
       S.filter.stage = el.dataset.value;
       renderMain({ keepScroll: true });
       break;
+    case 'filter-effect':
+      S.filter.effect = el.dataset.value;
+      renderMain({ keepScroll: true });
+      break;
     case 'filter-fav':
       S.filter.fav = !S.filter.fav;
       renderMain({ keepScroll: true });
@@ -1333,6 +2045,9 @@ async function onClick(e) {
     case 'open-favorites':
       S.tab = 'recipes';
       S.filter.fav = true;
+      S.filter.course = 'all';
+      S.filter.stage = 'all';
+      S.filter.effect = 'all';
       renderMain();
       break;
     case 'grocery-view':
@@ -1357,7 +2072,75 @@ async function onClick(e) {
       }
       break;
     case 'generate-plan':
-      generatePlan(7);
+      openSheet({ type: 'generate' });
+      break;
+    case 'open-generate':
+      openSheet({ type: 'generate' });
+      break;
+    case 'do-generate':
+      generatePlan(Number(el.dataset.days) || 7);
+      break;
+    case 'copy-grocery':
+      copyGrocery();
+      break;
+    case 'toggle-hide-checked':
+      S.grocery.hideChecked = !S.grocery.hideChecked;
+      renderMain({ keepScroll: true });
+      break;
+    case 'log-prev':
+      selectLogDate(addDays(S.recordDate, -1));
+      break;
+    case 'log-next':
+      if (S.recordDate < todayStr()) selectLogDate(addDays(S.recordDate, 1));
+      break;
+    case 'log-today':
+      selectLogDate(todayStr());
+      break;
+    case 'log-date':
+      selectLogDate(el.dataset.date);
+      break;
+    case 'log-water': {
+      const cups = Number(el.dataset.cups);
+      const cupMl = S.meta.logOptions.waterCupMl;
+      const current = Number(S.log.waterMl || 0);
+      S.log.waterMl = current === cups * cupMl ? (cups - 1) * cupMl : cups * cupMl;
+      S.logDirty = true;
+      renderMain({ keepScroll: true });
+      break;
+    }
+    case 'log-sleep':
+      S.log.sleepHours = Number(el.dataset.value);
+      S.logDirty = true;
+      renderMain({ keepScroll: true });
+      break;
+    case 'log-option':
+      setLogField(el.dataset.field, el.dataset.value);
+      break;
+    case 'save-log':
+      saveLog();
+      break;
+    case 'view-day-plan': {
+      const date = el.dataset.date;
+      if (!S.plan?.dayList.some((d) => d.date === date)) break;
+      S.tab = 'today';
+      if (date === S.selectedDate) renderMain();
+      else selectDate(date);
+      break;
+    }
+    case 'open-password':
+      openSheet({ type: 'password' });
+      break;
+    case 'open-articles':
+      openArticles();
+      break;
+    case 'open-article':
+      openArticle(el.dataset.id);
+      break;
+    case 'back-articles':
+      openSheet({ type: 'articles' });
+      break;
+    case 'export-data':
+      exportData();
       break;
     case 'open-edit':
       S.edit = {
@@ -1476,6 +2259,7 @@ function onSubmit(e) {
   e.preventDefault();
   if (form.dataset.form === 'auth') doAuthSubmit(form);
   if (form.dataset.form === 'edit-profile') saveProfile();
+  if (form.dataset.form === 'password') submitPassword(form);
 }
 
 function onInput(e) {
@@ -1487,6 +2271,12 @@ function onInput(e) {
   }
   if (el.dataset.edit) {
     S.edit[el.dataset.edit] = el.value;
+    return;
+  }
+  if (el.dataset.log) {
+    S.log[el.dataset.log] = el.value;
+    S.logDirty = true;
+    updateDirtyHint();
     return;
   }
   if (el.id === 'recipe-search') {
@@ -1555,4 +2345,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('input', onInput);
   document.addEventListener('change', onChange);
   boot();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js?v=2').catch(() => {});
+  }
 });

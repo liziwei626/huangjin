@@ -258,11 +258,13 @@ function resolveDay(plan, date) {
   };
 }
 
-function daySummary(plan, date, eaten) {
+function daySummary(plan, date, eaten, skipped = {}) {
   const day = resolveDay(plan, date);
   if (!day) return null;
   const eatenSlots = Array.isArray(eaten?.[date]) ? eaten[date] : [];
+  const skippedSlots = Array.isArray(skipped?.[date]) ? skipped[date] : [];
   const slotKeys = day.meals.map((m) => m.slot);
+  const handled = (s) => eatenSlots.includes(s) || skippedSlots.includes(s);
   return {
     date,
     weekday: weekdayLabel(date),
@@ -270,7 +272,8 @@ function daySummary(plan, date, eaten) {
     kcal: day.nutrition.kcal,
     mealCount: slotKeys.length,
     eatenCount: slotKeys.filter((s) => eatenSlots.includes(s)).length,
-    complete: slotKeys.length > 0 && slotKeys.every((s) => eatenSlots.includes(s))
+    skippedCount: slotKeys.filter((s) => skippedSlots.includes(s)).length,
+    complete: slotKeys.length > 0 && slotKeys.every(handled)
   };
 }
 
@@ -279,17 +282,17 @@ function planDays(plan) {
   return Array.from({ length: plan.days }, (_, i) => addDays(plan.startDate, i));
 }
 
-function planOverview(plan, eaten) {
+function planOverview(plan, eaten, skipped = {}) {
   if (!plan) return null;
   return {
     startDate: plan.startDate,
     days: plan.days,
     createdAt: plan.createdAt,
-    dayList: planDays(plan).map((d) => daySummary(plan, d, eaten)).filter(Boolean)
+    dayList: planDays(plan).map((d) => daySummary(plan, d, eaten, skipped)).filter(Boolean)
   };
 }
 
-function swapDish(plan, profile, date, slot, course, eaten) {
+function swapDish(plan, profile, date, slot, course, eaten, skipped) {
   if (!plan || !plan.items?.[date]) return { error: '该日期没有餐单' };
   const slotDef = SLOT_MAP.get(slot);
   if (!slotDef || !slotDef.courses.includes(course)) return { error: '餐次或品类不正确' };
@@ -336,6 +339,30 @@ function swapDish(plan, profile, date, slot, course, eaten) {
   if (eaten?.[date]) {
     eaten[date] = eaten[date].filter((s) => s !== slot);
   }
+  if (skipped?.[date]) {
+    skipped[date] = skipped[date].filter((s) => s !== slot);
+  }
+  return { day: resolveDay(plan, date), recipeId: recipe.id };
+}
+
+/**
+ * 手动把某道菜放进餐单的指定餐次。
+ * 会校验餐次、品类与忌口，成功时清除该餐的打卡/跳过状态。
+ */
+function applyRecipe(plan, profile, date, slot, course, recipeId, eaten, skipped) {
+  if (!plan || !plan.items?.[date]) return { error: '该日期没有餐单' };
+  const slotDef = SLOT_MAP.get(slot);
+  if (!slotDef || !slotDef.courses.includes(course)) return { error: '餐次或品类不正确' };
+  const recipe = RECIPE_MAP.get(recipeId);
+  if (!recipe || recipe.course !== course) return { error: '食谱与餐次品类不匹配' };
+  const { terms } = buildExclusions(profile);
+  if (isExcluded(recipe, terms)) return { error: '这道菜含有你设置的忌口食材，已为你拦截' };
+
+  const meal = plan.items[date][slot];
+  if (!meal) return { error: '这一餐还没有安排' };
+  meal[course] = recipe.id;
+  if (eaten?.[date]) eaten[date] = eaten[date].filter((s) => s !== slot);
+  if (skipped?.[date]) skipped[date] = skipped[date].filter((s) => s !== slot);
   return { day: resolveDay(plan, date), recipeId: recipe.id };
 }
 
@@ -397,29 +424,42 @@ function computeStats(user, today) {
   const plan = user.plan;
   const favoriteCount = Array.isArray(user.favorites) ? user.favorites.length : 0;
   if (!plan) {
-    return { planDays: 0, favoriteCount, eatenMeals: 0, totalMeals: 0, completionRate: 0, streak: 0, plannedToday: false };
+    return {
+      planDays: 0,
+      favoriteCount,
+      eatenMeals: 0,
+      skippedMeals: 0,
+      totalMeals: 0,
+      completionRate: 0,
+      streak: 0,
+      plannedToday: false,
+      recordDays: Object.keys(user.logs || {}).length
+    };
   }
   const dates = planDays(plan);
   let totalMeals = 0;
   let eatenMeals = 0;
+  let skippedMeals = 0;
   let passedMeals = 0;
-  let passedEaten = 0;
+  let passedHandled = 0;
 
   for (const date of dates) {
     const day = resolveDay(plan, date);
     if (!day) continue;
     const eaten = new Set(user.eaten?.[date] || []);
+    const skipped = new Set(user.skipped?.[date] || []);
     for (const meal of day.meals) {
       totalMeals += 1;
       if (eaten.has(meal.slot)) eatenMeals += 1;
+      else if (skipped.has(meal.slot)) skippedMeals += 1;
       if (date <= today) {
         passedMeals += 1;
-        if (eaten.has(meal.slot)) passedEaten += 1;
+        if (eaten.has(meal.slot) || skipped.has(meal.slot)) passedHandled += 1;
       }
     }
   }
 
-  // 连续打卡：从今天（或昨天）往前数，所有餐次都吃完的天数。
+  // 连续打卡：从今天（或昨天）往前数，所有餐次都已吃或跳过的天数。
   let streak = 0;
   let cursor = dates.includes(today) ? today : addDays(today, -1);
   const dateSet = new Set(dates);
@@ -427,7 +467,8 @@ function computeStats(user, today) {
     const day = resolveDay(plan, cursor);
     if (!day || !day.meals.length) break;
     const eaten = new Set(user.eaten?.[cursor] || []);
-    if (day.meals.every((m) => eaten.has(m.slot))) {
+    const skipped = new Set(user.skipped?.[cursor] || []);
+    if (day.meals.every((m) => eaten.has(m.slot) || skipped.has(m.slot))) {
       streak += 1;
       cursor = addDays(cursor, -1);
     } else {
@@ -439,10 +480,12 @@ function computeStats(user, today) {
     planDays: plan.days,
     favoriteCount,
     eatenMeals,
+    skippedMeals,
     totalMeals,
-    completionRate: passedMeals ? Math.round((passedEaten / passedMeals) * 100) : 0,
+    completionRate: passedMeals ? Math.round((passedHandled / passedMeals) * 100) : 0,
     streak,
-    plannedToday: dateSet.has(today)
+    plannedToday: dateSet.has(today),
+    recordDays: Object.keys(user.logs || {}).length
   };
 }
 
@@ -462,6 +505,7 @@ module.exports = {
   resolveDay,
   planOverview,
   swapDish,
+  applyRecipe,
   aggregateGrocery,
   computeStats,
   publicRecipe,

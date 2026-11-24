@@ -112,6 +112,49 @@ const RAW = [
     tips: '山药本身黏滑，煮饭时水量比平时略少一点。'
   },
 
+  {
+    id: 's15', name: '黑米红枣粥', course: 'staple', slots: ['breakfast'], stages: S2,
+    tags: ['补血', '养胃', '乌发'], kcal: 240, protein: 6, carbs: 50, fat: 2, time: 40,
+    ingredients: [['黑米', 30, 'g', '谷物豆类'], ['大米', 20, 'g', '谷物豆类'], ['红枣', 4, '颗', '干货药材']],
+    steps: ['黑米提前浸泡 2 小时。', '黑米、大米加 600ml 清水煮开。', '转小火煮 30 分钟，加入红枣再煮 10 分钟。'],
+    tips: '黑米外皮较硬，泡够时间口感才软糯。'
+  },
+  {
+    id: 's16', name: '菠菜猪肝粥', course: 'staple', slots: ['breakfast'], stages: [1, 2],
+    tags: ['补铁', '补血', '易消化'], kcal: 260, protein: 14, carbs: 40, fat: 6, time: 40,
+    ingredients: [['大米', 40, 'g', '谷物豆类'], ['猪肝', 40, 'g', '肉禽蛋'], ['菠菜', 60, 'g', '蔬菜'], ['姜丝', 3, 'g', '调味料']],
+    steps: ['大米加水煮成软粥。', '猪肝切薄片浸泡去血水，焯水后切碎。', '粥里加入猪肝和姜丝煮 3 分钟，放菠菜碎再煮 1 分钟。'],
+    tips: '猪肝每周吃 1-2 次即可，不要过量。'
+  },
+  {
+    id: 's17', name: '虾仁蔬菜面', course: 'staple', slots: ['breakfast'], stages: [1, 2, 3],
+    tags: ['高蛋白', '补钙', '易消化'], kcal: 350, protein: 20, carbs: 50, fat: 8, time: 20,
+    ingredients: [['细面条', 70, 'g', '谷物豆类'], ['虾仁', 50, 'g', '水产'], ['小青菜', 60, 'g', '蔬菜'], ['姜片', 2, '片', '调味料']],
+    steps: ['虾仁去虾线，用姜片腌 5 分钟。', '水开下面条煮软，加入虾仁。', '虾仁变色后放小青菜，煮 1 分钟连汤盛出。'],
+    tips: '面条煮软一点，搭配虾仁鲜甜开胃。'
+  },
+  {
+    id: 's18', name: '南瓜糙米饭', course: 'staple', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['膳食纤维', '控糖', '香甜'], kcal: 300, protein: 7, carbs: 64, fat: 2, time: 40,
+    ingredients: [['大米', 50, 'g', '谷物豆类'], ['糙米', 30, 'g', '谷物豆类'], ['南瓜', 80, 'g', '蔬菜']],
+    steps: ['糙米提前浸泡 2 小时，南瓜切丁。', '与大米混合放入电饭煲，加适量水。', '煮熟后焖 10 分钟，轻轻拌匀。'],
+    tips: '南瓜会出水，煮饭时比平时少放一点水。'
+  },
+  {
+    id: 's19', name: '鸡肉香菇蒸饺', course: 'staple', slots: ['breakfast'], stages: S2,
+    tags: ['高蛋白', '鲜香', '手作'], kcal: 330, protein: 18, carbs: 40, fat: 11, time: 35,
+    ingredients: [['饺子皮', 8, '张', '谷物豆类'], ['鸡肉', 80, 'g', '肉禽蛋'], ['香菇', 40, 'g', '蔬菜'], ['小葱', 5, 'g', '蔬菜']],
+    steps: ['鸡肉和香菇切碎，加葱花和少许盐拌匀。', '取饺子皮包入馅料，捏紧收口。', '水开后蒸 12 分钟至熟透。'],
+    tips: '一次多包一些冷冻，早餐随吃随蒸。'
+  },
+  {
+    id: 's20', name: '红豆紫米饭', course: 'staple', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['补血', '花青素', '有饱腹感'], kcal: 330, protein: 9, carbs: 68, fat: 2.5, time: 50,
+    ingredients: [['大米', 50, 'g', '谷物豆类'], ['紫米', 30, 'g', '谷物豆类'], ['红豆', 20, 'g', '谷物豆类']],
+    steps: ['红豆、紫米提前浸泡 3 小时。', '与大米混合，加水入电饭煲。', '煮熟后焖 10 分钟，口感更软糯。'],
+    tips: '紫米和红豆都偏硬，泡透再煮更好消化。'
+  },
+
   // ================= 主菜 =================
   {
     id: 'm01', name: '水煮蛋', course: 'main', slots: ['breakfast', 'lunch'], stages: ALL,
@@ -332,6 +375,77 @@ const RAW = [
     tips: '不吃鸡蛋时，这是一道温和的早餐蛋白质选择。'
   },
 
+  {
+    id: 'm32', name: '芦笋炒虾仁', course: 'main', slots: ['lunch', 'dinner'], stages: [2, 3, 4],
+    tags: ['高蛋白', '补钙', '清爽'], kcal: 220, protein: 22, carbs: 8, fat: 11, time: 15, proteinType: 'shrimp',
+    ingredients: [['虾仁', 100, 'g', '水产'], ['芦笋', 120, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    steps: ['虾仁去虾线，芦笋切段焯水 1 分钟。', '热锅少油炒虾仁至变色。', '加入芦笋和蒜末快炒，少许盐调味。'],
+    tips: '虾仁和芦笋都易熟，大火快炒口感最好。'
+  },
+  {
+    id: 'm33', name: '番茄龙利鱼', course: 'main', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['低脂', '优质蛋白', '开胃'], kcal: 210, protein: 24, carbs: 9, fat: 8, time: 20, proteinType: 'fish',
+    ingredients: [['龙利鱼', 150, 'g', '水产'], ['番茄', 150, 'g', '蔬菜'], ['姜片', 2, '片', '调味料']],
+    steps: ['龙利鱼解冻切块，用姜片腌 5 分钟。', '番茄切块炒软出汁。', '加小半碗水煮开，放入鱼块煮 5 分钟，少许盐调味。'],
+    tips: '龙利鱼刺少肉嫩，适合不太会吃鱼的人。'
+  },
+  {
+    id: 'm34', name: '土豆炖鸡块', course: 'main', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['补蛋白', '家常', '有饱腹感'], kcal: 350, protein: 26, carbs: 24, fat: 17, time: 45, proteinType: 'chicken',
+    ingredients: [['鸡肉', 180, 'g', '肉禽蛋'], ['土豆', 120, 'g', '蔬菜'], ['胡萝卜', 50, 'g', '蔬菜'], ['姜片', 3, '片', '调味料']],
+    steps: ['鸡肉切块焯水，土豆胡萝卜切块。', '少油炒香姜片和鸡块。', '加土豆、胡萝卜和热水，小火炖 25 分钟收汁。'],
+    tips: '土豆吸饱汤汁很下饭，主食可相应减少。'
+  },
+  {
+    id: 'm35', name: '萝卜炖牛肉', course: 'main', slots: ['lunch', 'dinner'], stages: S3,
+    tags: ['补铁', '温补', '软烂'], kcal: 340, protein: 26, carbs: 12, fat: 20, time: 90, proteinType: 'beef',
+    ingredients: [['牛腩', 180, 'g', '肉禽蛋'], ['白萝卜', 150, 'g', '蔬菜'], ['姜片', 3, '片', '调味料']],
+    steps: ['牛腩切块焯水去浮沫。', '加姜片和热水，小火炖 60 分钟。', '放白萝卜再炖 20 分钟，少许盐调味。'],
+    tips: '白萝卜能吸附油脂，汤喝起来更清爽。'
+  },
+  {
+    id: 'm36', name: '蒜香蒸排骨', course: 'main', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['补钙', '补蛋白', '鲜香'], kcal: 310, protein: 22, carbs: 6, fat: 22, time: 40, proteinType: 'pork',
+    ingredients: [['猪排骨', 180, 'g', '肉禽蛋'], ['蒜', 10, 'g', '调味料'], ['淀粉', 5, 'g', '调味料'], ['小葱', 5, 'g', '蔬菜']],
+    steps: ['排骨泡去血水，加蒜末、淀粉和少许盐抓匀。', '腌制 15 分钟后平铺盘中。', '水开后蒸 20 分钟，撒葱花出锅。'],
+    tips: '蒸排骨比红烧少油，更适合月子期。'
+  },
+  {
+    id: 'm37', name: '香菇牛肉饼', course: 'main', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['补铁', '高蛋白', '软嫩'], kcal: 290, protein: 24, carbs: 10, fat: 17, time: 30, proteinType: 'beef',
+    ingredients: [['牛肉末', 120, 'g', '肉禽蛋'], ['香菇', 50, 'g', '蔬菜'], ['淀粉', 5, 'g', '调味料'], ['小葱', 5, 'g', '蔬菜']],
+    steps: ['香菇切碎，与牛肉末、淀粉、葱花拌匀。', '压成小饼放入盘中。', '水开后蒸 15 分钟即可。'],
+    tips: '牛肉末选瘦一些的部位，口感更清爽。'
+  },
+  {
+    id: 'm38', name: '清蒸鸡腿', course: 'main', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['优质蛋白', '清淡', '易消化'], kcal: 270, protein: 28, carbs: 2, fat: 16, time: 30, proteinType: 'chicken',
+    ingredients: [['鸡腿', 180, 'g', '肉禽蛋'], ['姜丝', 8, 'g', '调味料'], ['小葱', 5, 'g', '蔬菜'], ['生抽', 5, 'ml', '调味料']],
+    steps: ['鸡腿去皮划刀，铺上姜丝。', '水开后蒸 18 分钟至熟透。', '淋少许生抽，撒葱花。'],
+    tips: '去皮蒸制能减少油脂，蛋白质依然充足。'
+  },
+  {
+    id: 'm39', name: '虾仁豆腐煲', course: 'main', slots: ['lunch', 'dinner'], stages: [1, 2, 3],
+    tags: ['补钙', '高蛋白', '暖胃'], kcal: 250, protein: 24, carbs: 8, fat: 13, time: 25, proteinType: 'shrimp',
+    ingredients: [['虾仁', 80, 'g', '水产'], ['豆腐', 180, 'g', '豆制品'], ['小葱', 5, 'g', '蔬菜'], ['姜片', 2, '片', '调味料']],
+    steps: ['豆腐切块，虾仁去虾线。', '砂锅加少许油炒香姜片，放豆腐和小半碗水煮 5 分钟。', '放入虾仁煮 3 分钟，撒葱花调味。'],
+    tips: '豆腐和虾仁都是补钙好食材，汤水也别浪费。'
+  },
+  {
+    id: 'm40', name: '五彩鸡丁', course: 'main', slots: ['lunch', 'dinner'], stages: [2, 3, 4],
+    tags: ['高蛋白', '开胃', '色彩丰富'], kcal: 280, protein: 27, carbs: 12, fat: 13, time: 20, proteinType: 'chicken',
+    ingredients: [['鸡肉', 150, 'g', '肉禽蛋'], ['彩椒', 60, 'g', '蔬菜'], ['玉米粒', 40, 'g', '蔬菜'], ['胡萝卜', 30, 'g', '蔬菜']],
+    steps: ['鸡肉切丁，用少许淀粉抓匀。', '热锅少油滑炒鸡丁至变色盛出。', '下彩椒、玉米、胡萝卜翻炒，倒回鸡丁炒匀调味。'],
+    tips: '颜色丰富更容易唤起食欲，蔬菜可随季节替换。'
+  },
+  {
+    id: 'm41', name: '清蒸鲳鱼', course: 'main', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['优质蛋白', 'DHA', '低脂'], kcal: 220, protein: 26, carbs: 2, fat: 11, time: 20, proteinType: 'fish',
+    ingredients: [['鲳鱼', 180, 'g', '水产'], ['姜丝', 8, 'g', '调味料'], ['小葱', 5, 'g', '蔬菜'], ['蒸鱼豉油', 5, 'ml', '调味料']],
+    steps: ['鲳鱼处理干净，两面划刀铺姜丝。', '水开后大火蒸 8-10 分钟。', '倒掉汤汁，铺葱丝淋豉油和少量热油。'],
+    tips: '鲳鱼肉厚刺少，蒸到筷子能轻松插入即可。'
+  },
+
   // ================= 蔬菜 =================
   {
     id: 'v01', name: '清炒西兰花', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
@@ -416,6 +530,42 @@ const RAW = [
     ingredients: [['西葫芦', 180, 'g', '蔬菜'], ['番茄', 100, 'g', '蔬菜']],
     steps: ['西葫芦和番茄切块。', '少油炒软番茄出汁。', '下西葫芦翻炒至软，少许盐调味。'],
     tips: '番茄的酸甜能让清淡的月子餐更有食欲。'
+  },
+
+  {
+    id: 'v13', name: '清炒秋葵', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['通便', '膳食纤维', '低脂'], kcal: 85, protein: 4, carbs: 11, fat: 3, time: 12,
+    ingredients: [['秋葵', 180, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    steps: ['秋葵洗净去蒂，焯水 1 分钟后切段。', '热锅少油爆香蒜末。', '下秋葵快炒，少许盐调味。'],
+    tips: '秋葵黏液富含可溶性纤维，对产后便秘很友好。'
+  },
+  {
+    id: 'v14', name: '蒜蓉茼蒿', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['安神', '清香', '纤维'], kcal: 75, protein: 4, carbs: 8, fat: 3, time: 10,
+    ingredients: [['茼蒿', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    steps: ['茼蒿洗净沥干。', '热锅少油爆香蒜末。', '下茼蒿大火快炒至变软，少许盐调味。'],
+    tips: '茼蒿有独特清香，传统上认为有助于安神。'
+  },
+  {
+    id: 'v15', name: '五彩时蔬', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['膳食纤维', '维C', '清爽'], kcal: 100, protein: 4, carbs: 14, fat: 4, time: 15,
+    ingredients: [['西兰花', 80, 'g', '蔬菜'], ['彩椒', 50, 'g', '蔬菜'], ['胡萝卜', 40, 'g', '蔬菜'], ['干木耳', 3, 'g', '干货药材']],
+    steps: ['木耳泡发，所有蔬菜切小块。', '焯水 1 分钟后捞出。', '热锅少油快炒，少许盐调味。'],
+    tips: '一次吃到多种蔬菜，颜色和营养都更丰富。'
+  },
+  {
+    id: 'v16', name: '醋溜藕片', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['开胃', '爽脆', '低脂'], kcal: 90, protein: 3, carbs: 16, fat: 2, time: 12,
+    ingredients: [['莲藕', 180, 'g', '蔬菜'], ['米醋', 5, 'ml', '调味料'], ['蒜', 2, '瓣', '调味料']],
+    steps: ['莲藕去皮切薄片，泡清水防氧化。', '焯水 1 分钟捞出。', '热锅少油爆香蒜末，下藕片快炒，烹入米醋调味。'],
+    tips: '少量米醋提味，有助于改善产后胃口。'
+  },
+  {
+    id: 'v17', name: '清炒荷兰豆', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['膳食纤维', '清甜', '低脂'], kcal: 90, protein: 5, carbs: 10, fat: 3, time: 12,
+    ingredients: [['荷兰豆', 180, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    steps: ['荷兰豆撕去两边老筋。', '焯水 1 分钟后捞出。', '热锅少油爆香蒜末，下荷兰豆快炒调味。'],
+    tips: '荷兰豆一定要炒熟，口感才脆嫩安全。'
   },
 
   // ================= 汤羹 =================
@@ -562,6 +712,63 @@ const RAW = [
     tips: '清爽利水，搭配清淡主菜很合适。'
   },
 
+  {
+    id: 'p21', name: '冬瓜虾仁汤', course: 'soup', slots: ['lunch', 'dinner'], stages: [1, 2, 3],
+    tags: ['消肿', '补钙', '清淡'], kcal: 150, protein: 14, carbs: 6, fat: 7, time: 20, proteinType: 'shrimp',
+    ingredients: [['冬瓜', 200, 'g', '蔬菜'], ['虾仁', 60, 'g', '水产'], ['姜片', 2, '片', '调味料']],
+    steps: ['冬瓜去皮切片，虾仁去虾线。', '加姜片和清水煮开，放冬瓜煮 8 分钟。', '放入虾仁煮 3 分钟，少许盐调味。'],
+    tips: '冬瓜利水，产后水肿明显时可以常喝。'
+  },
+  {
+    id: 'p22', name: '番茄牛肉汤', course: 'soup', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['补铁', '开胃', '补蛋白'], kcal: 260, protein: 20, carbs: 10, fat: 14, time: 70, proteinType: 'beef',
+    ingredients: [['牛腩', 120, 'g', '肉禽蛋'], ['番茄', 150, 'g', '蔬菜'], ['姜片', 3, '片', '调味料']],
+    steps: ['牛腩切块焯水。', '加姜片和热水炖 40 分钟。', '放入番茄再炖 20 分钟，少许盐调味。'],
+    tips: '番茄炖得越久，汤的酸甜味越浓。'
+  },
+  {
+    id: 'p23', name: '山药玉米汤', course: 'soup', slots: ['lunch', 'dinner'], stages: ALL,
+    tags: ['健脾', '清甜', '温和'], kcal: 180, protein: 6, carbs: 32, fat: 4, time: 40,
+    ingredients: [['铁棍山药', 100, 'g', '蔬菜'], ['玉米', 100, 'g', '蔬菜'], ['胡萝卜', 50, 'g', '蔬菜']],
+    steps: ['山药、胡萝卜切块，玉米切段。', '所有食材加清水煮开。', '转小火煮 25 分钟，少许盐调味。'],
+    tips: '三种食材都带天然甜味，不放糖也很好喝。'
+  },
+  {
+    id: 'p24', name: '萝卜丝鲫鱼汤', course: 'soup', slots: ['lunch', 'dinner'], stages: S3,
+    tags: ['催乳', '高蛋白', '清甜'], kcal: 280, protein: 25, carbs: 8, fat: 14, time: 35, proteinType: 'fish',
+    ingredients: [['鲫鱼', 180, 'g', '水产'], ['白萝卜', 120, 'g', '蔬菜'], ['姜片', 4, '片', '调味料']],
+    steps: ['鲫鱼煎至两面微黄，加姜片和开水。', '大火煮 10 分钟至汤色乳白。', '放白萝卜丝再煮 10 分钟，少许盐调味。'],
+    tips: '萝卜丝吸油，汤会更清甜不腻。'
+  },
+  {
+    id: 'p25', name: '花生鸡爪汤', course: 'soup', slots: ['lunch', 'dinner'], stages: [2, 3],
+    tags: ['催乳', '胶原', '滋补'], kcal: 300, protein: 20, carbs: 8, fat: 20, time: 80, proteinType: 'chicken',
+    ingredients: [['鸡爪', 150, 'g', '肉禽蛋'], ['花生', 25, 'g', '干货药材'], ['姜片', 3, '片', '调味料']],
+    steps: ['鸡爪剪去指甲焯水，花生提前浸泡。', '加姜片和清水小火炖 50 分钟。', '放入花生再炖 20 分钟，撇油后调味。'],
+    tips: '汤面浮油撇掉，喝汤也要吃点肉和花生。'
+  },
+  {
+    id: 'p26', name: '栗子鸡汤', course: 'soup', slots: ['lunch', 'dinner'], stages: S2,
+    tags: ['温补', '健脾', '补气'], kcal: 300, protein: 24, carbs: 20, fat: 14, time: 70, proteinType: 'chicken',
+    ingredients: [['鸡肉', 150, 'g', '肉禽蛋'], ['板栗', 60, 'g', '干货药材'], ['红枣', 3, '颗', '干货药材'], ['姜片', 3, '片', '调味料']],
+    steps: ['鸡肉焯水，板栗去壳。', '加姜片、红枣和清水炖 40 分钟。', '放入板栗再炖 20 分钟，少许盐调味。'],
+    tips: '板栗偏温补，容易上火时减少用量。'
+  },
+  {
+    id: 'p27', name: '海带豆腐汤', course: 'soup', slots: ['lunch', 'dinner'], stages: S3,
+    tags: ['补碘', '补钙', '清淡'], kcal: 140, protein: 10, carbs: 9, fat: 6, time: 20, proteinType: 'soy',
+    ingredients: [['海带', 40, 'g', '水产'], ['豆腐', 120, 'g', '豆制品'], ['姜片', 2, '片', '调味料']],
+    steps: ['海带泡发切丝，豆腐切块。', '加姜片和清水煮开，放海带煮 8 分钟。', '放入豆腐再煮 5 分钟，少许盐调味。'],
+    tips: '海带含碘丰富，甲状腺功能异常者请遵医嘱。'
+  },
+  {
+    id: 'p28', name: '丝瓜蛤蜊汤', course: 'soup', slots: ['lunch', 'dinner'], stages: [2, 3],
+    tags: ['鲜甜', '补锌', '低脂'], kcal: 160, protein: 16, carbs: 7, fat: 7, time: 20, proteinType: 'shrimp',
+    ingredients: [['蛤蜊', 150, 'g', '水产'], ['丝瓜', 150, 'g', '蔬菜'], ['姜片', 2, '片', '调味料']],
+    steps: ['蛤蜊吐沙洗净，丝瓜去皮切块。', '加姜片和清水煮开，放蛤蜊煮至开口。', '放入丝瓜煮 3 分钟，少许盐调味。'],
+    tips: '蛤蜊本身有咸味，盐要少放；海鲜过敏者避开。'
+  },
+
   // ================= 加餐 =================
   {
     id: 'k01', name: '红枣桂圆茶', course: 'snack', slots: ['morningSnack', 'afternoonSnack', 'nightSnack'], stages: ALL,
@@ -660,20 +867,81 @@ const RAW = [
     ingredients: [['花生', 25, 'g', '干货药材'], ['红枣', 4, '颗', '干货药材']],
     steps: ['花生提前浸泡 2 小时。', '与红枣一起加清水煮 30 分钟。', '连汤带料温热食用。'],
     tips: '花生红衣别丢，传统认为有助补血。'
+  },
+  {
+    id: 'k15', name: '红枣蒸蛋', course: 'snack', slots: ['morningSnack', 'afternoonSnack'], stages: [1, 2],
+    tags: ['补血', '高蛋白', '嫩滑'], kcal: 180, protein: 10, carbs: 12, fat: 10, time: 20,
+    ingredients: [['鸡蛋', 1, '个', '肉禽蛋'], ['红枣', 3, '颗', '干货药材'], ['红糖', 2, 'g', '调味料']],
+    steps: ['红枣去核切碎，加入打散的鸡蛋。', '加 100ml 温水和少许红糖搅匀，过筛。', '盖住碗口，水开后中小火蒸 10 分钟。'],
+    tips: '甜口蒸蛋更有食欲，红糖少量即可。'
+  },
+  {
+    id: 'k16', name: '蒸雪梨', course: 'snack', slots: ['morningSnack', 'afternoonSnack', 'nightSnack'], stages: ALL,
+    tags: ['润燥', '润肺', '清甜'], kcal: 110, protein: 0.5, carbs: 28, fat: 0.3, time: 25,
+    ingredients: [['雪梨', 200, 'g', '水果'], ['枸杞', 3, 'g', '干货药材']],
+    steps: ['雪梨洗净去核切块（可带皮）。', '放入碗中，撒枸杞。', '水开后蒸 15 分钟，温热食用。'],
+    tips: '嗓子干、咳嗽时可以试试，但症状持续请就医。'
+  },
+  {
+    id: 'k17', name: '南瓜牛奶羹', course: 'snack', slots: ['morningSnack', 'afternoonSnack'], stages: S2,
+    tags: ['补钙', '养胃', '香甜'], kcal: 190, protein: 7, carbs: 27, fat: 6, time: 20,
+    ingredients: [['南瓜', 150, 'g', '蔬菜'], ['牛奶', 200, 'ml', '奶制品']],
+    steps: ['南瓜去皮蒸熟，压成泥。', '加入温牛奶搅拌均匀。', '小火加热至微温即可，不要煮沸。'],
+    tips: '乳糖不耐受可以把牛奶换成无乳糖牛奶。'
+  },
+  {
+    id: 'k18', name: '黑米豆浆', course: 'snack', slots: ['morningSnack', 'afternoonSnack'], stages: S2,
+    tags: ['补血', '植物蛋白', '香浓'], kcal: 180, protein: 8, carbs: 26, fat: 5, time: 25,
+    ingredients: [['黑米', 20, 'g', '谷物豆类'], ['黄豆', 30, 'g', '谷物豆类']],
+    steps: ['黑米和黄豆提前浸泡 4 小时。', '放入豆浆机，加 400ml 清水。', '打成熟豆浆后趁温热喝，可不过滤。'],
+    tips: '豆类容易胀气，第一次喝先少量试试。'
+  },
+  {
+    id: 'k19', name: '紫米糕', course: 'snack', slots: ['morningSnack', 'afternoonSnack'], stages: S2,
+    tags: ['补血', '手作', '有饱腹感'], kcal: 210, protein: 5, carbs: 45, fat: 1.5, time: 40,
+    ingredients: [['紫米', 40, 'g', '谷物豆类'], ['糯米粉', 20, 'g', '谷物豆类'], ['红枣', 2, '颗', '干货药材']],
+    steps: ['紫米蒸熟，加入糯米粉和少许温水揉匀。', '拌入红枣碎，压入模具。', '水开后蒸 20 分钟，放温后切块。'],
+    tips: '糯米制品不好消化，一次吃一小块即可。'
+  },
+  {
+    id: 'k20', name: '桂圆红枣银耳羹', course: 'snack', slots: ['morningSnack', 'afternoonSnack', 'nightSnack'], stages: S2,
+    tags: ['安神', '润燥', '补气'], kcal: 140, protein: 2, carbs: 32, fat: 0.4, time: 60,
+    ingredients: [['干银耳', 5, 'g', '干货药材'], ['红枣', 3, '颗', '干货药材'], ['桂圆', 3, '颗', '干货药材']],
+    steps: ['银耳泡发撕小朵，红枣去核。', '加红枣和清水炖 40 分钟至出胶。', '放入桂圆再煮 10 分钟，可不加糖。'],
+    tips: '晚上容易燥热或恶露多时，少放桂圆。'
   }
 ];
 
-const COURSE_IMAGE = {
-  staple: '/images/staple.jpg',
-  main: '/images/main.jpg',
-  veg: '/images/veg.jpg',
-  soup: '/images/soup.jpg',
-  snack: '/images/snack.jpg'
-};
+function imageForRecipe(r) {
+  const n = r.name;
+  if (r.course === 'staple') {
+    if (/面|馄饨|饺/.test(n)) return '/images/noodle.jpg';
+    if (/饭/.test(n)) return '/images/rice.jpg';
+    return '/images/staple.jpg';
+  }
+  if (r.course === 'veg') return '/images/veg.jpg';
+  if (r.course === 'soup') return '/images/soup.jpg';
+  if (r.course === 'snack') {
+    if (/茶|豆浆/.test(n)) return '/images/drink.jpg';
+    if (/蒸蛋/.test(n)) return '/images/egg.jpg';
+    if (/果盘|水果/.test(n)) return '/images/fruit.jpg';
+    return '/images/dessert.jpg';
+  }
+  if (r.course === 'main') {
+    if (/鸡/.test(n)) return '/images/chicken.jpg';
+    if (/牛|羊/.test(n)) return '/images/beef.jpg';
+    if (/豆腐|豆干/.test(n)) return '/images/tofu.jpg';
+    if (/蛋/.test(n)) return '/images/egg.jpg';
+    if (/猪|排骨|腰|肉末|肉饼|瘦肉|蹄/.test(n)) return '/images/pork.jpg';
+    if (/鱼|虾|蟹|贝|蛤蜊|海参/.test(n)) return '/images/main.jpg';
+    return '/images/chicken.jpg';
+  }
+  return '/images/main.jpg';
+}
 
 const RECIPES = RAW.map((r) => ({
   ...r,
-  image: COURSE_IMAGE[r.course] || '/images/main.jpg',
+  image: imageForRecipe(r),
   proteinType: r.proteinType || 'none',
   searchText: [r.name, ...r.tags, ...r.ingredients.map((i) => i[0])].join(' ')
 }));
