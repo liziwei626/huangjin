@@ -1,0 +1,18 @@
+{
+  "name": "暖月 · 月子餐智能搭配",
+  "short_name": "暖月",
+  "description": "按产后阶段、分娩方式和忌口，自动搭配一周不重样的月子餐。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F2EA",
+  "theme_color": "#C4704E",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
