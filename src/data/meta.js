@@ -101,9 +101,16 @@ const EFFECT_GROUPS = [
 const LOG_OPTIONS = {
   moods: ['很好', '不错', '一般', '疲惫', '低落'],
   moodEmoji: { 很好: '😄', 不错: '🙂', 一般: '😐', 疲惫: '😪', 低落: '😔' },
+  sleepQuality: ['很好', '一般', '较差'],
   lochia: ['无', '少量', '中等', '较多'],
+  lochiaColor: ['淡红', '暗红', '鲜红', '褐色', '黄色', '白色'],
+  lochiaOdor: ['正常', '有异味'],
   wound: ['良好', '轻微不适', '红肿疼痛'],
+  breast: ['正常', '胀痛', '硬块', '乳头破损'],
+  pain: ['无', '轻微', '明显', '剧烈'],
+  fatigue: ['无', '轻微', '明显'],
   bowel: ['正常', '便秘', '腹泻'],
+  supplements: ['铁剂', '钙片', '维生素D', '复合维生素'],
   waterCupMl: 250,
   waterGoalMl: 2000
 };

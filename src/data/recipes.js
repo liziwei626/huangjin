@@ -328,28 +328,28 @@ const RAW = [
   {
     id: 'm25', name: '彩椒炒豆干', course: 'main', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['植物蛋白', '爽脆', '补钙'], kcal: 230, protein: 18, carbs: 10, fat: 13, time: 15, proteinType: 'soy',
-    ingredients: [['豆干', 150, 'g', '豆制品'], ['彩椒', 80, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['豆干', 150, 'g', '豆制品'], ['彩椒', 80, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['豆干切条，彩椒切丝。', '少油爆香蒜末，下豆干翻炒 2 分钟。', '加入彩椒大火快炒，少许盐调味。'],
     tips: '豆干蛋白质密度高，是清淡饮食里的好搭档。'
   },
   {
     id: 'm26', name: '腰果西芹', course: 'main', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['植物蛋白', '膳食纤维', '清爽'], kcal: 240, protein: 8, carbs: 12, fat: 18, time: 12, proteinType: 'nuts',
-    ingredients: [['西芹', 150, 'g', '蔬菜'], ['腰果', 20, 'g', '干货药材'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['西芹', 150, 'g', '蔬菜'], ['腰果', 20, 'g', '干货药材'], ['蒜', 10, 'g', '调味料']],
     steps: ['西芹撕去老筋，切斜段后焯水 30 秒。', '小火把腰果炒香备用。', '少油爆香蒜末，下西芹快炒，最后拌入腰果。'],
     tips: '坚果过敏者请避开；腰果最后放才够酥脆。'
   },
   {
     id: 'm27', name: '素炒三菇', course: 'main', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['鲜香', '低脂', '增强免疫'], kcal: 130, protein: 7, carbs: 12, fat: 6, time: 15, proteinType: 'veg',
-    ingredients: [['香菇', 40, 'g', '蔬菜'], ['白玉菇', 60, 'g', '蔬菜'], ['平菇', 60, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['香菇', 40, 'g', '蔬菜'], ['白玉菇', 60, 'g', '蔬菜'], ['平菇', 60, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['三种菌菇洗净，香菇切片。', '菌菇焯水 1 分钟捞出。', '少油爆香蒜末，下菌菇大火翻炒 2 分钟，少许盐调味。'],
     tips: '菌菇自带鲜味，少盐也很好吃。'
   },
   {
     id: 'm31', name: '清炒山药木耳', course: 'main', slots: ['breakfast', 'lunch', 'dinner'], stages: ALL,
     tags: ['健脾', '爽脆', '低脂'], kcal: 180, protein: 5, carbs: 30, fat: 5, time: 15, proteinType: 'veg',
-    ingredients: [['铁棍山药', 150, 'g', '蔬菜'], ['干木耳', 5, 'g', '干货药材'], ['彩椒', 40, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['铁棍山药', 150, 'g', '蔬菜'], ['干木耳', 5, 'g', '干货药材'], ['彩椒', 40, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['木耳提前泡发撕小朵，山药去皮切片，彩椒切块。', '山药和木耳分别焯水 1 分钟。', '少油爆香蒜末，下所有食材大火快炒，少许盐调味。'],
     tips: '口感清爽脆嫩，早餐或晚餐搭配粥类都合适。'
   },
@@ -378,7 +378,7 @@ const RAW = [
   {
     id: 'm32', name: '芦笋炒虾仁', course: 'main', slots: ['lunch', 'dinner'], stages: [2, 3, 4],
     tags: ['高蛋白', '补钙', '清爽'], kcal: 220, protein: 22, carbs: 8, fat: 11, time: 15, proteinType: 'shrimp',
-    ingredients: [['虾仁', 100, 'g', '水产'], ['芦笋', 120, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['虾仁', 100, 'g', '水产'], ['芦笋', 120, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['虾仁去虾线，芦笋切段焯水 1 分钟。', '热锅少油炒虾仁至变色。', '加入芦笋和蒜末快炒，少许盐调味。'],
     tips: '虾仁和芦笋都易熟，大火快炒口感最好。'
   },
@@ -450,14 +450,14 @@ const RAW = [
   {
     id: 'v01', name: '清炒西兰花', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['维C', '膳食纤维', '清爽'], kcal: 90, protein: 5, carbs: 10, fat: 4, time: 12,
-    ingredients: [['西兰花', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料'], ['食用油', 4, 'g', '调味料']],
+    ingredients: [['西兰花', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料'], ['食用油', 4, 'g', '调味料']],
     steps: ['西兰花切小朵，用淡盐水浸泡 10 分钟。', '焯水 1 分钟后捞出。', '热锅少油爆香蒜末，下西兰花快炒，少许盐调味。'],
     tips: '先焯后炒能减少用油，颜色也更翠绿。'
   },
   {
     id: 'v02', name: '蒜蓉菠菜', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['补铁', '纤维', '清淡'], kcal: 80, protein: 5, carbs: 8, fat: 4, time: 10,
-    ingredients: [['菠菜', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料'], ['食用油', 4, 'g', '调味料']],
+    ingredients: [['菠菜', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料'], ['食用油', 4, 'g', '调味料']],
     steps: ['菠菜洗净焯水 30 秒，挤干水分切段。', '热锅少油爆香蒜末。', '下菠菜快炒，少许盐调味出锅。'],
     tips: '焯水可去除草酸，吃起来不涩口。'
   },
@@ -471,21 +471,21 @@ const RAW = [
   {
     id: 'v04', name: '清炒时蔬', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['纤维', '应季', '清爽'], kcal: 75, protein: 4, carbs: 9, fat: 3, time: 10,
-    ingredients: [['时令青菜', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料'], ['食用油', 4, 'g', '调味料']],
+    ingredients: [['时令青菜', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料'], ['食用油', 4, 'g', '调味料']],
     steps: ['青菜洗净沥干，蒜切片。', '热锅少油爆香蒜片。', '下青菜大火快炒，少许盐调味。'],
     tips: '叶菜类大火快炒，口感和营养都保留得更好。'
   },
   {
     id: 'v05', name: '香菇油菜', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['补钙', '纤维', '鲜香'], kcal: 95, protein: 5, carbs: 11, fat: 4, time: 15,
-    ingredients: [['油菜', 200, 'g', '蔬菜'], ['香菇', 50, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['油菜', 200, 'g', '蔬菜'], ['香菇', 50, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['油菜和香菇洗净，香菇切片。', '油菜焯水后摆盘。', '少油炒香香菇和蒜，加少许水煮 2 分钟，浇在油菜上。'],
     tips: '油菜钙含量不错，搭配香菇更鲜美。'
   },
   {
     id: 'v06', name: '清炒芦笋', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['叶酸', '纤维', '清爽'], kcal: 85, protein: 5, carbs: 8, fat: 4, time: 12,
-    ingredients: [['芦笋', 180, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料'], ['食用油', 4, 'g', '调味料']],
+    ingredients: [['芦笋', 180, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料'], ['食用油', 4, 'g', '调味料']],
     steps: ['芦笋去老根，切斜段。', '焯水 1 分钟后过凉。', '热锅少油爆香蒜末，下芦笋快炒调味。'],
     tips: '芦笋尖最嫩，焯水时间不宜过长。'
   },
@@ -499,28 +499,28 @@ const RAW = [
   {
     id: 'v08', name: '胡萝卜炒木耳', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['补铁', '明目', '爽脆'], kcal: 100, protein: 3, carbs: 15, fat: 4, time: 15,
-    ingredients: [['胡萝卜', 120, 'g', '蔬菜'], ['干木耳', 5, 'g', '干货药材'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['胡萝卜', 120, 'g', '蔬菜'], ['干木耳', 5, 'g', '干货药材'], ['蒜', 10, 'g', '调味料']],
     steps: ['木耳提前泡发，撕小朵；胡萝卜切片。', '木耳焯水 1 分钟。', '少油爆香蒜末，下胡萝卜翻炒，加木耳炒熟调味。'],
     tips: '木耳泡发时间不宜超过 2 小时，现泡现用更安全。'
   },
   {
     id: 'v09', name: '清炒莴笋', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['通乳', '清爽', '低热量'], kcal: 70, protein: 3, carbs: 9, fat: 3, time: 12,
-    ingredients: [['莴笋', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['莴笋', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['莴笋去皮切片，可加少许盐腌 5 分钟出水。', '热锅少油爆香蒜末。', '下莴笋大火快炒 2 分钟，少许盐调味。'],
     tips: '莴笋清香爽脆，传统上也被认为有助于通乳。'
   },
   {
     id: 'v10', name: '蒜蓉丝瓜', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['清淡', '通络', '补水'], kcal: 75, protein: 3, carbs: 9, fat: 3, time: 12,
-    ingredients: [['丝瓜', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['丝瓜', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['丝瓜去皮滚刀切块。', '热锅少油爆香蒜末。', '下丝瓜翻炒至变软出汁，少许盐调味。'],
     tips: '丝瓜易出水，炒制时间不要太长。'
   },
   {
     id: 'v11', name: '手撕包菜', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['开胃', '纤维', '爽脆'], kcal: 85, protein: 4, carbs: 11, fat: 4, time: 12,
-    ingredients: [['包菜', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料'], ['食用油', 4, 'g', '调味料']],
+    ingredients: [['包菜', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料'], ['食用油', 4, 'g', '调味料']],
     steps: ['包菜用手撕成小片，洗净沥干。', '热锅少油爆香蒜末。', '下包菜大火快炒至断生，少许盐调味。'],
     tips: '手撕比刀切更容易入味，边缘也更好看。'
   },
@@ -535,14 +535,14 @@ const RAW = [
   {
     id: 'v13', name: '清炒秋葵', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['通便', '膳食纤维', '低脂'], kcal: 85, protein: 4, carbs: 11, fat: 3, time: 12,
-    ingredients: [['秋葵', 180, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['秋葵', 180, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['秋葵洗净去蒂，焯水 1 分钟后切段。', '热锅少油爆香蒜末。', '下秋葵快炒，少许盐调味。'],
     tips: '秋葵黏液富含可溶性纤维，对产后便秘很友好。'
   },
   {
     id: 'v14', name: '蒜蓉茼蒿', course: 'veg', slots: ['lunch', 'dinner'], stages: ALL,
     tags: ['安神', '清香', '纤维'], kcal: 75, protein: 4, carbs: 8, fat: 3, time: 10,
-    ingredients: [['茼蒿', 200, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['茼蒿', 200, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['茼蒿洗净沥干。', '热锅少油爆香蒜末。', '下茼蒿大火快炒至变软，少许盐调味。'],
     tips: '茼蒿有独特清香，传统上认为有助于安神。'
   },
@@ -556,14 +556,14 @@ const RAW = [
   {
     id: 'v16', name: '醋溜藕片', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['开胃', '爽脆', '低脂'], kcal: 90, protein: 3, carbs: 16, fat: 2, time: 12,
-    ingredients: [['莲藕', 180, 'g', '蔬菜'], ['米醋', 5, 'ml', '调味料'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['莲藕', 180, 'g', '蔬菜'], ['米醋', 5, 'ml', '调味料'], ['蒜', 10, 'g', '调味料']],
     steps: ['莲藕去皮切薄片，泡清水防氧化。', '焯水 1 分钟捞出。', '热锅少油爆香蒜末，下藕片快炒，烹入米醋调味。'],
     tips: '少量米醋提味，有助于改善产后胃口。'
   },
   {
     id: 'v17', name: '清炒荷兰豆', course: 'veg', slots: ['lunch', 'dinner'], stages: S2,
     tags: ['膳食纤维', '清甜', '低脂'], kcal: 90, protein: 5, carbs: 10, fat: 3, time: 12,
-    ingredients: [['荷兰豆', 180, 'g', '蔬菜'], ['蒜', 2, '瓣', '调味料']],
+    ingredients: [['荷兰豆', 180, 'g', '蔬菜'], ['蒜', 10, 'g', '调味料']],
     steps: ['荷兰豆撕去两边老筋。', '焯水 1 分钟后捞出。', '热锅少油爆香蒜末，下荷兰豆快炒调味。'],
     tips: '荷兰豆一定要炒熟，口感才脆嫩安全。'
   },
@@ -939,12 +939,15 @@ function imageForRecipe(r) {
   return '/images/main.jpg';
 }
 
-const RECIPES = RAW.map((r) => ({
-  ...r,
-  image: imageForRecipe(r),
-  proteinType: r.proteinType || 'none',
-  searchText: [r.name, ...r.tags, ...r.ingredients.map((i) => i[0])].join(' ')
-}));
+const { decorateRecipe } = require('./recipe-utils');
+
+const RECIPES = RAW.map((r) =>
+  decorateRecipe({
+    ...r,
+    image: imageForRecipe(r),
+    proteinType: r.proteinType || 'none'
+  })
+);
 
 const RECIPE_MAP = new Map(RECIPES.map((r) => [r.id, r]));
 

@@ -221,7 +221,13 @@ function publicRecipe(r) {
     image: r.image,
     ingredients: r.ingredients,
     steps: r.steps,
-    tips: r.tips
+    tips: r.tips,
+    method: r.method,
+    difficulty: r.difficulty,
+    nutrients: r.nutrients,
+    cautions: r.cautions,
+    substitutes: r.substitutes,
+    custom: Boolean(r.custom)
   };
 }
 

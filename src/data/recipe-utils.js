@@ -1,0 +1,314 @@
+'use strict';
+
+/** 常见食材每 100g 的膳食纤维(g)、钙(mg)、铁(mg) 估算值。 */
+const PER_100G = {
+  大米: [0.7, 6, 0.8],
+  小米: [1.6, 8, 5.1],
+  糙米: [3.4, 12, 2.3],
+  黑米: [3.9, 12, 1.6],
+  紫米: [3.5, 12, 1.6],
+  藜麦: [2.8, 47, 4.6],
+  燕麦: [6.0, 54, 4.7],
+  即食燕麦: [6.0, 54, 4.7],
+  糯米粉: [0.8, 10, 0.6],
+  细面条: [1.2, 10, 1.2],
+  馄饨皮: [1.0, 10, 1.0],
+  饺子皮: [1.0, 10, 1.0],
+  红豆: [7.7, 76, 5.2],
+  黄豆: [15.5, 191, 8.2],
+  玉米: [2.9, 4, 0.5],
+  玉米粒: [2.9, 4, 0.5],
+  紫薯: [1.6, 23, 0.5],
+  南瓜: [0.8, 16, 0.4],
+  土豆: [1.1, 8, 0.8],
+  铁棍山药: [0.8, 16, 0.3],
+  莲藕: [1.2, 39, 1.4],
+  板栗: [1.7, 17, 1.1],
+  红枣: [1.9, 64, 2.3],
+  桂圆: [1.1, 6, 0.2],
+  枸杞: [4.0, 60, 5.4],
+  干银耳: [30.4, 36, 4.1],
+  莲子: [3.0, 97, 3.6],
+  干木耳: [29.9, 247, 5.5],
+  干黄花菜: [7.7, 463, 16.5],
+  海带: [1.2, 168, 0.6],
+  紫菜: [21.6, 264, 54.9],
+  核桃: [6.7, 56, 2.7],
+  黑芝麻: [14, 780, 22.7],
+  腰果: [3.6, 26, 6.7],
+  花生: [7.7, 92, 2.9],
+  牛奶: [0, 104, 0.3],
+  酸奶: [0, 118, 0.4],
+  豆腐: [0.4, 164, 1.9],
+  豆干: [0.8, 308, 4.9],
+  鸡蛋: [0, 56, 2.0],
+  鸡肉: [0, 9, 1.4],
+  鸡胸肉: [0, 3, 0.6],
+  乌鸡: [0, 17, 2.3],
+  鸡爪: [0, 36, 1.4],
+  鸡腿: [0, 11, 1.5],
+  猪排骨: [0, 8, 1.5],
+  猪瘦肉: [0, 6, 3.0],
+  猪肉末: [0, 6, 2.0],
+  猪肝: [0, 6, 22.6],
+  猪蹄: [0, 33, 1.1],
+  猪腰: [0, 17, 6.1],
+  牛肉末: [0, 23, 3.3],
+  牛腩: [0, 9, 2.8],
+  牛尾: [0, 10, 2.5],
+  羊肉: [0, 12, 2.3],
+  鲈鱼: [0, 138, 1.5],
+  鲫鱼: [0, 79, 1.3],
+  黑鱼: [0, 152, 0.7],
+  鳕鱼: [0, 42, 0.5],
+  三文鱼: [0, 13, 0.3],
+  龙利鱼: [0, 30, 0.4],
+  鲳鱼: [0, 46, 0.9],
+  虾仁: [0, 62, 1.5],
+  蛤蜊: [0, 130, 10.9],
+  菠菜: [1.7, 66, 2.9],
+  西兰花: [2.6, 47, 0.7],
+  油菜: [1.1, 108, 1.2],
+  小青菜: [1.5, 90, 1.5],
+  时令青菜: [1.5, 80, 1.5],
+  娃娃菜: [0.8, 50, 0.5],
+  包菜: [1.5, 49, 0.6],
+  芦笋: [1.9, 24, 0.6],
+  秋葵: [1.8, 45, 0.3],
+  茼蒿: [1.2, 73, 2.5],
+  荷兰豆: [1.4, 51, 1.0],
+  莴笋: [0.6, 23, 0.9],
+  丝瓜: [0.6, 14, 0.4],
+  冬瓜: [0.7, 19, 0.2],
+  西葫芦: [0.6, 15, 0.3],
+  番茄: [0.5, 10, 0.4],
+  胡萝卜: [1.1, 32, 1.0],
+  白萝卜: [1.0, 24, 0.5],
+  彩椒: [1.4, 14, 0.8],
+  洋葱: [1.7, 24, 0.6],
+  香菇: [3.3, 2, 0.3],
+  白玉菇: [2.0, 3, 1.0],
+  平菇: [2.0, 3, 1.0],
+  西芹: [1.2, 38, 0.8],
+  小葱: [1.3, 50, 0.6],
+  蒜: [1.0, 39, 0.4],
+  老姜: [1.0, 15, 0.8],
+  姜片: [1.0, 15, 0.8],
+  姜丝: [1.0, 15, 0.8],
+  姜末: [1.0, 15, 0.8],
+  木瓜: [0.8, 17, 0.2],
+  雪梨: [1.3, 9, 0.2],
+  苹果: [1.2, 4, 0.3],
+  香蕉: [1.2, 7, 0.4],
+  橙子: [1.6, 20, 0.4],
+  猕猴桃: [1.4, 27, 1.2],
+  蓝莓: [2.4, 6, 0.3],
+  醪糟: [0.2, 5, 0.2],
+  红糖: [0, 157, 2.2],
+  淀粉: [0.1, 2, 0.1],
+  生抽: [0, 20, 0.4],
+  蒸鱼豉油: [0, 20, 0.4],
+  米醋: [0, 7, 0.2],
+  高汤: [0, 10, 0.3],
+  鸡汤: [0, 10, 0.3],
+  香油: [0, 9, 0.9],
+  黑麻油: [0, 9, 0.9]
+};
+
+const UNIT_GRAMS = {
+  鸡蛋: { 个: 50 },
+  红枣: { 颗: 8 },
+  桂圆: { 颗: 5 },
+  板栗: { 颗: 8 },
+  饺子皮: { 张: 8 },
+  馄饨皮: { 张: 8 },
+  蒜: { 瓣: 5 },
+  姜片: { 片: 2 }
+};
+
+const INGREDIENT_CATEGORIES = ['谷物豆类', '肉禽蛋', '水产', '豆制品', '蔬菜', '水果', '奶制品', '干货药材', '调味料', '其他'];
+
+const CATEGORY_KEYWORDS = [
+  ['水产', ['鱼', '虾', '蛤蜊', '海带', '紫菜', '海参', '蟹', '贝']],
+  ['豆制品', ['豆腐', '豆干', '豆浆', '腐竹', '豆皮', '千张']],
+  ['奶制品', ['牛奶', '酸奶', '奶粉', '奶酪', '奶油']],
+  ['肉禽蛋', ['鸡蛋', '鸡肉', '鸡胸', '鸡腿', '鸡爪', '乌鸡', '猪', '排骨', '牛肉', '牛腩', '牛尾', '羊肉', '肉末', '瘦肉', '腰花']],
+  ['谷物豆类', ['大米', '小米', '糙米', '黑米', '紫米', '藜麦', '燕麦', '面条', '馄饨皮', '饺子皮', '糯米粉', '红豆', '黄豆', '淀粉']],
+  ['水果', ['苹果', '雪梨', '橙子', '猕猴桃', '蓝莓', '香蕉', '木瓜', '樱桃']],
+  ['干货药材', ['红枣', '桂圆', '枸杞', '核桃', '腰果', '芝麻', '花生', '银耳', '莲子', '黄花菜', '板栗', '杜仲']],
+  ['蔬菜', ['菜', '瓜', '萝卜', '山药', '莲藕', '南瓜', '番茄', '椒', '笋', '秋葵', '洋葱', '玉米', '豆', '菇', '菌', '木耳', '茼蒿', '菠菜']],
+  ['调味料', ['油', '盐', '糖', '醋', '生抽', '豉油', '姜', '蒜', '葱']],
+  ['其他', ['温水', '清水', '高汤', '鸡汤', '醪糟']]
+];
+
+function inferCategory(name) {
+  const n = String(name || '');
+  for (const [category, keywords] of CATEGORY_KEYWORDS) {
+    if (keywords.some((k) => n.includes(k))) return category;
+  }
+  return '其他';
+}
+
+function gramsFor(name, amount, unit) {
+  if (unit === 'g' || unit === 'ml') return Number(amount) || 0;
+  const unitMap = UNIT_GRAMS[name];
+  if (unitMap && unitMap[unit]) return Number(amount) * unitMap[unit];
+  return Number(amount) * 10;
+}
+
+function computeNutrients(ingredients = []) {
+  let fiber = 0;
+  let calcium = 0;
+  let iron = 0;
+  for (const item of ingredients) {
+    if (!Array.isArray(item)) continue;
+    const [name, amount, unit] = item;
+    if (name === '温水' || name === '清水') continue;
+    const per = PER_100G[name];
+    if (!per) continue;
+    const grams = gramsFor(name, amount, unit);
+    fiber += (grams * per[0]) / 100;
+    calcium += (grams * per[1]) / 100;
+    iron += (grams * per[2]) / 100;
+  }
+  return {
+    fiber: Math.round(fiber * 10) / 10,
+    calcium: Math.round(calcium),
+    iron: Math.round(iron * 10) / 10
+  };
+}
+
+function methodFor(name = '', course = '') {
+  if (/蒸/.test(name)) return '蒸';
+  if (/煎|饼/.test(name)) return '煎';
+  if (/拌/.test(name)) return '拌';
+  if (/炒/.test(name)) return '炒';
+  if (/汤|羹|煲/.test(name)) return '炖煮';
+  if (/粥|糊/.test(name)) return '煮';
+  if (/茶/.test(name)) return '煮饮';
+  if (/糕/.test(name)) return '蒸';
+  if (/酸奶|果盘|水果/.test(name)) return '即食';
+  if (course === 'soup') return '炖煮';
+  if (course === 'staple') return '煮';
+  return '炒';
+}
+
+function difficultyFor(time) {
+  if (time <= 15) return '简单';
+  if (time <= 40) return '适中';
+  return '需要耐心';
+}
+
+const CAUTION_RULES = [
+  { match: ['猪肝'], text: '猪肝维生素 A 含量高，每周 1-2 次即可，不宜过量。' },
+  { match: ['海带', '紫菜'], text: '含碘较高，甲状腺功能异常者请遵医嘱。' },
+  { match: ['花生', '核桃', '腰果', '黑芝麻', '南瓜子'], text: '坚果种子类需注意过敏，首次少量尝试。' },
+  { match: ['牛奶', '酸奶'], text: '乳糖不耐受可换成无乳糖牛奶或温热豆浆。' },
+  { match: ['虾仁', '蛤蜊', '鲫鱼', '鲈鱼', '鳕鱼', '黑鱼', '三文鱼', '鲳鱼', '龙利鱼'], text: '水产务必彻底煮熟；海鲜过敏者请避开。' },
+  { match: ['醪糟'], text: '含微量酒精，哺乳期建议不吃或充分煮沸。' },
+  { match: ['干木耳', '干银耳'], text: '泡发时间不宜超过 2 小时，现泡现用。' },
+  { match: ['猪蹄'], text: '脂肪含量较高，喝汤前撇去浮油。' },
+  { match: ['羊肉'], text: '偏温补，体质偏热或容易上火时少吃。' },
+  { match: ['红糖'], text: '血糖偏高或恶露较多时减少用量。' },
+  { match: ['糯米粉', '紫米', '糙米'], text: '糯米与粗粮不易消化，肠胃弱时少量食用。' },
+  { match: ['黄豆'], text: '豆类容易胀气，初次食用先少量。' },
+  { match: ['杜仲'], text: '属于传统药膳，食用前请咨询医生。' },
+  { match: ['即食燕麦', '燕麦'], text: '增加饮水量，膳食纤维才能更好发挥作用。' }
+];
+
+function cautionsFor(ingredients = []) {
+  const names = ingredients.map((i) => (Array.isArray(i) ? i[0] : i.name));
+  const out = [];
+  for (const rule of CAUTION_RULES) {
+    if (rule.match.some((m) => names.some((n) => String(n).includes(m)))) {
+      if (!out.includes(rule.text)) out.push(rule.text);
+    }
+  }
+  return out.slice(0, 3);
+}
+
+const SUBSTITUTES = {
+  鲫鱼: '鲈鱼、鳕鱼或瘦肉片',
+  鲈鱼: '鳕鱼、鲳鱼或龙利鱼',
+  鳕鱼: '鲈鱼、龙利鱼',
+  龙利鱼: '鳕鱼、鲈鱼',
+  鲳鱼: '鲈鱼、鳕鱼',
+  黑鱼: '鲈鱼、鳕鱼',
+  三文鱼: '鳕鱼、龙利鱼',
+  虾仁: '鸡肉丝、豆腐',
+  蛤蜊: '虾仁、鸡肉',
+  鸡肉: '瘦牛肉、虾仁或豆制品',
+  鸡胸肉: '鸡腿肉、瘦牛肉',
+  鸡腿: '鸡胸肉、瘦牛肉',
+  乌鸡: '鸡肉、瘦牛肉',
+  鸡爪: '猪蹄、鸡腿',
+  猪排骨: '鸡腿、牛腩或猪瘦肉',
+  猪肝: '瘦牛肉、鸭血等含铁食材',
+  猪蹄: '鸡爪、牛尾（注意去油）',
+  猪腰: '猪瘦肉、牛肉',
+  猪肉末: '鸡肉末、牛肉末',
+  牛肉末: '鸡肉末、猪瘦肉末',
+  牛腩: '牛尾、猪排骨',
+  牛尾: '牛腩、猪排骨',
+  羊肉: '牛肉、鸡肉',
+  鸡蛋: '鹌鹑蛋、豆腐',
+  牛奶: '无乳糖牛奶、豆浆',
+  酸奶: '无糖酸奶、温牛奶',
+  豆腐: '豆干、鸡蛋或鸡肉',
+  豆干: '豆腐、鸡胸肉',
+  花生: '南瓜籽、葵花籽（注意过敏）',
+  核桃: '腰果、黑芝麻',
+  腰果: '核桃、南瓜籽',
+  黑芝麻: '白芝麻、核桃',
+  海带: '紫菜（甲功异常遵医嘱）',
+  紫菜: '海带（甲功异常遵医嘱）',
+  醪糟: '桂圆红枣汤（无酒精）',
+  糯米粉: '大米粉（更易消化）',
+  糙米: '大米、小米',
+  藜麦: '小米、燕麦',
+  燕麦: '小米、藜麦',
+  即食燕麦: '小米粥、燕麦片',
+  铁棍山药: '土豆、南瓜'
+};
+
+function substitutesFor(ingredients = []) {
+  const names = ingredients.map((i) => (Array.isArray(i) ? i[0] : i.name));
+  const out = [];
+  for (const name of names) {
+    if (SUBSTITUTES[name]) out.push({ from: name, to: SUBSTITUTES[name] });
+  }
+  return out.slice(0, 4);
+}
+
+const COURSE_IMAGE = {
+  staple: '/images/staple.jpg',
+  main: '/images/main.jpg',
+  veg: '/images/veg.jpg',
+  soup: '/images/soup.jpg',
+  snack: '/images/dessert.jpg'
+};
+
+function decorateRecipe(recipe) {
+  const r = { ...recipe };
+  const nutrients = r.nutrients || computeNutrients(r.ingredients);
+  r.image = r.image || COURSE_IMAGE[r.course] || '/images/main.jpg';
+  r.nutrients = nutrients;
+  r.method = r.method || methodFor(r.name, r.course);
+  r.difficulty = r.difficulty || difficultyFor(r.time);
+  r.cautions = Array.isArray(r.cautions) ? r.cautions : cautionsFor(r.ingredients);
+  r.substitutes = Array.isArray(r.substitutes) ? r.substitutes : substitutesFor(r.ingredients);
+  r.searchText =
+    r.searchText || [r.name, ...(r.tags || []), ...(r.ingredients || []).map((i) => i[0]), r.method].join(' ');
+  return r;
+}
+
+module.exports = {
+  INGREDIENT_CATEGORIES,
+  inferCategory,
+  computeNutrients,
+  methodFor,
+  difficultyFor,
+  cautionsFor,
+  substitutesFor,
+  decorateRecipe
+};

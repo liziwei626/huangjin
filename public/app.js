@@ -20,7 +20,7 @@ const S = {
   planDay: null,
   selectedDate: '',
   tab: 'today',
-  filter: { course: 'all', stage: 'all', effect: 'all', q: '', fav: false },
+  filter: { course: 'all', stage: 'all', effect: 'all', q: '', fav: false, mine: false, sort: 'recommend' },
   grocery: { view: 'week', data: null, loading: false, hideChecked: false },
   authMode: 'login',
   onb: null,
@@ -33,6 +33,7 @@ const S = {
   logDirty: false,
   articles: null,
   article: null,
+  recipeForm: null,
   busy: false,
   bootError: null
 };
@@ -198,6 +199,8 @@ function clearSession() {
   S.articles = null;
   S.article = null;
   S.sheet = null;
+  S.recipes = S.recipes.filter((r) => !r.custom);
+  S.filter = { course: 'all', stage: 'all', effect: 'all', q: '', fav: false, mine: false, sort: 'recommend' };
 }
 
 function handleError(err) {
@@ -215,14 +218,13 @@ function handleError(err) {
 async function boot() {
   try {
     S.meta = await api('/meta');
-    const recipeData = await api('/recipes');
-    S.recipes = recipeData.recipes;
     S.selectedDate = todayStr();
 
     if (S.token) {
       try {
         const me = await api(`/auth/me?date=${S.selectedDate}`);
         applyMe(me);
+        await refreshRecipes();
         if (!S.profile.onboarded) {
           initOnboarding();
           renderOnboarding();
@@ -239,6 +241,9 @@ async function boot() {
         }
       }
     }
+
+    const recipeData = await api('/recipes');
+    S.recipes = recipeData.recipes;
     renderAuth();
   } catch (err) {
     S.bootError = err;
@@ -323,6 +328,7 @@ async function doAuthSubmit(form) {
     });
     setToken(data.token);
     applyMe(data);
+    await refreshRecipes();
     if (!S.profile.onboarded) {
       initOnboarding();
       renderOnboarding();
@@ -348,6 +354,7 @@ async function doDemoLogin(btn) {
     const data = await api('/auth/login', { method: 'POST', body: { ...demo, date: todayStr() } });
     setToken(data.token);
     applyMe(data);
+    await refreshRecipes();
     S.selectedDate = todayStr();
     if (!S.profile.onboarded) {
       initOnboarding();
@@ -737,17 +744,24 @@ function filteredRecipes() {
   const f = S.filter;
   const q = f.q.trim();
   const effect = f.effect === 'all' ? null : (S.meta.effects || []).find((e) => e.key === f.effect);
-  return S.recipes.filter((r) => {
+  let list = S.recipes.filter((r) => {
     if (f.fav && !S.favorites.includes(r.id)) return false;
+    if (f.mine && !r.custom) return false;
     if (f.course !== 'all' && r.course !== f.course) return false;
     if (f.stage !== 'all' && !r.stages.includes(Number(f.stage))) return false;
     if (effect && !r.tags.some((t) => effect.tags.includes(t))) return false;
     if (q) {
-      const hay = `${r.name} ${r.tags.join(' ')} ${r.ingredients.map((i) => i[0]).join(' ')}`;
+      const hay = `${r.name} ${r.tags.join(' ')} ${r.ingredients.map((i) => i[0]).join(' ')} ${r.method || ''}`;
       if (!hay.includes(q)) return false;
     }
     return true;
   });
+  if (f.sort === 'kcal') list = list.slice().sort((a, b) => a.kcal - b.kcal);
+  else if (f.sort === 'time') list = list.slice().sort((a, b) => a.time - b.time);
+  else if (f.sort === 'fav') {
+    list = list.slice().sort((a, b) => Number(S.favorites.includes(b.id)) - Number(S.favorites.includes(a.id)));
+  }
+  return list;
 }
 
 function recipeCardHTML(r) {
@@ -756,6 +770,7 @@ function recipeCardHTML(r) {
     <article class="recipe-card" data-action="open-recipe" data-id="${r.id}">
       <div class="recipe-thumb">
         <img src="${r.image}" alt="" loading="lazy" />
+        ${r.custom ? '<span class="custom-badge">我的</span>' : ''}
         <button type="button" class="fav-btn ${fav ? 'on' : ''}" data-action="fav" data-id="${r.id}" aria-label="收藏${esc(r.name)}">
           ${icon('heart', 16)}
         </button>
@@ -763,7 +778,7 @@ function recipeCardHTML(r) {
       <div class="recipe-body">
         <h3>${esc(r.name)}</h3>
         <p>${esc(r.tags.slice(0, 2).join(' · '))}</p>
-        <div class="recipe-meta"><span>${courseLabel(r.course)}</span><span>${r.kcal} kcal</span></div>
+        <div class="recipe-meta"><span>${courseLabel(r.course)} · ${r.method || ''}</span><span>${r.kcal} kcal</span></div>
       </div>
     </article>`;
 }
@@ -776,20 +791,35 @@ function recipeGridHTML() {
 
 function recipesHTML() {
   const f = S.filter;
+  const customCount = S.recipes.filter((r) => r.custom).length;
   return `
-    <header class="page-head">
-      <h1>食谱库</h1>
-      <p>${S.recipes.length} 道月子餐 · 按阶段、餐次与功效自由筛选</p>
+    <header class="page-head recipes-head">
+      <div>
+        <h1>食谱库</h1>
+        <p>${S.recipes.length} 道月子餐 · 阶段、餐次、功效自由筛选</p>
+      </div>
+      <button class="add-recipe-btn" type="button" data-action="open-recipe-form">＋ 自定义</button>
     </header>
     <div class="search-box">
       ${icon('search', 18)}
-      <input id="recipe-search" placeholder="搜索菜名或食材，如「鲫鱼」" value="${esc(f.q)}" autocomplete="off" />
+      <input id="recipe-search" placeholder="搜索菜名、食材或做法，如「鲫鱼」" value="${esc(f.q)}" autocomplete="off" />
     </div>
     <div class="filter-bar">
       <span class="small muted">共 ${filteredRecipes().length} 道</span>
-      <button class="fav-filter ${f.fav ? 'active' : ''}" type="button" data-action="filter-fav">
-        ${icon('heart', 13)} 我的收藏
-      </button>
+      <div class="filter-actions">
+        <button class="fav-filter ${f.mine ? 'active' : ''}" type="button" data-action="filter-mine">我的食谱${customCount ? ` ${customCount}` : ''}</button>
+        <button class="fav-filter ${f.fav ? 'active' : ''}" type="button" data-action="filter-fav">${icon('heart', 13)} 收藏</button>
+      </div>
+    </div>
+    <div class="sort-row">
+      <label class="sort-label">排序
+        <select id="recipe-sort" class="sort-select">
+          <option value="recommend" ${f.sort === 'recommend' ? 'selected' : ''}>推荐</option>
+          <option value="kcal" ${f.sort === 'kcal' ? 'selected' : ''}>热量从低到高</option>
+          <option value="time" ${f.sort === 'time' ? 'selected' : ''}>用时从短到长</option>
+          <option value="fav" ${f.sort === 'fav' ? 'selected' : ''}>收藏优先</option>
+        </select>
+      </label>
     </div>
     <div class="chip-row">
       <button class="chip ${f.course === 'all' ? 'active' : ''}" type="button" data-action="filter-course" data-value="all">全部</button>
@@ -810,12 +840,23 @@ function recipesHTML() {
 
 const EMPTY_LOG = {
   weight: '',
+  temperature: '',
+  systolic: '',
+  diastolic: '',
   waterMl: 0,
   sleepHours: '',
+  sleepQuality: '',
   mood: '',
   lochia: '',
+  lochiaColor: '',
+  lochiaOdor: '',
   wound: '',
+  breast: '',
+  pain: '',
+  fatigue: '',
   bowel: '',
+  activityMinutes: '',
+  supplements: [],
   note: ''
 };
 
@@ -824,7 +865,9 @@ function findLog(date) {
 }
 
 function logWithDefaults(log) {
-  return { ...EMPTY_LOG, ...(log || {}) };
+  const merged = { ...EMPTY_LOG, ...(log || {}) };
+  if (!Array.isArray(merged.supplements)) merged.supplements = [];
+  return merged;
 }
 
 async function loadLogs() {
@@ -925,21 +968,24 @@ function recordsHTML() {
   if (!S.logsLoaded) {
     return `
       <header class="page-head"><h1>调养记录</h1><p>正在加载你的记录…</p></header>
-      <div class="empty-card"><h3>加载中</h3><p>正在同步体重、饮水与睡眠记录。</p></div>`;
+      <div class="empty-card"><h3>加载中</h3><p>正在同步体重、体温、饮水与睡眠记录。</p></div>`;
   }
 
   const date = S.recordDate;
   const log = logWithDefaults(S.log);
+  const rawLog = findLog(date);
   const dayNumber = postpartumDays(S.profile?.deliveryDate);
   const dateDay = daysBetween(S.profile?.deliveryDate, date) + 1;
   const isToday = date === todayStr();
   const summary = S.plan?.dayList?.find((d) => d.date === date);
-  const weightLogs = sortedLogs().filter((l) => l.weight && l.date <= date).slice(-14);
+  const weightLogs = sortedLogs().filter((l) => l.weight && l.date <= date).slice(-30);
   const change = weightChange(date, log.weight);
   const waterGoal = S.meta.logOptions.waterGoalMl;
   const cupMl = S.meta.logOptions.waterCupMl;
   const cups = Math.round(Number(log.waterMl || 0) / cupMl);
   const waterPct = Math.min(100, Math.round((Number(log.waterMl || 0) / waterGoal) * 100));
+  const supplements = Array.isArray(log.supplements) ? log.supplements : [];
+  const alerts = healthAlerts(log);
 
   return `
     <header class="page-head">
@@ -956,6 +1002,12 @@ function recordsHTML() {
       <button class="icon-btn nav-arrow" type="button" data-action="log-next" ${isToday ? 'disabled' : ''} aria-label="后一天">${icon('arrowRight', 18)}</button>
     </div>
     ${!isToday ? `<div class="today-link"><button type="button" data-action="log-today">回到今天</button></div>` : ''}
+
+    ${alerts.length
+      ? `<div class="alert-stack">${alerts.map((a) => `<div class="alert ${a.level}"><strong>${esc(a.title)}</strong><p>${esc(a.text)}</p></div>`).join('')}</div>`
+      : rawLog
+        ? `<div class="alert ok">${icon('leaf', 15)}<span>今天的记录没有发现需要特别关注的情况，继续保持。</span></div>`
+        : ''}
 
     <section class="card meal-progress-card">
       <div class="section-head" style="padding:0 0 8px">
@@ -974,18 +1026,32 @@ function recordsHTML() {
     </section>
 
     <section class="card record-card">
-      <div class="record-head"><h3>体重</h3><span class="small muted">每周固定时间记录更准确</span></div>
-      <div class="weight-row">
-        <input type="number" inputmode="decimal" step="0.1" min="25" max="200" data-log="weight" value="${log.weight ?? ''}" placeholder="62.5" />
-        <span class="unit">kg</span>
-        ${change === null ? '<span class="weight-diff muted">首次记录</span>' : `<span class="weight-diff ${change > 0 ? 'up' : 'down'}">${change > 0 ? '+' : ''}${change} kg</span>`}
+      <div class="record-head"><h3>生命体征</h3><span class="small muted">建议每天固定时间测量</span></div>
+      <div class="vital-grid">
+        <label class="vital-box">
+          <span>体重 kg</span>
+          <input type="number" inputmode="decimal" step="0.1" min="25" max="200" data-log="weight" value="${log.weight ?? ''}" placeholder="62.5" />
+        </label>
+        <label class="vital-box">
+          <span>体温 ℃</span>
+          <input type="number" inputmode="decimal" step="0.1" min="34" max="43" data-log="temperature" value="${log.temperature ?? ''}" placeholder="36.5" />
+        </label>
       </div>
+      <div class="bp-row">
+        <span class="feeling-label">血压</span>
+        <input type="number" inputmode="numeric" min="50" max="250" data-log="systolic" value="${log.systolic ?? ''}" placeholder="收缩压" />
+        <span class="bp-sep">/</span>
+        <input type="number" inputmode="numeric" min="30" max="160" data-log="diastolic" value="${log.diastolic ?? ''}" placeholder="舒张压" />
+        <span class="unit">mmHg</span>
+      </div>
+      ${change === null ? '' : `<div class="weight-diff-line ${change > 0 ? 'up' : 'down'}">较上次 ${change > 0 ? '+' : ''}${change} kg</div>`}
       ${sparklineSVG(weightLogs)}
+      <p class="small muted" style="margin-top:2px">体重为近 30 天趋势；产后 42 天内不必追求快速下降。</p>
     </section>
 
     <section class="card record-card">
       <div class="record-head">
-        <h3>饮水</h3>
+        <h3>饮水与补剂</h3>
         <span class="water-total"><b>${log.waterMl || 0}</b> / ${waterGoal} ml</span>
       </div>
       <div class="water-cups">
@@ -995,43 +1061,48 @@ function recordsHTML() {
           </button>`).join('')}
       </div>
       <div class="bar"><span style="width:${waterPct}%"></span></div>
-      <p class="small muted" style="margin-top:8px">每杯约 ${cupMl} ml，哺乳期建议每天 ${waterGoal} ml 以上</p>
+      <p class="small muted" style="margin-top:8px">每杯约 ${cupMl} ml，哺乳期建议每天 ${waterGoal} ml 以上。</p>
+      <div class="supplement-row">
+        <span class="feeling-label">补剂</span>
+        <div class="option-mini-group">
+          ${(S.meta.logOptions.supplements || []).map((s) => `<button type="button" class="option-mini ${supplements.includes(s) ? 'active' : ''}" data-action="log-supplement" data-value="${esc(s)}">${esc(s)}</button>`).join('')}
+        </div>
+      </div>
     </section>
 
     <section class="card record-card">
-      <div class="record-head"><h3>睡眠</h3><span class="small muted">按实际睡眠估算</span></div>
-      <div class="weight-row">
+      <div class="record-head"><h3>睡眠与情绪</h3><span class="small muted">允许自己偶尔低落</span></div>
+      <div class="sleep-line">
         <input type="number" inputmode="decimal" step="0.5" min="0" max="24" data-log="sleepHours" value="${log.sleepHours ?? ''}" placeholder="6.5" />
         <span class="unit">小时</span>
+        <div class="quick-chips" style="margin:0 0 0 auto">
+          ${[5, 6, 7, 8, 9].map((h) => `<button type="button" class="chip ${Number(log.sleepHours) === h ? 'active' : ''}" data-action="log-sleep" data-value="${h}">${h}h</button>`).join('')}
+        </div>
       </div>
-      <div class="quick-chips">
-        ${[5, 6, 7, 8, 9].map((h) => `<button type="button" class="chip ${Number(log.sleepHours) === h ? 'active' : ''}" data-action="log-sleep" data-value="${h}">${h} 小时</button>`).join('')}
-      </div>
-    </section>
-
-    <section class="card record-card">
-      <div class="record-head"><h3>心情</h3><span class="small muted">允许自己偶尔低落</span></div>
-      <div class="mood-row">
+      ${logOptionRow('sleepQuality', '睡眠质量', log)}
+      ${logOptionRow('fatigue', '疲劳感', log)}
+      <div class="mood-row" style="margin-top:8px">
         ${S.meta.logOptions.moods.map((m) => `
           <button type="button" class="mood ${log.mood === m ? 'active' : ''}" data-action="log-option" data-field="mood" data-value="${esc(m)}">
             <span>${S.meta.logOptions.moodEmoji[m] || '🙂'}</span>${esc(m)}
           </button>`).join('')}
       </div>
+      <div class="bp-row" style="margin-top:12px">
+        <span class="feeling-label">活动</span>
+        <input type="number" inputmode="numeric" min="0" max="600" data-log="activityMinutes" value="${log.activityMinutes ?? ''}" placeholder="散步几分钟" />
+        <span class="unit">分钟</span>
+      </div>
     </section>
 
     <section class="card record-card">
-      <div class="record-head"><h3>身体感受</h3><span class="small muted">异常时请及时就医</span></div>
-      ${[
-        ['lochia', '恶露'],
-        ['wound', '伤口'],
-        ['bowel', '排便']
-      ].map(([field, label]) => `
-        <div class="feeling-row">
-          <span class="feeling-label">${label}</span>
-          <div class="option-mini-group">
-            ${S.meta.logOptions[field].map((v) => `<button type="button" class="option-mini ${log[field] === v ? 'active' : ''}" data-action="log-option" data-field="${field}" data-value="${esc(v)}">${esc(v)}</button>`).join('')}
-          </div>
-        </div>`).join('')}
+      <div class="record-head"><h3>恢复情况</h3><span class="small muted">异常时请及时就医</span></div>
+      ${logOptionRow('lochia', '恶露量', log)}
+      ${logOptionRow('lochiaColor', '颜色', log)}
+      ${logOptionRow('lochiaOdor', '气味', log)}
+      ${logOptionRow('wound', '伤口', log)}
+      ${logOptionRow('breast', '乳房', log)}
+      ${logOptionRow('pain', '疼痛', log)}
+      ${logOptionRow('bowel', '排便', log)}
     </section>
 
     <section class="card record-card">
@@ -1044,10 +1115,12 @@ function recordsHTML() {
       <button class="btn btn-primary" type="button" data-action="save-log">保存记录</button>
     </div>
 
+    ${weekSummaryHTML()}
+
     <section class="card calendar-card">
       <div class="section-head" style="padding:0 0 10px">
         <h2>恢复日历</h2>
-        <span class="small muted">近 42 天</span>
+        <button class="link-btn" type="button" data-action="export-logs">导出 CSV</button>
       </div>
       ${recoveryCalendarHTML()}
       <div class="calendar-legend">
@@ -1063,7 +1136,165 @@ function recordsHTML() {
       </div>
       ${waterChartHTML()}
       ${sleepChartHTML()}
+      ${temperatureChartHTML()}
     </section>`;
+}
+
+function logOptionRow(field, label, log) {
+  const options = S.meta.logOptions[field] || [];
+  return `
+    <div class="feeling-row">
+      <span class="feeling-label">${esc(label)}</span>
+      <div class="option-mini-group">
+        ${options.map((v) => `<button type="button" class="option-mini ${log[field] === v ? 'active' : ''}" data-action="log-option" data-field="${field}" data-value="${esc(v)}">${esc(v)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function healthAlerts(log) {
+  const alerts = [];
+  const temp = Number(log.temperature);
+  if (temp >= 38) {
+    alerts.push({ level: 'danger', title: `体温 ${temp}℃ 偏高`, text: '建议尽快就医，注意补水和休息；如伴随寒战、伤口红肿请立即就诊。' });
+  } else if (temp >= 37.5) {
+    alerts.push({ level: 'warn', title: `体温 ${temp}℃ 略高`, text: '先休息并补充水分，30 分钟后复测；持续偏高请咨询医生。' });
+  }
+  const sys = Number(log.systolic);
+  const dia = Number(log.diastolic);
+  if ((sys && sys >= 140) || (dia && dia >= 90)) {
+    alerts.push({ level: 'warn', title: '血压偏高', text: '安静休息后复测；若持续偏高或伴随头痛、视物模糊，请及时就医。' });
+  }
+  if (log.wound === '红肿疼痛') {
+    alerts.push({ level: 'danger', title: '伤口红肿疼痛', text: '可能是感染信号，请尽快联系产科或外科医生评估。' });
+  }
+  if (log.lochia === '较多' && log.lochiaColor === '鲜红') {
+    alerts.push({ level: 'danger', title: '恶露量多且鲜红', text: '注意休息并观察；如持续增多、有大血块或头晕，请及时就医。' });
+  } else if (log.lochiaOdor === '有异味') {
+    alerts.push({ level: 'danger', title: '恶露有异味', text: '可能提示感染，建议尽快就医检查。' });
+  }
+  if (log.breast === '硬块') {
+    alerts.push({ level: 'warn', title: '乳房有硬块', text: '可先热敷并让宝宝多吸吮；如伴发热或红肿，请警惕乳腺炎并就医。' });
+  } else if (log.breast === '乳头破损') {
+    alerts.push({ level: 'warn', title: '乳头破损', text: '调整含接姿势，哺乳后涂少量乳汁风干；持续疼痛可咨询哺乳指导。' });
+  }
+  if (log.pain === '剧烈') {
+    alerts.push({ level: 'danger', title: '疼痛较剧烈', text: '请及时联系医生评估，不要硬扛。' });
+  }
+  if (log.fatigue === '明显' && log.mood === '低落') {
+    alerts.push({ level: 'warn', title: '疲劳伴情绪低落', text: '请家人分担家务，尽量补觉；如情绪持续低落，建议寻求专业支持。' });
+  }
+  const recent = sortedLogs().filter((l) => l.date <= S.recordDate).slice(-3);
+  if (recent.length === 3 && recent.every((l) => l.mood === '低落')) {
+    alerts.push({ level: 'warn', title: '连续三天情绪低落', text: '这很常见，也值得被认真对待。可以和家人说说，必要时咨询心理或产科医生。' });
+  }
+  return alerts.slice(0, 4);
+}
+
+function weekSummaryHTML() {
+  const today = todayStr();
+  const days = Array.from({ length: 7 }, (_, i) => addDays(today, -6 + i));
+  const logs = days.map((d) => findLog(d)).filter(Boolean);
+  if (!logs.length) {
+    return `<section class="card week-summary"><div class="record-head"><h3>本周小结</h3><span>近 7 天</span></div><p class="small muted" style="line-height:1.8">本周还没有记录，从今天开始记一笔吧。</p></section>`;
+  }
+  const sleeps = logs.map((l) => Number(l.sleepHours)).filter((v) => v > 0);
+  const waters = logs.map((l) => Number(l.waterMl)).filter((v) => v > 0);
+  const waterGoal = S.meta.logOptions.waterGoalMl;
+  const weights = sortedLogs().filter((l) => l.weight && l.date >= days[0] && l.date <= days[6]);
+  const weightChange = weights.length >= 2
+    ? Math.round((Number(weights[weights.length - 1].weight) - Number(weights[0].weight)) * 10) / 10
+    : null;
+  const alertCount = logs.reduce((sum, l) => sum + healthAlerts(logWithDefaults(l)).length, 0);
+  const avg = (arr) => (arr.length ? Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 10) / 10 : 0);
+  return `
+    <section class="card week-summary">
+      <div class="record-head"><h3>本周小结</h3><span>近 7 天</span></div>
+      <div class="week-summary-grid">
+        <div><strong>${logs.length}<span>/7</span></strong><p>记录天数</p></div>
+        <div><strong>${avg(sleeps)}<span>h</span></strong><p>平均睡眠</p></div>
+        <div><strong>${Math.round(avg(waters))}<span>ml</span></strong><p>平均饮水</p></div>
+        <div><strong>${waters.filter((v) => v >= waterGoal).length}<span>天</span></strong><p>饮水达标</p></div>
+        <div><strong>${weightChange === null ? '—' : `${weightChange > 0 ? '+' : ''}${weightChange}`}<span>${weightChange === null ? '' : 'kg'}</span></strong><p>体重变化</p></div>
+        <div><strong>${alertCount}<span>条</span></strong><p>异常提醒</p></div>
+      </div>
+    </section>`;
+}
+
+function temperatureChartHTML() {
+  const days = Array.from({ length: 7 }, (_, i) => addDays(todayStr(), -6 + i));
+  const points = days
+    .map((d) => ({ date: d, value: Number(findLog(d)?.temperature) }))
+    .filter((p) => p.value > 0);
+  if (!points.length) {
+    return `<div class="mini-chart"><div class="chart-title"><span>近 7 天体温</span><em>℃</em></div><div class="chart-empty">记录体温后，这里会出现变化曲线</div></div>`;
+  }
+  const w = 300;
+  const h = 78;
+  const pad = 10;
+  const min = 35;
+  const max = 40;
+  const coords = points.map((p, i) => {
+    const x = pad + (points.length === 1 ? (w - pad * 2) / 2 : (i * (w - pad * 2)) / (points.length - 1));
+    const y = h - pad - ((Math.min(max, Math.max(min, p.value)) - min) / (max - min)) * (h - pad * 2);
+    return [x, y];
+  });
+  const line = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  return `
+    <div class="mini-chart">
+      <div class="chart-title"><span>近 7 天体温</span><em>最新 ${points[points.length - 1].value} ℃</em></div>
+      <svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="${pad}" y1="${h - pad - ((37.5 - min) / (max - min)) * (h - pad * 2)}" x2="${w - pad}" y2="${h - pad - ((37.5 - min) / (max - min)) * (h - pad * 2)}" stroke="#e7c9b8" stroke-width="1" stroke-dasharray="4 4"/>
+        <polyline points="${line}" fill="none" stroke="#c4704e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${coords.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="#c4704e"/>`).join('')}
+      </svg>
+    </div>`;
+}
+
+function exportLogsCSV() {
+  const logs = sortedLogs();
+  if (!logs.length) {
+    toast('还没有可导出的记录', 'error');
+    return;
+  }
+  const headers = [
+    '日期', '体重kg', '体温℃', '收缩压', '舒张压', '饮水ml', '睡眠h', '睡眠质量',
+    '心情', '疲劳', '恶露量', '恶露颜色', '恶露气味', '伤口', '乳房', '疼痛', '排便',
+    '活动分钟', '补剂', '备注'
+  ];
+  const rows = logs.map((l) => [
+    l.date,
+    l.weight ?? '',
+    l.temperature ?? '',
+    l.systolic ?? '',
+    l.diastolic ?? '',
+    l.waterMl ?? '',
+    l.sleepHours ?? '',
+    l.sleepQuality ?? '',
+    l.mood ?? '',
+    l.fatigue ?? '',
+    l.lochia ?? '',
+    l.lochiaColor ?? '',
+    l.lochiaOdor ?? '',
+    l.wound ?? '',
+    l.breast ?? '',
+    l.pain ?? '',
+    l.bowel ?? '',
+    l.activityMinutes ?? '',
+    (l.supplements || []).join('、'),
+    l.note ?? ''
+  ]);
+  const quote = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  const csv = [headers, ...rows].map((row) => row.map(quote).join(',')).join('\r\n');
+  const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `nuanyue-records-${todayStr()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast('记录已导出为 CSV');
 }
 
 function recoveryCalendarHTML() {
@@ -1211,7 +1442,9 @@ function meHTML() {
       <div class="stat-cell"><strong>${stats.planDays || 0}<span>天</span></strong><p>计划餐单</p></div>
       <div class="stat-cell"><strong>${stats.completionRate || 0}<span>%</span></strong><p>打卡完成率</p></div>
       <div class="stat-cell"><strong>${stats.streak || 0}<span>天</span></strong><p>连续打卡</p></div>
+      <div class="stat-cell"><strong>${stats.recordDays || 0}<span>天</span></strong><p>健康记录</p></div>
       <div class="stat-cell"><strong>${(S.favorites || []).length}<span>道</span></strong><p>收藏食谱</p></div>
+      <div class="stat-cell"><strong>${stats.eatenMeals || 0}<span>餐</span></strong><p>累计已吃</p></div>
     </div>
     <div class="card menu-list" style="padding:4px 0">
       <button class="menu-row" type="button" data-action="open-favorites">
@@ -1247,7 +1480,7 @@ function meHTML() {
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
     </div>
-    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v2.0<br />饮食建议仅供参考，具体请遵医嘱</p>`;
+    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v3.0<br />饮食建议仅供参考，具体请遵医嘱</p>`;
 }
 
 /* ------------------------------ 弹层 ------------------------------ */
@@ -1296,6 +1529,9 @@ function renderSheet() {
   } else if (S.sheet.type === 'article') {
     label = '知识详情';
     inner = articleSheetHTML();
+  } else if (S.sheet.type === 'recipe-form') {
+    label = '自定义食谱';
+    inner = recipeFormSheetHTML();
   }
 
   root.innerHTML = `
@@ -1322,28 +1558,43 @@ function recipeSheetHTML(r) {
   const stageText = r.stages.map((n) => S.meta.stages.find((s) => s.stage === n)?.week || '').filter(Boolean).join('、');
   const slotText = r.slots.map((s) => slotMeta(s).label).join('、');
   const targets = applyTargets(r);
+  const n = r.nutrients || { fiber: 0, calcium: 0, iron: 0 };
+  const pct = (value, ref) => Math.min(999, Math.round((Number(value) / ref) * 100));
+  const similar = S.recipes.filter((x) => x.id !== r.id && x.course === r.course).slice(0, 3);
   return `
     <img class="detail-cover" src="${r.image}" alt="${esc(r.name)}" />
     <div class="sheet-head" style="padding-bottom:0">
       <div>
-        <div class="small muted">${courseLabel(r.course)} · 约 ${r.time} 分钟</div>
+        <div class="small muted">${courseLabel(r.course)} · ${esc(r.method || '')} · 约 ${r.time} 分钟</div>
       </div>
       <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
     </div>
     <div class="detail-body">
       <div class="detail-title-row">
         <h2>${esc(r.name)}</h2>
-        <button class="fav-btn ${fav ? 'on' : ''}" type="button" data-action="sheet-fav" data-id="${r.id}" aria-label="收藏" style="position:static;background:var(--bg-deep);width:38px;height:38px;flex:0 0 auto">
-          ${icon('heart', 18)}
-        </button>
+        <div class="detail-title-actions">
+          ${r.custom ? `<button class="edit-inline" type="button" data-action="edit-custom-recipe" data-id="${r.id}">编辑</button>` : ''}
+          <button class="fav-btn ${fav ? 'on' : ''}" type="button" data-action="sheet-fav" data-id="${r.id}" aria-label="收藏" style="position:static;background:var(--bg-deep);width:38px;height:38px;flex:0 0 auto">
+            ${icon('heart', 18)}
+          </button>
+        </div>
       </div>
-      <div class="tag-row">${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="tag-row">
+        ${r.custom ? '<span class="tag custom">我创建的</span>' : ''}
+        ${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}
+      </div>
       <div class="nutri-grid">
         <div><strong>${r.kcal}</strong><span>kcal</span></div>
         <div><strong>${r.protein}g</strong><span>蛋白质</span></div>
         <div><strong>${r.carbs}g</strong><span>碳水</span></div>
         <div><strong>${r.fat}g</strong><span>脂肪</span></div>
       </div>
+      <div class="micro-grid">
+        <div><strong>${n.calcium} mg</strong><span>钙 · ${pct(n.calcium, 1000)}%</span></div>
+        <div><strong>${n.iron} mg</strong><span>铁 · ${pct(n.iron, 24)}%</span></div>
+        <div><strong>${n.fiber} g</strong><span>纤维 · ${pct(n.fiber, 25)}%</span></div>
+      </div>
+      <p class="detail-meta" style="margin:0 0 14px">烹饪方式：${esc(r.method || '—')} · 难度：${esc(r.difficulty || '—')} · 营养为每份估算值</p>
       ${targets.length ? `
         <section class="apply-block">
           <h3>加入餐单</h3>
@@ -1364,14 +1615,255 @@ function recipeSheetHTML(r) {
           ${r.steps.map((s, i) => `<li><span class="n">${i + 1}</span><span>${esc(s)}</span></li>`).join('')}
         </ol>
       </section>
+      ${(r.cautions || []).length ? `
+        <section class="detail-section">
+          <h3>注意事项</h3>
+          <ul class="caution-list">${r.cautions.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+        </section>` : `
+        <section class="detail-section">
+          <h3>注意事项</h3>
+          <p class="small muted" style="line-height:1.8">暂无特殊禁忌。月子期注意少油少盐、食材彻底煮熟，并按个人体质调整。</p>
+        </section>`}
+      ${(r.substitutes || []).length ? `
+        <section class="detail-section">
+          <h3>食材替换</h3>
+          <div class="sub-list">
+            ${r.substitutes.map((s) => `<div><span>${esc(s.from)}</span><em>可换</em><strong>${esc(s.to)}</strong></div>`).join('')}
+          </div>
+        </section>` : `
+        <section class="detail-section">
+          <h3>食材替换</h3>
+          <p class="small muted" style="line-height:1.8">可按口味替换同类食材；如果对某种食材过敏，请直接用等量的其他蛋白质或蔬菜替代。</p>
+        </section>`}
+      ${similar.length ? `
+        <section class="detail-section">
+          <h3>相似食谱</h3>
+          <div class="similar-row">
+            ${similar.map((s) => `<button type="button" class="similar-item" data-action="open-recipe" data-id="${s.id}">
+              <img src="${s.image}" alt="" loading="lazy" />
+              <span>${esc(s.name)}</span>
+            </button>`).join('')}
+          </div>
+        </section>` : ''}
       <div class="tip-box">小贴士：${esc(r.tips)}</div>
-      <p class="detail-meta">适合阶段：${esc(stageText)}<br />适合餐次：${esc(slotText)} · 营养数据为每份估算值</p>
+      <p class="detail-meta">适合阶段：${esc(stageText)}<br />适合餐次：${esc(slotText)}</p>
     </div>
     <div class="sheet-actions">
       <button class="btn ${fav ? 'btn-soft' : 'btn-primary'}" type="button" data-action="sheet-fav" data-id="${r.id}">
         ${fav ? '已收藏，点击取消' : '收藏这道菜'}
       </button>
-    </div>`;
+    </div>
+    ${r.custom ? `
+      <div class="sheet-actions" style="padding-top:8px">
+        <button class="btn btn-ghost" type="button" data-action="edit-custom-recipe" data-id="${r.id}">编辑食谱</button>
+        <button class="btn btn-danger" type="button" data-action="delete-custom-recipe" data-id="${r.id}">删除</button>
+      </div>` : ''}`;
+}
+
+function recipeFormSheetHTML() {
+  const rf = S.recipeForm;
+  if (!rf) return '';
+  const d = rf.data;
+  const compatibleSlots = (S.meta.slots || []).filter((s) => s.courses.includes(d.course));
+  return `
+    <div class="sheet-head">
+      <h2>${rf.mode === 'edit' ? '编辑我的食谱' : '添加我的食谱'}</h2>
+      <button class="sheet-close" type="button" data-action="close-sheet" aria-label="关闭">${icon('close', 17)}</button>
+    </div>
+    <form data-form="custom-recipe">
+      <div class="edit-section">
+        <label class="field">
+          <span>食谱名称</span>
+          <input data-rf="name" maxlength="30" value="${esc(d.name)}" placeholder="例如：妈妈的红枣鸡蛋汤" />
+        </label>
+        <div class="field">
+          <span>品类</span>
+          <div class="option-grid">
+            ${(S.meta.courses || []).map((c) => `<button type="button" class="option ${d.course === c.key ? 'active' : ''}" data-action="rf-course" data-value="${c.key}">${esc(c.label)}</button>`).join('')}
+          </div>
+        </div>
+        <div class="field">
+          <span>适合餐次</span>
+          <div class="option-grid">
+            ${compatibleSlots.map((s) => `<button type="button" class="option ${d.slots.includes(s.key) ? 'active' : ''}" data-action="rf-slot" data-key="${s.key}">${esc(s.label)}</button>`).join('')}
+          </div>
+        </div>
+        <div class="field">
+          <span>用时（分钟）</span>
+          <input type="number" inputmode="numeric" min="1" max="360" data-rf="time" value="${d.time}" />
+        </div>
+      </div>
+      <div class="edit-section">
+        <h3>营养估算（每份，可留空）</h3>
+        <div class="rf-nutri">
+          <label class="field"><span>热量 kcal</span><input type="number" min="0" max="1500" data-rf="kcal" value="${d.kcal}" /></label>
+          <label class="field"><span>蛋白质 g</span><input type="number" min="0" max="300" data-rf="protein" value="${d.protein}" /></label>
+          <label class="field"><span>碳水 g</span><input type="number" min="0" max="300" data-rf="carbs" value="${d.carbs}" /></label>
+          <label class="field"><span>脂肪 g</span><input type="number" min="0" max="300" data-rf="fat" value="${d.fat}" /></label>
+        </div>
+        <label class="field" style="margin-top:12px">
+          <span>标签（用逗号分隔，如：补血，暖胃）</span>
+          <input data-rf="tags" maxlength="80" value="${esc(d.tags)}" />
+        </label>
+      </div>
+      <div class="edit-section">
+        <label class="field">
+          <span>食材（每行一种：名称 数量 单位）</span>
+          <textarea class="note-input" data-rf="ingredientsText" maxlength="1200" placeholder="小米 40 g&#10;南瓜 80 g&#10;红枣 3 颗">${esc(d.ingredientsText)}</textarea>
+        </label>
+        <label class="field" style="margin-top:12px">
+          <span>做法（每行一步）</span>
+          <textarea class="note-input" data-rf="stepsText" maxlength="2000" placeholder="小米淘洗后浸泡 10 分钟。&#10;加水煮开后转小火 25 分钟。">${esc(d.stepsText)}</textarea>
+        </label>
+        <label class="field" style="margin-top:12px">
+          <span>小贴士（可留空）</span>
+          <input data-rf="tips" maxlength="200" value="${esc(d.tips)}" />
+        </label>
+      </div>
+      <p class="form-error" id="rf-error" style="padding:0 20px"></p>
+      <div class="sheet-actions" style="padding-bottom:8px">
+        <button class="btn btn-primary" type="submit">${rf.mode === 'edit' ? '保存修改' : '添加到食谱库'}</button>
+      </div>
+    </form>`;
+}
+
+function parseIngredientLines(text) {
+  return String(text || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split(/[\s,，]+/).filter(Boolean);
+      return {
+        name: parts[0] || '',
+        amount: Number(parts[1]),
+        unit: parts[2] || 'g',
+        category: parts[3] || ''
+      };
+    });
+}
+
+function openRecipeForm(recipe) {
+  const data = recipe
+    ? {
+        name: recipe.name,
+        course: recipe.course,
+        slots: [...recipe.slots],
+        time: recipe.time,
+        kcal: recipe.kcal,
+        protein: recipe.protein,
+        carbs: recipe.carbs,
+        fat: recipe.fat,
+        tags: (recipe.tags || []).join('，'),
+        ingredientsText: recipe.ingredients.map(([n, a, u]) => `${n} ${a} ${u}`).join('\n'),
+        stepsText: recipe.steps.join('\n'),
+        tips: recipe.tips || ''
+      }
+    : {
+        name: '',
+        course: 'main',
+        slots: ['lunch', 'dinner'],
+        time: 20,
+        kcal: 250,
+        protein: 15,
+        carbs: 15,
+        fat: 12,
+        tags: '',
+        ingredientsText: '',
+        stepsText: '',
+        tips: ''
+      };
+  S.recipeForm = { mode: recipe ? 'edit' : 'create', id: recipe?.id || null, data };
+  openSheet({ type: 'recipe-form' });
+}
+
+async function refreshRecipes() {
+  const data = await api('/recipes');
+  S.recipes = data.recipes;
+}
+
+async function submitCustomRecipe(form) {
+  const rf = S.recipeForm;
+  const d = rf.data;
+  const errBox = $('#rf-error');
+  errBox.textContent = '';
+
+  const ingredients = parseIngredientLines(d.ingredientsText);
+  if (!ingredients.length) {
+    errBox.textContent = '请至少填写一种食材';
+    return;
+  }
+  if (ingredients.some((i) => !i.name || !Number.isFinite(i.amount) || i.amount <= 0)) {
+    errBox.textContent = '食材格式不正确，请按「名称 数量 单位」每行填写';
+    return;
+  }
+  const steps = String(d.stepsText || '')
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!steps.length) {
+    errBox.textContent = '请至少填写一个做法步骤';
+    return;
+  }
+
+  const payload = {
+    name: String(d.name || '').trim(),
+    course: d.course,
+    slots: d.slots,
+    time: Number(d.time) || 20,
+    kcal: Number(d.kcal) || 0,
+    protein: Number(d.protein) || 0,
+    carbs: Number(d.carbs) || 0,
+    fat: Number(d.fat) || 0,
+    tags: String(d.tags || '').split(/[,，、]/).map((t) => t.trim()).filter(Boolean),
+    ingredients,
+    steps,
+    tips: String(d.tips || '').trim()
+  };
+
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    await api(rf.mode === 'edit' ? `/recipes/custom/${rf.id}` : '/recipes/custom', {
+      method: rf.mode === 'edit' ? 'PUT' : 'POST',
+      body: payload
+    });
+    await refreshRecipes();
+    if (S.plan) {
+      try {
+        await loadPlan(S.selectedDate, true);
+      } catch {
+        /* 餐单刷新失败不影响食谱保存 */
+      }
+    }
+    closeSheet();
+    renderMain({ keepScroll: true });
+    toast(rf.mode === 'edit' ? '食谱已更新' : '已添加到我的食谱');
+  } catch (err) {
+    errBox.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function deleteCustomRecipe(id) {
+  if (!window.confirm('删除后不可恢复，确定删除这道食谱吗？')) return;
+  try {
+    await api(`/recipes/custom/${id}`, { method: 'DELETE' });
+    await refreshRecipes();
+    if (S.plan) {
+      try {
+        await loadPlan(S.selectedDate, true);
+      } catch {
+        /* ignore */
+      }
+    }
+    closeSheet();
+    renderMain({ keepScroll: true });
+    toast('食谱已删除');
+  } catch (err) {
+    handleError(err);
+  }
 }
 
 function editSheetHTML() {
@@ -1455,7 +1947,7 @@ function aboutSheetHTML() {
       <p><strong>免责声明：</strong>食谱、营养数据与功效说明均为日常饮食参考，不构成医疗建议。产后饮食需结合个人体质、伤口恢复、哺乳情况和医生建议调整；如出现过敏、发热、伤口异常、恶露异常等情况，请及时就医。</p>
       <p><strong>忌口说明：</strong>勾选忌口或过敏项后，生成餐单与换菜时会自动排除相关食材；母乳喂养或混合喂养会默认排除含酒精的菜品。</p>
       <p><strong>数据说明：</strong>账号、餐单与打卡记录保存在服务端实例中，仅用于功能演示。请勿填写身份证号、住址等敏感个人信息。</p>
-      <p class="muted">暖月 v2.0 · 用一日三餐，好好照顾自己。</p>
+      <p class="muted">暖月 v3.0 · 用一日三餐，好好照顾自己。</p>
     </div>`;
 }
 
@@ -1785,12 +2277,23 @@ async function saveLog() {
   const date = S.recordDate;
   const payload = {
     weight: S.log.weight === '' || S.log.weight === null ? null : Number(S.log.weight),
+    temperature: S.log.temperature === '' || S.log.temperature === null ? null : Number(S.log.temperature),
+    systolic: S.log.systolic === '' || S.log.systolic === null ? null : Number(S.log.systolic),
+    diastolic: S.log.diastolic === '' || S.log.diastolic === null ? null : Number(S.log.diastolic),
     waterMl: Number(S.log.waterMl) || 0,
     sleepHours: S.log.sleepHours === '' || S.log.sleepHours === null ? null : Number(S.log.sleepHours),
+    sleepQuality: S.log.sleepQuality || '',
     mood: S.log.mood || '',
     lochia: S.log.lochia || '',
+    lochiaColor: S.log.lochiaColor || '',
+    lochiaOdor: S.log.lochiaOdor || '',
     wound: S.log.wound || '',
+    breast: S.log.breast || '',
+    pain: S.log.pain || '',
+    fatigue: S.log.fatigue || '',
     bowel: S.log.bowel || '',
+    activityMinutes: S.log.activityMinutes === '' || S.log.activityMinutes === null ? null : Number(S.log.activityMinutes),
+    supplements: Array.isArray(S.log.supplements) ? S.log.supplements : [],
     note: S.log.note || ''
   };
   try {
@@ -2042,9 +2545,43 @@ async function onClick(e) {
       S.filter.fav = !S.filter.fav;
       renderMain({ keepScroll: true });
       break;
+    case 'filter-mine':
+      S.filter.mine = !S.filter.mine;
+      renderMain({ keepScroll: true });
+      break;
+    case 'open-recipe-form':
+      openRecipeForm(null);
+      break;
+    case 'edit-custom-recipe': {
+      const recipe = S.recipes.find((r) => r.id === el.dataset.id);
+      if (recipe) openRecipeForm(recipe);
+      break;
+    }
+    case 'delete-custom-recipe':
+      deleteCustomRecipe(el.dataset.id);
+      break;
+    case 'rf-course': {
+      const value = el.dataset.value;
+      S.recipeForm.data.course = value;
+      S.recipeForm.data.slots = (S.meta.slots || [])
+        .filter((s) => s.courses.includes(value))
+        .map((s) => s.key);
+      renderSheet();
+      break;
+    }
+    case 'rf-slot': {
+      const key = el.dataset.key;
+      const list = S.recipeForm.data.slots;
+      const idx = list.indexOf(key);
+      if (idx >= 0) list.splice(idx, 1);
+      else list.push(key);
+      renderSheet();
+      break;
+    }
     case 'open-favorites':
       S.tab = 'recipes';
       S.filter.fav = true;
+      S.filter.mine = false;
       S.filter.course = 'all';
       S.filter.stage = 'all';
       S.filter.effect = 'all';
@@ -2112,6 +2649,20 @@ async function onClick(e) {
       S.log.sleepHours = Number(el.dataset.value);
       S.logDirty = true;
       renderMain({ keepScroll: true });
+      break;
+    case 'log-supplement': {
+      const value = el.dataset.value;
+      const list = Array.isArray(S.log.supplements) ? S.log.supplements : [];
+      const idx = list.indexOf(value);
+      if (idx >= 0) list.splice(idx, 1);
+      else list.push(value);
+      S.log.supplements = list;
+      S.logDirty = true;
+      renderMain({ keepScroll: true });
+      break;
+    }
+    case 'export-logs':
+      exportLogsCSV();
       break;
     case 'log-option':
       setLogField(el.dataset.field, el.dataset.value);
@@ -2260,6 +2811,7 @@ function onSubmit(e) {
   if (form.dataset.form === 'auth') doAuthSubmit(form);
   if (form.dataset.form === 'edit-profile') saveProfile();
   if (form.dataset.form === 'password') submitPassword(form);
+  if (form.dataset.form === 'custom-recipe') submitCustomRecipe(form);
 }
 
 function onInput(e) {
@@ -2279,6 +2831,10 @@ function onInput(e) {
     updateDirtyHint();
     return;
   }
+  if (el.dataset.rf) {
+    S.recipeForm.data[el.dataset.rf] = el.value;
+    return;
+  }
   if (el.id === 'recipe-search') {
     S.filter.q = el.value;
     const grid = $('#recipe-grid');
@@ -2290,6 +2846,11 @@ function onInput(e) {
 
 async function onChange(e) {
   const el = e.target;
+  if (el.id === 'recipe-sort') {
+    S.filter.sort = el.value;
+    renderMain({ keepScroll: true });
+    return;
+  }
   const key = el.dataset.checkKey;
   if (!key || !S.grocery.data) return;
   let item = null;
@@ -2346,6 +2907,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('change', onChange);
   boot();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=2').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=3').catch(() => {});
   }
 });

@@ -25,6 +25,7 @@ const {
   LOG_OPTIONS
 } = require('./data/meta');
 const { ARTICLES, ARTICLE_MAP } = require('./data/articles');
+const { decorateRecipe, inferCategory, INGREDIENT_CATEGORIES } = require('./data/recipe-utils');
 const planner = require('./planner');
 
 const DEMO_USERNAME = 'demo';
@@ -91,7 +92,16 @@ function ensureCollections(user) {
   if (!user.eaten || typeof user.eaten !== 'object') user.eaten = {};
   if (!user.groceryChecks || typeof user.groceryChecks !== 'object') user.groceryChecks = {};
   if (!Array.isArray(user.favorites)) user.favorites = [];
+  if (!Array.isArray(user.customRecipes)) user.customRecipes = [];
   return user;
+}
+
+function optionalUser(req) {
+  try {
+    return requireUser(req);
+  } catch {
+    return null;
+  }
 }
 
 function dateParam(url) {
@@ -131,7 +141,8 @@ function createUserRecord({ username, password, name }) {
     eaten: {},
     skipped: {},
     logs: {},
-    groceryChecks: {}
+    groceryChecks: {},
+    customRecipes: []
   };
 }
 
@@ -262,6 +273,8 @@ function ensureDemoUser() {
       [planner.addDays(planner.todayStr(), -1)]: ['nightSnack']
     };
     demo.logs = buildDemoLogs();
+    demo.customRecipes = [buildDemoRecipe(demo.id)];
+    for (const r of demo.customRecipes) RECIPE_MAP.set(r.id, r);
     addUser(demo);
     console.log('[seed] demo account created');
     return;
@@ -280,16 +293,43 @@ function ensureDemoUser() {
   }
 }
 
+function buildDemoRecipe(ownerId) {
+  return decorateRecipe({
+    id: newId('c'),
+    custom: true,
+    customOwnerId: ownerId,
+    name: '外婆的红枣桂圆蛋花汤',
+    course: 'soup',
+    slots: ['lunch', 'dinner'],
+    stages: [1, 2, 3, 4],
+    tags: ['补血', '暖身', '家常'],
+    kcal: 180,
+    protein: 8,
+    carbs: 22,
+    fat: 6,
+    time: 15,
+    proteinType: 'egg',
+    ingredients: [
+      ['鸡蛋', 1, '个', '肉禽蛋'],
+      ['红枣', 3, '颗', '干货药材'],
+      ['桂圆', 3, '颗', '干货药材'],
+      ['枸杞', 3, 'g', '干货药材']
+    ],
+    steps: ['红枣去核，桂圆去壳，加 400ml 清水煮 10 分钟。', '鸡蛋打散，转圈淋入汤中煮成蛋花。', '关火前撒枸杞，温热饮用。'],
+    tips: '家里传下来的暖身甜汤，恶露量多时少放桂圆。'
+  });
+}
+
 function buildDemoLogs() {
   const today = planner.todayStr();
   const samples = [
-    { offset: 0, weight: 62.4, waterMl: 1250, sleepHours: 6.5, mood: '不错', lochia: '少量', wound: '良好', bowel: '正常', note: '今天奶量不错，午后睡了半小时。' },
-    { offset: 1, weight: 62.6, waterMl: 2000, sleepHours: 7, mood: '很好', lochia: '少量', wound: '良好', bowel: '正常', note: '走了 15 分钟，精神好多了。' },
-    { offset: 2, weight: 62.8, waterMl: 1750, sleepHours: 5.5, mood: '疲惫', lochia: '中等', wound: '轻微不适', bowel: '正常', note: '夜里喂了两次，白天补觉。' },
-    { offset: 3, weight: 63.0, waterMl: 1500, sleepHours: 6, mood: '一般', lochia: '中等', wound: '良好', bowel: '便秘', note: '蔬菜吃少了，明天加一份秋葵。' },
-    { offset: 4, weight: 63.1, waterMl: 2000, sleepHours: 7.5, mood: '不错', lochia: '少量', wound: '良好', bowel: '正常', note: '' },
-    { offset: 5, weight: 63.3, waterMl: 2250, sleepHours: 8, mood: '很好', lochia: '少量', wound: '良好', bowel: '正常', note: '胃口不错，汤都喝完了。' },
-    { offset: 6, weight: 63.4, waterMl: 1800, sleepHours: 6, mood: '一般', lochia: '少量', wound: '良好', bowel: '正常', note: '' }
+    { offset: 0, weight: 62.4, temperature: 36.5, systolic: 112, diastolic: 72, waterMl: 1250, sleepHours: 6.5, sleepQuality: '一般', mood: '不错', fatigue: '轻微', lochia: '少量', lochiaColor: '暗红', lochiaOdor: '正常', wound: '良好', breast: '正常', pain: '无', bowel: '正常', activityMinutes: 15, supplements: ['钙片'], note: '今天奶量不错，午后睡了半小时。' },
+    { offset: 1, weight: 62.6, temperature: 36.6, systolic: 115, diastolic: 74, waterMl: 2000, sleepHours: 7, sleepQuality: '很好', mood: '很好', fatigue: '无', lochia: '少量', lochiaColor: '暗红', lochiaOdor: '正常', wound: '良好', breast: '正常', pain: '无', bowel: '正常', activityMinutes: 25, supplements: ['钙片', '铁剂'], note: '走了 15 分钟，精神好多了。' },
+    { offset: 2, weight: 62.8, temperature: 36.8, systolic: 120, diastolic: 78, waterMl: 1750, sleepHours: 5.5, sleepQuality: '较差', mood: '疲惫', fatigue: '明显', lochia: '中等', lochiaColor: '暗红', lochiaOdor: '正常', wound: '轻微不适', breast: '胀痛', pain: '轻微', bowel: '正常', activityMinutes: 5, supplements: ['钙片'], note: '夜里喂了两次，白天补觉。' },
+    { offset: 3, weight: 63.0, temperature: 36.7, systolic: 118, diastolic: 76, waterMl: 1500, sleepHours: 6, sleepQuality: '一般', mood: '一般', fatigue: '轻微', lochia: '中等', lochiaColor: '褐色', lochiaOdor: '正常', wound: '良好', breast: '正常', pain: '无', bowel: '便秘', activityMinutes: 10, supplements: [], note: '蔬菜吃少了，明天加一份秋葵。' },
+    { offset: 4, weight: 63.1, temperature: 36.4, systolic: 110, diastolic: 70, waterMl: 2000, sleepHours: 7.5, sleepQuality: '很好', mood: '不错', fatigue: '无', lochia: '少量', lochiaColor: '褐色', lochiaOdor: '正常', wound: '良好', breast: '正常', pain: '无', bowel: '正常', activityMinutes: 20, supplements: ['钙片', '维生素D'], note: '' },
+    { offset: 5, weight: 63.3, temperature: 36.6, systolic: 114, diastolic: 73, waterMl: 2250, sleepHours: 8, sleepQuality: '很好', mood: '很好', fatigue: '无', lochia: '少量', lochiaColor: '淡红', lochiaOdor: '正常', wound: '良好', breast: '正常', pain: '无', bowel: '正常', activityMinutes: 30, supplements: ['钙片'], note: '胃口不错，汤都喝完了。' },
+    { offset: 6, weight: 63.4, temperature: 36.5, systolic: 116, diastolic: 75, waterMl: 1800, sleepHours: 6, sleepQuality: '一般', mood: '一般', fatigue: '轻微', lochia: '少量', lochiaColor: '淡红', lochiaOdor: '正常', wound: '良好', breast: '正常', pain: '无', bowel: '正常', activityMinutes: 15, supplements: [], note: '' }
   ];
   const logs = {};
   for (const s of samples) {
@@ -313,6 +353,7 @@ async function handleMeta(req, res) {
     caloriePresets: CALORIE_PRESETS,
     effects: EFFECT_GROUPS,
     logOptions: LOG_OPTIONS,
+    ingredientCategories: INGREDIENT_CATEGORIES,
     recipeCount: RECIPES.length,
     demo: { username: DEMO_USERNAME, password: DEMO_PASSWORD }
   });
@@ -406,8 +447,10 @@ async function handleRecipes(req, res, url) {
   const slot = url.searchParams.get('slot');
   const q = String(url.searchParams.get('q') || '').trim().toLowerCase();
   const ids = url.searchParams.get('ids');
+  const user = optionalUser(req);
 
-  let list = RECIPES;
+  const ownCustom = user ? (user.customRecipes || []).filter((r) => r && !r.deleted) : [];
+  let list = ownCustom.length ? [...RECIPES, ...ownCustom] : RECIPES;
   if (ids) {
     const wanted = new Set(ids.split(',').map((s) => s.trim()));
     list = list.filter((r) => wanted.has(r.id));
@@ -419,16 +462,23 @@ async function handleRecipes(req, res, url) {
 
   sendJson(res, 200, {
     total: list.length,
+    customCount: ownCustom.length,
     recipes: list.map(planner.publicRecipe)
   });
 }
 
 async function handleRecipeDetail(req, res, id) {
+  const user = optionalUser(req);
   const recipe = RECIPE_MAP.get(id);
   if (!recipe) throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
-  const similar = RECIPES.filter((r) => r.id !== id && r.course === recipe.course)
+  if (recipe.custom && (!user || recipe.customOwnerId !== user.id)) {
+    throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  }
+  const pool = user && recipe.custom ? [...RECIPES, ...(user.customRecipes || [])] : RECIPES;
+  const similar = pool
+    .filter((r) => r.id !== id && r.course === recipe.course)
     .slice(0, 3)
-    .map((r) => ({ id: r.id, name: r.name, image: r.image, kcal: r.kcal }));
+    .map((r) => ({ id: r.id, name: r.name, image: r.image, kcal: r.kcal, time: r.time }));
   sendJson(res, 200, { recipe: planner.publicRecipe(recipe), similar });
 }
 
@@ -436,7 +486,9 @@ async function handleFavorite(req, res, id) {
   const user = requireUser(req);
   const recipe = RECIPE_MAP.get(id);
   if (!recipe) throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
-  if (!Array.isArray(user.favorites)) user.favorites = [];
+  if (recipe.custom && recipe.customOwnerId !== user.id) {
+    throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  }
   const idx = user.favorites.indexOf(id);
   let favorited;
   if (idx >= 0) {
@@ -448,6 +500,143 @@ async function handleFavorite(req, res, id) {
   }
   touchUser(user);
   sendJson(res, 200, { favorited, favorites: user.favorites });
+}
+
+function normalizeTags(value) {
+  const raw = Array.isArray(value) ? value : String(value || '').split(/[,，、\s]+/);
+  const tags = [...new Set(raw.map((t) => String(t).trim()).filter(Boolean))];
+  if (tags.length > 6) throw new ApiError(400, '标签最多 6 个');
+  if (tags.some((t) => t.length > 12)) throw new ApiError(400, '单个标签最多 12 个字符');
+  return tags;
+}
+
+function normalizeIngredients(value) {
+  if (!Array.isArray(value) || !value.length) throw new ApiError(400, '请至少填写一种食材');
+  if (value.length > 20) throw new ApiError(400, '食材最多 20 种');
+  return value.map((item) => {
+    const raw = Array.isArray(item)
+      ? { name: item[0], amount: item[1], unit: item[2], category: item[3] }
+      : item || {};
+    const name = String(raw.name || '').trim();
+    const amount = Number(raw.amount);
+    const unit = String(raw.unit || 'g').trim();
+    let category = String(raw.category || '').trim();
+    if (!name || name.length > 20) throw new ApiError(400, '食材名称需为 1-20 个字符');
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 5000) throw new ApiError(400, `「${name}」的用量不正确`);
+    if (!['g', 'ml', '个', '颗', '张', '瓣', '片'].includes(unit)) {
+      throw new ApiError(400, `「${name}」的单位需为 g/ml/个/颗/张/瓣/片`);
+    }
+    if (!INGREDIENT_CATEGORIES.includes(category)) category = inferCategory(name);
+    return [name, amount, unit, category];
+  });
+}
+
+function normalizeSteps(value) {
+  const raw = Array.isArray(value) ? value : String(value || '').split('\n');
+  const steps = raw.map((s) => String(s).trim()).filter(Boolean);
+  if (!steps.length) throw new ApiError(400, '请至少填写一个做法步骤');
+  if (steps.length > 15) throw new ApiError(400, '做法步骤最多 15 条');
+  if (steps.some((s) => s.length > 200)) throw new ApiError(400, '单条步骤最多 200 字');
+  return steps;
+}
+
+function buildCustomRecipe(user, body, existing) {
+  const name = String(body.name || existing?.name || '').trim();
+  if (!name || name.length > 30) throw new ApiError(400, '食谱名称需为 1-30 个字符');
+
+  const course = String(body.course || existing?.course || '');
+  if (!COURSES[course]) throw new ApiError(400, '请选择正确的品类');
+
+  const compatibleSlots = SLOTS.filter((s) => s.courses.includes(course)).map((s) => s.key);
+  const requested = Array.isArray(body.slots) ? body.slots.filter((k) => compatibleSlots.includes(k)) : [];
+  const slots = requested.length ? requested : compatibleSlots;
+
+  const kcal = Math.round(Number(body.kcal ?? existing?.kcal ?? 0) || 0);
+  const protein = Math.round((Number(body.protein ?? existing?.protein ?? 0) || 0) * 10) / 10;
+  const carbs = Math.round((Number(body.carbs ?? existing?.carbs ?? 0) || 0) * 10) / 10;
+  const fat = Math.round((Number(body.fat ?? existing?.fat ?? 0) || 0) * 10) / 10;
+  if (kcal < 0 || kcal > 1500) throw new ApiError(400, '热量需在 0-1500 kcal 之间');
+  if ([protein, carbs, fat].some((v) => v < 0 || v > 300)) throw new ApiError(400, '营养素数值需在 0-300 之间');
+
+  const time = Math.round(Number(body.time ?? existing?.time ?? 20) || 20);
+  if (time < 1 || time > 360) throw new ApiError(400, '用时需在 1-360 分钟之间');
+
+  const tags = body.tags !== undefined ? normalizeTags(body.tags) : existing?.tags || [];
+  const ingredients = body.ingredients !== undefined ? normalizeIngredients(body.ingredients) : existing?.ingredients;
+  if (!ingredients || !ingredients.length) throw new ApiError(400, '请至少填写一种食材');
+  const steps = body.steps !== undefined ? normalizeSteps(body.steps) : existing?.steps;
+  if (!steps || !steps.length) throw new ApiError(400, '请至少填写一个做法步骤');
+  const tips = String(body.tips ?? existing?.tips ?? '').trim();
+  if (tips.length > 200) throw new ApiError(400, '小贴士最多 200 字');
+
+  const recipe = decorateRecipe({
+    id: existing?.id || newId('c'),
+    custom: true,
+    customOwnerId: user.id,
+    name,
+    course,
+    slots,
+    stages: [1, 2, 3, 4],
+    tags,
+    kcal,
+    protein,
+    carbs,
+    fat,
+    time,
+    ingredients,
+    steps,
+    tips,
+    proteinType: 'none',
+    createdAt: existing?.createdAt || new Date().toISOString()
+  });
+  return recipe;
+}
+
+function recipeUsedInPlan(user, recipeId) {
+  const items = user.plan?.items || {};
+  for (const day of Object.values(items)) {
+    for (const meal of Object.values(day)) {
+      if (Object.values(meal).includes(recipeId)) return true;
+    }
+  }
+  return false;
+}
+
+async function handleCustomRecipeCreate(req, res) {
+  const user = requireUser(req);
+  const body = await readJson(req);
+  const recipe = buildCustomRecipe(user, body);
+  user.customRecipes.unshift(recipe);
+  RECIPE_MAP.set(recipe.id, recipe);
+  touchUser(user);
+  sendJson(res, 201, { recipe: planner.publicRecipe(recipe), customCount: user.customRecipes.length });
+}
+
+async function handleCustomRecipeUpdate(req, res, id) {
+  const user = requireUser(req);
+  const existing = user.customRecipes.find((r) => r.id === id);
+  if (!existing) throw new ApiError(404, '没有找到这道自制食谱', 'NOT_FOUND');
+  const body = await readJson(req);
+  const recipe = buildCustomRecipe(user, body, existing);
+  const idx = user.customRecipes.findIndex((r) => r.id === id);
+  user.customRecipes[idx] = recipe;
+  RECIPE_MAP.set(recipe.id, recipe);
+  touchUser(user);
+  sendJson(res, 200, { recipe: planner.publicRecipe(recipe), customCount: user.customRecipes.length });
+}
+
+async function handleCustomRecipeDelete(req, res, id) {
+  const user = requireUser(req);
+  const idx = user.customRecipes.findIndex((r) => r.id === id);
+  if (idx < 0) throw new ApiError(404, '没有找到这道自制食谱', 'NOT_FOUND');
+  if (recipeUsedInPlan(user, id)) {
+    throw new ApiError(400, '这道菜还在当前餐单中，请先换掉再删除');
+  }
+  user.customRecipes.splice(idx, 1);
+  user.favorites = user.favorites.filter((fid) => fid !== id);
+  RECIPE_MAP.delete(id);
+  touchUser(user);
+  sendJson(res, 200, { ok: true, customCount: user.customRecipes.length });
 }
 
 async function handlePlanGet(req, res, url) {
@@ -555,6 +744,10 @@ async function handlePlanApply(req, res) {
   const course = String(body.course || '');
   const recipeId = String(body.recipeId || '');
   if (!planner.isValidDate(date)) throw new ApiError(400, '日期不正确');
+  const target = RECIPE_MAP.get(recipeId);
+  if (target?.custom && target.customOwnerId !== user.id) {
+    throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  }
 
   const result = planner.applyRecipe(
     user.plan,
@@ -642,6 +835,33 @@ function sanitizeLog(body) {
       out.weight = Math.round(w * 10) / 10;
     }
   }
+  if (body.temperature !== undefined) {
+    if (body.temperature === '' || body.temperature === null) {
+      out.temperature = null;
+    } else {
+      const t = Number(body.temperature);
+      if (!Number.isFinite(t) || t < 34 || t > 43) throw new ApiError(400, '体温需在 34-43 ℃ 之间');
+      out.temperature = Math.round(t * 10) / 10;
+    }
+  }
+  if (body.systolic !== undefined) {
+    if (body.systolic === '' || body.systolic === null) {
+      out.systolic = null;
+    } else {
+      const v = Number(body.systolic);
+      if (!Number.isFinite(v) || v < 50 || v > 250) throw new ApiError(400, '收缩压需在 50-250 mmHg 之间');
+      out.systolic = Math.round(v);
+    }
+  }
+  if (body.diastolic !== undefined) {
+    if (body.diastolic === '' || body.diastolic === null) {
+      out.diastolic = null;
+    } else {
+      const v = Number(body.diastolic);
+      if (!Number.isFinite(v) || v < 30 || v > 160) throw new ApiError(400, '舒张压需在 30-160 mmHg 之间');
+      out.diastolic = Math.round(v);
+    }
+  }
   if (body.waterMl !== undefined) {
     const v = Number(body.waterMl);
     if (!Number.isFinite(v) || v < 0 || v > 8000) throw new ApiError(400, '饮水量不正确');
@@ -656,21 +876,36 @@ function sanitizeLog(body) {
       out.sleepHours = Math.round(v * 10) / 10;
     }
   }
-  if (body.mood !== undefined) {
-    if (body.mood && !LOG_OPTIONS.moods.includes(body.mood)) throw new ApiError(400, '心情选项不正确');
-    out.mood = body.mood || '';
+  if (body.activityMinutes !== undefined) {
+    if (body.activityMinutes === '' || body.activityMinutes === null) {
+      out.activityMinutes = null;
+    } else {
+      const v = Number(body.activityMinutes);
+      if (!Number.isFinite(v) || v < 0 || v > 600) throw new ApiError(400, '活动时长需在 0-600 分钟之间');
+      out.activityMinutes = Math.round(v);
+    }
   }
-  if (body.lochia !== undefined) {
-    if (body.lochia && !LOG_OPTIONS.lochia.includes(body.lochia)) throw new ApiError(400, '恶露选项不正确');
-    out.lochia = body.lochia || '';
+  const optionFields = {
+    mood: LOG_OPTIONS.moods,
+    sleepQuality: LOG_OPTIONS.sleepQuality,
+    lochia: LOG_OPTIONS.lochia,
+    lochiaColor: LOG_OPTIONS.lochiaColor,
+    lochiaOdor: LOG_OPTIONS.lochiaOdor,
+    wound: LOG_OPTIONS.wound,
+    breast: LOG_OPTIONS.breast,
+    pain: LOG_OPTIONS.pain,
+    fatigue: LOG_OPTIONS.fatigue,
+    bowel: LOG_OPTIONS.bowel
+  };
+  for (const [field, options] of Object.entries(optionFields)) {
+    if (body[field] !== undefined) {
+      if (body[field] && !options.includes(body[field])) throw new ApiError(400, `${field} 选项不正确`);
+      out[field] = body[field] || '';
+    }
   }
-  if (body.wound !== undefined) {
-    if (body.wound && !LOG_OPTIONS.wound.includes(body.wound)) throw new ApiError(400, '伤口选项不正确');
-    out.wound = body.wound || '';
-  }
-  if (body.bowel !== undefined) {
-    if (body.bowel && !LOG_OPTIONS.bowel.includes(body.bowel)) throw new ApiError(400, '排便选项不正确');
-    out.bowel = body.bowel || '';
+  if (body.supplements !== undefined) {
+    const raw = Array.isArray(body.supplements) ? body.supplements : [];
+    out.supplements = [...new Set(raw.filter((s) => LOG_OPTIONS.supplements.includes(s)))];
   }
   if (body.note !== undefined) {
     const note = String(body.note || '').trim();
@@ -682,10 +917,10 @@ function sanitizeLog(body) {
 
 async function handleLogsGet(req, res, url) {
   const user = requireUser(req);
-  let start = url.searchParams.get('start');
   let days = Number(url.searchParams.get('days'));
-  if (!planner.isValidDate(start)) start = planner.addDays(planner.todayStr(), -41);
   if (!days || days < 1 || days > 120) days = 42;
+  let start = url.searchParams.get('start');
+  if (!planner.isValidDate(start)) start = planner.addDays(planner.todayStr(), -(days - 1));
 
   const logs = [];
   for (let i = 0; i < days; i += 1) {
@@ -745,7 +980,8 @@ async function handleExport(req, res) {
     skipped: user.skipped,
     logs: user.logs,
     favorites: user.favorites,
-    groceryChecks: user.groceryChecks
+    groceryChecks: user.groceryChecks,
+    customRecipes: user.customRecipes || []
   });
 }
 
@@ -792,6 +1028,11 @@ async function handle(req, res, url) {
     if (path === '/api/recipes' && method === 'GET') return await handleRecipes(req, res, url);
     if (path === '/api/favorites' && method === 'GET') return await handleFavorites(req, res);
 
+    if (path === '/api/recipes/custom' && method === 'POST') return await handleCustomRecipeCreate(req, res);
+    const customRecipe = path.match(/^\/api\/recipes\/custom\/([\w-]+)$/);
+    if (customRecipe && method === 'PUT') return await handleCustomRecipeUpdate(req, res, customRecipe[1]);
+    if (customRecipe && method === 'DELETE') return await handleCustomRecipeDelete(req, res, customRecipe[1]);
+
     if (path === '/api/articles' && method === 'GET') return await handleArticles(req, res);
     const articleDetail = path.match(/^\/api\/articles\/([\w-]+)$/);
     if (articleDetail && method === 'GET') return await handleArticleDetail(req, res, articleDetail[1]);
@@ -831,8 +1072,17 @@ async function handle(req, res, url) {
   }
 }
 
+function registerCustomRecipes() {
+  for (const user of getDb().users) {
+    for (const recipe of user.customRecipes || []) {
+      if (recipe && recipe.id) RECIPE_MAP.set(recipe.id, decorateRecipe(recipe));
+    }
+  }
+}
+
 function createApi() {
   ensureDemoUser();
+  registerCustomRecipes();
   return { handle };
 }
 
