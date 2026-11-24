@@ -20,7 +20,24 @@ const S = {
   planDay: null,
   selectedDate: '',
   tab: 'today',
-  filter: { course: 'all', stage: 'all', effect: 'all', q: '', fav: false, mine: false, sort: 'recommend' },
+  filter: {
+    course: 'all',
+    stage: 'all',
+    effect: 'all',
+    slot: 'all',
+    method: 'all',
+    quick: 'all',
+    kcal: 'all',
+    collection: 'all',
+    q: '',
+    fav: false,
+    mine: false,
+    cooked: false,
+    expanded: false,
+    sort: 'recommend'
+  },
+  cooked: [],
+  recipeNotes: {},
   grocery: { view: 'week', data: null, loading: false, hideChecked: false },
   authMode: 'login',
   onb: null,
@@ -177,6 +194,8 @@ function applyMe(data) {
   S.profile = data.profile;
   S.stage = data.stage;
   S.favorites = Array.isArray(data.favorites) ? data.favorites : [];
+  S.cooked = Array.isArray(data.cooked) ? data.cooked : [];
+  S.recipeNotes = data.recipeNotes && typeof data.recipeNotes === 'object' ? data.recipeNotes : {};
   S.plan = data.plan || null;
   S.stats = data.stats || null;
 }
@@ -187,6 +206,8 @@ function clearSession() {
   S.profile = null;
   S.stage = null;
   S.favorites = [];
+  S.cooked = [];
+  S.recipeNotes = {};
   S.plan = null;
   S.planDay = null;
   S.stats = null;
@@ -200,7 +221,22 @@ function clearSession() {
   S.article = null;
   S.sheet = null;
   S.recipes = S.recipes.filter((r) => !r.custom);
-  S.filter = { course: 'all', stage: 'all', effect: 'all', q: '', fav: false, mine: false, sort: 'recommend' };
+  S.filter = {
+    course: 'all',
+    stage: 'all',
+    effect: 'all',
+    slot: 'all',
+    method: 'all',
+    quick: 'all',
+    kcal: 'all',
+    collection: 'all',
+    q: '',
+    fav: false,
+    mine: false,
+    cooked: false,
+    expanded: false,
+    sort: 'recommend'
+  };
 }
 
 function handleError(err) {
@@ -740,16 +776,66 @@ function tipsHTML(stage) {
 
 /* ------------------------------ 食谱 ------------------------------ */
 
+const SNACK_SLOT_KEYS = ['morningSnack', 'afternoonSnack', 'nightSnack'];
+
+function recipeMatchesSlot(r, slot) {
+  if (slot === 'snack') return r.slots.some((s) => SNACK_SLOT_KEYS.includes(s));
+  return r.slots.includes(slot);
+}
+
+function effectByKey(key) {
+  return (S.meta?.effects || []).find((e) => e.key === key) || null;
+}
+
+function recipeMatchesEffect(r, key) {
+  const effect = effectByKey(key);
+  if (!effect) return true;
+  return r.tags.some((t) => effect.tags.includes(t));
+}
+
+function activeCollectionMeta() {
+  if (!S.filter.collection || S.filter.collection === 'all') return null;
+  return (S.meta?.collections || []).find((c) => c.key === S.filter.collection) || null;
+}
+
+function recipeMatchesCollection(r, collection) {
+  if (!collection) return true;
+  const m = collection.match || {};
+  if (m.effect && !recipeMatchesEffect(r, m.effect)) return false;
+  if (m.course && r.course !== m.course) return false;
+  if (m.slot && !recipeMatchesSlot(r, m.slot)) return false;
+  if (m.maxTime && Number(r.time) > m.maxTime) return false;
+  if (m.method && r.method !== m.method) return false;
+  if (m.vegetarian && !r.vegetarian) return false;
+  return true;
+}
+
+function collectionCount(collection) {
+  return S.recipes.filter((r) => recipeMatchesCollection(r, collection)).length;
+}
+
+function clearCollectionFilter() {
+  if (S.filter.collection !== 'all') S.filter.collection = 'all';
+}
+
 function filteredRecipes() {
   const f = S.filter;
   const q = f.q.trim();
-  const effect = f.effect === 'all' ? null : (S.meta.effects || []).find((e) => e.key === f.effect);
+  const collection = activeCollectionMeta();
   let list = S.recipes.filter((r) => {
     if (f.fav && !S.favorites.includes(r.id)) return false;
+    if (f.cooked && !S.cooked.includes(r.id)) return false;
     if (f.mine && !r.custom) return false;
     if (f.course !== 'all' && r.course !== f.course) return false;
     if (f.stage !== 'all' && !r.stages.includes(Number(f.stage))) return false;
-    if (effect && !r.tags.some((t) => effect.tags.includes(t))) return false;
+    if (f.slot !== 'all' && !recipeMatchesSlot(r, f.slot)) return false;
+    if (f.method !== 'all' && r.method !== f.method) return false;
+    if (f.quick !== 'all' && Number(r.time) > Number(f.quick)) return false;
+    if (f.kcal === 'low' && Number(r.kcal) > 200) return false;
+    if (f.kcal === 'mid' && (Number(r.kcal) <= 200 || Number(r.kcal) > 350)) return false;
+    if (f.kcal === 'high' && Number(r.kcal) <= 350) return false;
+    if (f.effect !== 'all' && !recipeMatchesEffect(r, f.effect)) return false;
+    if (collection && !recipeMatchesCollection(r, collection)) return false;
     if (q) {
       const hay = `${r.name} ${r.tags.join(' ')} ${r.ingredients.map((i) => i[0]).join(' ')} ${r.method || ''}`;
       if (!hay.includes(q)) return false;
@@ -766,11 +852,13 @@ function filteredRecipes() {
 
 function recipeCardHTML(r) {
   const fav = S.favorites.includes(r.id);
+  const cooked = S.cooked.includes(r.id);
   return `
     <article class="recipe-card" data-action="open-recipe" data-id="${r.id}">
       <div class="recipe-thumb">
         <img src="${r.image}" alt="" loading="lazy" />
         ${r.custom ? '<span class="custom-badge">我的</span>' : ''}
+        ${cooked ? `<span class="cooked-badge">${icon('check', 10)} 做过</span>` : ''}
         <button type="button" class="fav-btn ${fav ? 'on' : ''}" data-action="fav" data-id="${r.id}" aria-label="收藏${esc(r.name)}">
           ${icon('heart', 16)}
         </button>
@@ -785,13 +873,93 @@ function recipeCardHTML(r) {
 
 function recipeGridHTML() {
   const list = filteredRecipes();
-  if (!list.length) return `<div class="grid-empty">没有符合条件的食谱${S.filter.fav ? '，去收藏几道喜欢的菜吧' : ''}</div>`;
+  if (!list.length) {
+    const hint = S.filter.fav
+      ? '，去收藏几道喜欢的菜吧'
+      : S.filter.cooked
+        ? '，做过的菜会自动出现在这里'
+        : '';
+    return `<div class="grid-empty">没有符合条件的食谱${hint}</div>`;
+  }
   return list.map(recipeCardHTML).join('');
+}
+
+function collectionsHTML() {
+  const collections = S.meta?.collections || [];
+  if (!collections.length) return '';
+  const active = S.filter.collection;
+  return `
+    <div class="collection-head">
+      <div>
+        <h2>精选合集</h2>
+        <p>不知道吃什么？从场景开始挑</p>
+      </div>
+      <span class="small muted">${collections.length} 个合集</span>
+    </div>
+    <div class="collection-strip">
+      ${collections.map((c) => `
+        <button class="collection-card ${active === c.key ? 'active' : ''}" type="button" data-action="filter-collection" data-key="${c.key}">
+          <span class="collection-ic">${icon(c.icon || 'sparkle', 17)}</span>
+          <strong>${esc(c.label)}</strong>
+          <small>${esc(c.desc)}</small>
+          <em>${collectionCount(c)} 道</em>
+        </button>`).join('')}
+    </div>`;
+}
+
+function activeCollectionBannerHTML() {
+  const c = activeCollectionMeta();
+  if (!c) return '';
+  return `
+    <div class="collection-banner">
+      <div>
+        <strong>正在浏览 · ${esc(c.label)}</strong>
+        <span>${esc(c.desc)}</span>
+      </div>
+      <button type="button" data-action="filter-collection" data-key="${c.key}">清除</button>
+    </div>`;
+}
+
+function filterPanelHTML() {
+  const f = S.filter;
+  const slots = [
+    { key: 'all', label: '全部餐次' },
+    { key: 'breakfast', label: '早餐' },
+    { key: 'lunch', label: '午餐' },
+    { key: 'dinner', label: '晚餐' },
+    { key: 'snack', label: '加餐' }
+  ];
+  return `
+    <div class="filter-panel">
+      <div class="filter-panel-label">餐次</div>
+      <div class="chip-row">
+        ${slots.map((s) => `<button class="chip ${f.slot === s.key ? 'active' : ''}" type="button" data-action="filter-slot" data-value="${s.key}">${s.label}</button>`).join('')}
+      </div>
+      <div class="filter-panel-label">烹饪方式</div>
+      <div class="chip-row">
+        <button class="chip ${f.method === 'all' ? 'active' : ''}" type="button" data-action="filter-method" data-value="all">全部做法</button>
+        ${(S.meta.methods || []).map((m) => `<button class="chip ${f.method === m ? 'active' : ''}" type="button" data-action="filter-method" data-value="${esc(m)}">${esc(m)}</button>`).join('')}
+      </div>
+      <div class="filter-panel-label">用时</div>
+      <div class="chip-row">
+        <button class="chip ${f.quick === 'all' ? 'active' : ''}" type="button" data-action="filter-quick" data-value="all">不限</button>
+        <button class="chip ${f.quick === '15' ? 'active' : ''}" type="button" data-action="filter-quick" data-value="15">≤ 15 分钟</button>
+        <button class="chip ${f.quick === '30' ? 'active' : ''}" type="button" data-action="filter-quick" data-value="30">≤ 30 分钟</button>
+      </div>
+      <div class="filter-panel-label">热量</div>
+      <div class="chip-row">
+        <button class="chip ${f.kcal === 'all' ? 'active' : ''}" type="button" data-action="filter-kcal" data-value="all">不限</button>
+        <button class="chip ${f.kcal === 'low' ? 'active' : ''}" type="button" data-action="filter-kcal" data-value="low">≤ 200 kcal</button>
+        <button class="chip ${f.kcal === 'mid' ? 'active' : ''}" type="button" data-action="filter-kcal" data-value="mid">200-350 kcal</button>
+        <button class="chip ${f.kcal === 'high' ? 'active' : ''}" type="button" data-action="filter-kcal" data-value="high">≥ 350 kcal</button>
+      </div>
+    </div>`;
 }
 
 function recipesHTML() {
   const f = S.filter;
   const customCount = S.recipes.filter((r) => r.custom).length;
+  const advancedCount = [f.slot !== 'all', f.method !== 'all', f.quick !== 'all', f.kcal !== 'all'].filter(Boolean).length;
   return `
     <header class="page-head recipes-head">
       <div>
@@ -804,14 +972,20 @@ function recipesHTML() {
       ${icon('search', 18)}
       <input id="recipe-search" placeholder="搜索菜名、食材或做法，如「鲫鱼」" value="${esc(f.q)}" autocomplete="off" />
     </div>
+    ${collectionsHTML()}
+    ${activeCollectionBannerHTML()}
     <div class="filter-bar">
       <span class="small muted">共 ${filteredRecipes().length} 道</span>
       <div class="filter-actions">
-        <button class="fav-filter ${f.mine ? 'active' : ''}" type="button" data-action="filter-mine">我的食谱${customCount ? ` ${customCount}` : ''}</button>
+        <button class="fav-filter ${f.mine ? 'active' : ''}" type="button" data-action="filter-mine">我的${customCount ? ` ${customCount}` : ''}</button>
         <button class="fav-filter ${f.fav ? 'active' : ''}" type="button" data-action="filter-fav">${icon('heart', 13)} 收藏</button>
+        <button class="fav-filter ${f.cooked ? 'active' : ''}" type="button" data-action="filter-cooked">${icon('check', 13)} 做过${S.cooked.length ? ` ${S.cooked.length}` : ''}</button>
       </div>
     </div>
     <div class="sort-row">
+      <button class="more-filter-btn ${f.expanded ? 'active' : ''}" type="button" data-action="toggle-filters">
+        ${icon('chevron', 13)} 更多筛选${advancedCount ? ` · ${advancedCount}` : ''}
+      </button>
       <label class="sort-label">排序
         <select id="recipe-sort" class="sort-select">
           <option value="recommend" ${f.sort === 'recommend' ? 'selected' : ''}>推荐</option>
@@ -821,6 +995,7 @@ function recipesHTML() {
         </select>
       </label>
     </div>
+    ${f.expanded ? filterPanelHTML() : ''}
     <div class="chip-row">
       <button class="chip ${f.course === 'all' ? 'active' : ''}" type="button" data-action="filter-course" data-value="all">全部</button>
       ${(S.meta.courses || []).map((c) => `<button class="chip ${f.course === c.key ? 'active' : ''}" type="button" data-action="filter-course" data-value="${c.key}">${esc(c.label)}</button>`).join('')}
@@ -1444,6 +1619,7 @@ function meHTML() {
       <div class="stat-cell"><strong>${stats.streak || 0}<span>天</span></strong><p>连续打卡</p></div>
       <div class="stat-cell"><strong>${stats.recordDays || 0}<span>天</span></strong><p>健康记录</p></div>
       <div class="stat-cell"><strong>${(S.favorites || []).length}<span>道</span></strong><p>收藏食谱</p></div>
+      <div class="stat-cell"><strong>${stats.cookedCount || S.cooked.length}<span>道</span></strong><p>做过的菜</p></div>
       <div class="stat-cell"><strong>${stats.eatenMeals || 0}<span>餐</span></strong><p>累计已吃</p></div>
     </div>
     <div class="card menu-list" style="padding:4px 0">
@@ -1480,19 +1656,28 @@ function meHTML() {
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
     </div>
-    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v3.0<br />饮食建议仅供参考，具体请遵医嘱</p>`;
+    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v4.1<br />饮食建议仅供参考，具体请遵医嘱</p>`;
 }
 
 /* ------------------------------ 弹层 ------------------------------ */
 
 function openSheet(sheet) {
+  if (S.sheet?.type === 'recipe' && sheet?.type === 'recipe') captureRecipeNote(S.sheet.id);
   S.sheet = sheet;
   renderSheet();
 }
 
 function closeSheet() {
+  if (S.sheet?.type === 'recipe') captureRecipeNote(S.sheet.id);
   S.sheet = null;
   $('#overlay-root').innerHTML = '';
+}
+
+function captureRecipeNote(id) {
+  const el = $('#recipe-note');
+  if (el && S.sheet?.type === 'recipe' && S.sheet.id === id) {
+    S.recipeNotes[id] = el.value;
+  }
 }
 
 function renderSheet() {
@@ -1553,14 +1738,48 @@ function applyTargets(r) {
     .map((s) => ({ slot: s.key, label: s.label, date, course: r.course }));
 }
 
+function recipeHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i += 1) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function recommendPairings(r) {
+  const stage =
+    S.planDay?.stage?.stage ||
+    S.stage?.stage ||
+    stageNumberForDay(postpartumDays(S.profile?.deliveryDate));
+  const hash = recipeHash(r.id);
+  if (r.course === 'snack') {
+    const pool = S.recipes.filter((x) => x.course === 'snack' && x.id !== r.id && x.stages.includes(stage));
+    const fallback = S.recipes.filter((x) => x.course === 'snack' && x.id !== r.id);
+    const list = pool.length >= 3 ? pool : fallback;
+    if (!list.length) return [];
+    return [0, 1, 2]
+      .map((i) => list[(hash + i) % list.length])
+      .filter((x, i, arr) => x && arr.indexOf(x) === i);
+  }
+  const courses = ['staple', 'main', 'veg', 'soup'].filter((c) => c !== r.course);
+  const out = [];
+  for (const c of courses) {
+    const pool = S.recipes.filter((x) => x.course === c && x.id !== r.id && x.stages.includes(stage));
+    const list = pool.length ? pool : S.recipes.filter((x) => x.course === c && x.id !== r.id);
+    if (list.length) out.push(list[(hash + c.charCodeAt(0)) % list.length]);
+  }
+  return out;
+}
+
 function recipeSheetHTML(r) {
   const fav = S.favorites.includes(r.id);
+  const cooked = S.cooked.includes(r.id);
+  const note = S.recipeNotes[r.id] || '';
   const stageText = r.stages.map((n) => S.meta.stages.find((s) => s.stage === n)?.week || '').filter(Boolean).join('、');
   const slotText = r.slots.map((s) => slotMeta(s).label).join('、');
   const targets = applyTargets(r);
   const n = r.nutrients || { fiber: 0, calcium: 0, iron: 0 };
   const pct = (value, ref) => Math.min(999, Math.round((Number(value) / ref) * 100));
   const similar = S.recipes.filter((x) => x.id !== r.id && x.course === r.course).slice(0, 3);
+  const pairings = recommendPairings(r);
   return `
     <img class="detail-cover" src="${r.image}" alt="${esc(r.name)}" />
     <div class="sheet-head" style="padding-bottom:0">
@@ -1581,8 +1800,12 @@ function recipeSheetHTML(r) {
       </div>
       <div class="tag-row">
         ${r.custom ? '<span class="tag custom">我创建的</span>' : ''}
+        ${r.vegetarian ? '<span class="tag veg">素食</span>' : ''}
         ${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}
       </div>
+      <button class="cook-toggle ${cooked ? 'on' : ''}" type="button" data-action="toggle-cooked" data-id="${r.id}">
+        ${icon('check', 14)} ${cooked ? '已经做过，点击取消标记' : '标记为做过这道菜'}
+      </button>
       <div class="nutri-grid">
         <div><strong>${r.kcal}</strong><span>kcal</span></div>
         <div><strong>${r.protein}g</strong><span>蛋白质</span></div>
@@ -1615,6 +1838,14 @@ function recipeSheetHTML(r) {
           ${r.steps.map((s, i) => `<li><span class="n">${i + 1}</span><span>${esc(s)}</span></li>`).join('')}
         </ol>
       </section>
+      <section class="detail-section">
+        <h3>我的笔记</h3>
+        <textarea id="recipe-note" class="note-input" maxlength="300" placeholder="记下家人的反馈、口味调整或下次要注意的地方…">${esc(note)}</textarea>
+        <div class="note-actions">
+          <span class="small muted">仅自己可见</span>
+          <button class="btn btn-soft btn-sm" type="button" data-action="save-note" data-id="${r.id}">保存笔记</button>
+        </div>
+      </section>
       ${(r.cautions || []).length ? `
         <section class="detail-section">
           <h3>注意事项</h3>
@@ -1635,6 +1866,17 @@ function recipeSheetHTML(r) {
           <h3>食材替换</h3>
           <p class="small muted" style="line-height:1.8">可按口味替换同类食材；如果对某种食材过敏，请直接用等量的其他蛋白质或蔬菜替代。</p>
         </section>`}
+      ${pairings.length ? `
+        <section class="detail-section">
+          <h3>推荐搭配</h3>
+          <div class="pairing-list">
+            ${pairings.map((p) => `<button type="button" class="pairing-item" data-action="open-recipe" data-id="${p.id}">
+              <img src="${p.image}" alt="" loading="lazy" />
+              <div><span>${courseLabel(p.course)}</span><strong>${esc(p.name)}</strong></div>
+              <em>${p.kcal} kcal</em>
+            </button>`).join('')}
+          </div>
+        </section>` : ''}
       ${similar.length ? `
         <section class="detail-section">
           <h3>相似食谱</h3>
@@ -1651,6 +1893,9 @@ function recipeSheetHTML(r) {
     <div class="sheet-actions">
       <button class="btn ${fav ? 'btn-soft' : 'btn-primary'}" type="button" data-action="sheet-fav" data-id="${r.id}">
         ${fav ? '已收藏，点击取消' : '收藏这道菜'}
+      </button>
+      <button class="btn ${cooked ? 'btn-soft' : 'btn-ghost'}" type="button" data-action="toggle-cooked" data-id="${r.id}">
+        ${cooked ? '取消做过' : '标记做过'}
       </button>
     </div>
     ${r.custom ? `
@@ -1947,7 +2192,7 @@ function aboutSheetHTML() {
       <p><strong>免责声明：</strong>食谱、营养数据与功效说明均为日常饮食参考，不构成医疗建议。产后饮食需结合个人体质、伤口恢复、哺乳情况和医生建议调整；如出现过敏、发热、伤口异常、恶露异常等情况，请及时就医。</p>
       <p><strong>忌口说明：</strong>勾选忌口或过敏项后，生成餐单与换菜时会自动排除相关食材；母乳喂养或混合喂养会默认排除含酒精的菜品。</p>
       <p><strong>数据说明：</strong>账号、餐单与打卡记录保存在服务端实例中，仅用于功能演示。请勿填写身份证号、住址等敏感个人信息。</p>
-      <p class="muted">暖月 v3.0 · 用一日三餐，好好照顾自己。</p>
+      <p class="muted">暖月 v4.1 · 用一日三餐，好好照顾自己。</p>
     </div>`;
 }
 
@@ -2189,9 +2434,45 @@ async function doFavorite(id) {
     const data = await api(`/recipes/${id}/favorite`, { method: 'POST' });
     S.favorites = data.favorites;
     if (S.stats) S.stats.favoriteCount = S.favorites.length;
-    if (S.sheet?.type === 'recipe') renderSheet();
+    if (S.sheet?.type === 'recipe') {
+      captureRecipeNote(id);
+      renderSheet();
+    }
     renderMain({ keepScroll: true });
     toast(data.favorited ? '已加入收藏' : '已取消收藏');
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+async function toggleCooked(id) {
+  if (!S.me) {
+    toast('请先登录', 'error');
+    return;
+  }
+  try {
+    const data = await api(`/recipes/${id}/cook`, { method: 'POST' });
+    S.cooked = Array.isArray(data.cooked) ? data.cooked : S.cooked;
+    if (S.stats) S.stats.cookedCount = S.cooked.length;
+    if (S.sheet?.type === 'recipe') {
+      captureRecipeNote(id);
+      renderSheet();
+    }
+    renderMain({ keepScroll: true });
+    toast(data.isCooked ? '已标记为做过' : '已取消做过标记');
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+async function saveRecipeNote(id) {
+  const el = $('#recipe-note');
+  if (!el) return;
+  try {
+    const data = await api(`/recipes/${id}/note`, { method: 'PUT', body: { note: el.value } });
+    if (data.note) S.recipeNotes[id] = data.note;
+    else delete S.recipeNotes[id];
+    toast(data.note ? '笔记已保存' : '笔记已清空');
   } catch (err) {
     handleError(err);
   }
@@ -2531,23 +2812,84 @@ async function onClick(e) {
       break;
     case 'filter-course':
       S.filter.course = el.dataset.value;
+      clearCollectionFilter();
       renderMain({ keepScroll: true });
       break;
     case 'filter-stage':
       S.filter.stage = el.dataset.value;
+      clearCollectionFilter();
       renderMain({ keepScroll: true });
       break;
     case 'filter-effect':
       S.filter.effect = el.dataset.value;
+      clearCollectionFilter();
+      renderMain({ keepScroll: true });
+      break;
+    case 'filter-slot':
+      S.filter.slot = el.dataset.value;
+      clearCollectionFilter();
+      renderMain({ keepScroll: true });
+      break;
+    case 'filter-method':
+      S.filter.method = el.dataset.value;
+      clearCollectionFilter();
+      renderMain({ keepScroll: true });
+      break;
+    case 'filter-quick':
+      S.filter.quick = el.dataset.value;
+      clearCollectionFilter();
+      renderMain({ keepScroll: true });
+      break;
+    case 'filter-kcal':
+      S.filter.kcal = el.dataset.value;
+      clearCollectionFilter();
       renderMain({ keepScroll: true });
       break;
     case 'filter-fav':
       S.filter.fav = !S.filter.fav;
+      clearCollectionFilter();
       renderMain({ keepScroll: true });
       break;
     case 'filter-mine':
       S.filter.mine = !S.filter.mine;
+      clearCollectionFilter();
       renderMain({ keepScroll: true });
+      break;
+    case 'filter-cooked':
+      S.filter.cooked = !S.filter.cooked;
+      clearCollectionFilter();
+      renderMain({ keepScroll: true });
+      break;
+    case 'filter-collection': {
+      const key = el.dataset.key;
+      if (S.filter.collection === key) {
+        S.filter.collection = 'all';
+      } else {
+        S.filter.collection = key;
+        S.filter.course = 'all';
+        S.filter.stage = 'all';
+        S.filter.effect = 'all';
+        S.filter.slot = 'all';
+        S.filter.method = 'all';
+        S.filter.quick = 'all';
+        S.filter.kcal = 'all';
+        S.filter.q = '';
+        S.filter.fav = false;
+        S.filter.mine = false;
+        S.filter.cooked = false;
+      }
+      renderMain({ keepScroll: true });
+      break;
+    }
+    case 'toggle-filters':
+      S.filter.expanded = !S.filter.expanded;
+      renderMain({ keepScroll: true });
+      break;
+    case 'toggle-cooked':
+      toggleCooked(el.dataset.id);
+      break;
+    case 'save-note':
+      saveRecipeNote(el.dataset.id);
       break;
     case 'open-recipe-form':
       openRecipeForm(null);
@@ -2582,9 +2924,16 @@ async function onClick(e) {
       S.tab = 'recipes';
       S.filter.fav = true;
       S.filter.mine = false;
+      S.filter.cooked = false;
       S.filter.course = 'all';
       S.filter.stage = 'all';
       S.filter.effect = 'all';
+      S.filter.slot = 'all';
+      S.filter.method = 'all';
+      S.filter.quick = 'all';
+      S.filter.kcal = 'all';
+      S.filter.collection = 'all';
+      S.filter.q = '';
       renderMain();
       break;
     case 'grocery-view':
@@ -2907,6 +3256,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('change', onChange);
   boot();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=3').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=4.1').catch(() => {});
   }
 });

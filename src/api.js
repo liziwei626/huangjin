@@ -22,6 +22,7 @@ const {
   CALORIE_PRESETS,
   DEFAULT_SLOTS,
   EFFECT_GROUPS,
+  COLLECTIONS,
   LOG_OPTIONS
 } = require('./data/meta');
 const { ARTICLES, ARTICLE_MAP } = require('./data/articles');
@@ -93,6 +94,8 @@ function ensureCollections(user) {
   if (!user.groceryChecks || typeof user.groceryChecks !== 'object') user.groceryChecks = {};
   if (!Array.isArray(user.favorites)) user.favorites = [];
   if (!Array.isArray(user.customRecipes)) user.customRecipes = [];
+  if (!Array.isArray(user.cooked)) user.cooked = [];
+  if (!user.recipeNotes || typeof user.recipeNotes !== 'object') user.recipeNotes = {};
   return user;
 }
 
@@ -137,6 +140,8 @@ function createUserRecord({ username, password, name }) {
     updatedAt: new Date().toISOString(),
     profile: defaultProfile(name || username),
     favorites: [],
+    cooked: [],
+    recipeNotes: {},
     plan: null,
     eaten: {},
     skipped: {},
@@ -159,6 +164,8 @@ function authPayload(user, date) {
     profile,
     stage: planner.stagePayload(profile.deliveryDate, date),
     favorites: Array.isArray(user.favorites) ? user.favorites : [],
+    cooked: user.cooked,
+    recipeNotes: user.recipeNotes,
     plan: planner.planOverview(user.plan, user.eaten, user.skipped),
     stats: planner.computeStats(user, date)
   };
@@ -274,6 +281,11 @@ function ensureDemoUser() {
     };
     demo.logs = buildDemoLogs();
     demo.customRecipes = [buildDemoRecipe(demo.id)];
+    demo.cooked = ['p01', 'm02', 's01', 'k04'];
+    demo.recipeNotes = {
+      p01: '鲫鱼煎过再冲开水，汤色更白；豆腐最后放，别煮老。',
+      m02: '温水按 1.5 倍加，蒸出来真的很嫩。'
+    };
     for (const r of demo.customRecipes) RECIPE_MAP.set(r.id, r);
     addUser(demo);
     console.log('[seed] demo account created');
@@ -281,6 +293,13 @@ function ensureDemoUser() {
   }
 
   ensureCollections(demo);
+  if (!demo.cooked.length) demo.cooked = ['p01', 'm02', 's01', 'k04'];
+  if (!Object.keys(demo.recipeNotes).length) {
+    demo.recipeNotes = {
+      p01: '鲫鱼煎过再冲开水，汤色更白；豆腐最后放，别煮老。',
+      m02: '温水按 1.5 倍加，蒸出来真的很嫩。'
+    };
+  }
 
   // 演示账号的餐单过期时自动顺延，保证体验始终可用。
   if (!demo.plan || !demo.plan.items?.[planner.todayStr()]) {
@@ -342,6 +361,10 @@ function buildDemoLogs() {
 // ------------------------- 路由处理 -------------------------
 
 async function handleMeta(req, res) {
+  const methodOrder = ['蒸', '煮', '炖煮', '炒', '拌', '煎', '灼', '焖', '煮饮', '冲调', '即食'];
+  const methods = [...new Set(RECIPES.map((r) => r.method))].sort(
+    (a, b) => (methodOrder.indexOf(a) + 1 || 99) - (methodOrder.indexOf(b) + 1 || 99)
+  );
   sendJson(res, 200, {
     stages: STAGES,
     slots: SLOTS,
@@ -352,6 +375,8 @@ async function handleMeta(req, res) {
     feedings: FEEDINGS,
     caloriePresets: CALORIE_PRESETS,
     effects: EFFECT_GROUPS,
+    collections: COLLECTIONS,
+    methods,
     logOptions: LOG_OPTIONS,
     ingredientCategories: INGREDIENT_CATEGORIES,
     recipeCount: RECIPES.length,
@@ -411,7 +436,9 @@ async function handleProfileGet(req, res, url) {
     stage: planner.stagePayload(user.profile.deliveryDate, date),
     plan: planner.planOverview(user.plan, user.eaten, user.skipped),
     stats: planner.computeStats(user, date),
-    favorites: user.favorites || []
+    favorites: user.favorites || [],
+    cooked: user.cooked || [],
+    recipeNotes: user.recipeNotes || {}
   });
 }
 
@@ -445,6 +472,11 @@ async function handleRecipes(req, res, url) {
   const course = url.searchParams.get('course');
   const stage = Number(url.searchParams.get('stage'));
   const slot = url.searchParams.get('slot');
+  const method = url.searchParams.get('method');
+  const maxTime = Number(url.searchParams.get('maxTime'));
+  const minKcal = Number(url.searchParams.get('minKcal'));
+  const maxKcal = Number(url.searchParams.get('maxKcal'));
+  const vegetarian = url.searchParams.get('vegetarian');
   const q = String(url.searchParams.get('q') || '').trim().toLowerCase();
   const ids = url.searchParams.get('ids');
   const user = optionalUser(req);
@@ -458,6 +490,11 @@ async function handleRecipes(req, res, url) {
   if (course) list = list.filter((r) => r.course === course);
   if (stage) list = list.filter((r) => r.stages.includes(stage));
   if (slot) list = list.filter((r) => r.slots.includes(slot));
+  if (method) list = list.filter((r) => r.method === method);
+  if (Number.isFinite(maxTime) && maxTime > 0) list = list.filter((r) => r.time <= maxTime);
+  if (Number.isFinite(minKcal) && minKcal > 0) list = list.filter((r) => r.kcal >= minKcal);
+  if (Number.isFinite(maxKcal) && maxKcal > 0) list = list.filter((r) => r.kcal <= maxKcal);
+  if (vegetarian === '1') list = list.filter((r) => r.vegetarian);
   if (q) list = list.filter((r) => r.searchText.toLowerCase().includes(q));
 
   sendJson(res, 200, {
@@ -479,7 +516,52 @@ async function handleRecipeDetail(req, res, id) {
     .filter((r) => r.id !== id && r.course === recipe.course)
     .slice(0, 3)
     .map((r) => ({ id: r.id, name: r.name, image: r.image, kcal: r.kcal, time: r.time }));
-  sendJson(res, 200, { recipe: planner.publicRecipe(recipe), similar });
+  sendJson(res, 200, {
+    recipe: planner.publicRecipe(recipe),
+    similar,
+    cooked: Boolean(user && (user.cooked || []).includes(id)),
+    note: (user && user.recipeNotes?.[id]) || ''
+  });
+}
+
+async function handleRecipeCook(req, res, id) {
+  const user = requireUser(req);
+  const recipe = RECIPE_MAP.get(id);
+  if (!recipe) throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  if (recipe.custom && recipe.customOwnerId !== user.id) {
+    throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  }
+  const idx = user.cooked.indexOf(id);
+  let isCooked;
+  if (idx >= 0) {
+    user.cooked.splice(idx, 1);
+    isCooked = false;
+  } else {
+    user.cooked.unshift(id);
+    isCooked = true;
+  }
+  touchUser(user);
+  sendJson(res, 200, {
+    isCooked,
+    cooked: user.cooked,
+    stats: planner.computeStats(user, planner.todayStr())
+  });
+}
+
+async function handleRecipeNote(req, res, id) {
+  const user = requireUser(req);
+  const recipe = RECIPE_MAP.get(id);
+  if (!recipe) throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  if (recipe.custom && recipe.customOwnerId !== user.id) {
+    throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  }
+  const body = await readJson(req);
+  const note = String(body.note || '').trim();
+  if (note.length > 300) throw new ApiError(400, '笔记最多 300 字');
+  if (note) user.recipeNotes[id] = note;
+  else delete user.recipeNotes[id];
+  touchUser(user);
+  sendJson(res, 200, { id, note });
 }
 
 async function handleFavorite(req, res, id) {
@@ -634,6 +716,8 @@ async function handleCustomRecipeDelete(req, res, id) {
   }
   user.customRecipes.splice(idx, 1);
   user.favorites = user.favorites.filter((fid) => fid !== id);
+  user.cooked = (user.cooked || []).filter((cid) => cid !== id);
+  if (user.recipeNotes) delete user.recipeNotes[id];
   RECIPE_MAP.delete(id);
   touchUser(user);
   sendJson(res, 200, { ok: true, customCount: user.customRecipes.length });
@@ -980,6 +1064,8 @@ async function handleExport(req, res) {
     skipped: user.skipped,
     logs: user.logs,
     favorites: user.favorites,
+    cooked: user.cooked,
+    recipeNotes: user.recipeNotes,
     groceryChecks: user.groceryChecks,
     customRecipes: user.customRecipes || []
   });
@@ -1036,6 +1122,11 @@ async function handle(req, res, url) {
     if (path === '/api/articles' && method === 'GET') return await handleArticles(req, res);
     const articleDetail = path.match(/^\/api\/articles\/([\w-]+)$/);
     if (articleDetail && method === 'GET') return await handleArticleDetail(req, res, articleDetail[1]);
+
+    const recipeCook = path.match(/^\/api\/recipes\/([\w-]+)\/cook$/);
+    if (recipeCook && method === 'POST') return await handleRecipeCook(req, res, recipeCook[1]);
+    const recipeNote = path.match(/^\/api\/recipes\/([\w-]+)\/note$/);
+    if (recipeNote && method === 'PUT') return await handleRecipeNote(req, res, recipeNote[1]);
 
     const recipeDetail = path.match(/^\/api\/recipes\/([\w-]+)$/);
     if (recipeDetail && method === 'GET') return await handleRecipeDetail(req, res, recipeDetail[1]);

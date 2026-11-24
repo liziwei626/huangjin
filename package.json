@@ -1,6 +1,6 @@
 {
   "name": "nuanyue-yuezican",
-  "version": "1.0.0",
+  "version": "4.1.0",
   "private": true,
   "description": "暖月 · 月子餐智能搭配 —— 前后端一体的产后餐单小程序（H5）",
   "main": "server.js",

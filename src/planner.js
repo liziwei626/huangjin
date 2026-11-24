@@ -227,6 +227,7 @@ function publicRecipe(r) {
     nutrients: r.nutrients,
     cautions: r.cautions,
     substitutes: r.substitutes,
+    vegetarian: Boolean(r.vegetarian),
     custom: Boolean(r.custom)
   };
 }
@@ -429,10 +430,12 @@ function aggregateGrocery(plan, startDate, days, checks) {
 function computeStats(user, today) {
   const plan = user.plan;
   const favoriteCount = Array.isArray(user.favorites) ? user.favorites.length : 0;
+  const cookedCount = Array.isArray(user.cooked) ? user.cooked.length : 0;
   if (!plan) {
     return {
       planDays: 0,
       favoriteCount,
+      cookedCount,
       eatenMeals: 0,
       skippedMeals: 0,
       totalMeals: 0,
@@ -485,6 +488,7 @@ function computeStats(user, today) {
   return {
     planDays: plan.days,
     favoriteCount,
+    cookedCount,
     eatenMeals,
     skippedMeals,
     totalMeals,

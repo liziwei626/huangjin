@@ -98,6 +98,70 @@ const EFFECT_GROUPS = [
   { key: 'immune', label: '增强免疫', tags: ['增强免疫', '增强体力', '伤口愈合'] }
 ];
 
+/**
+ * 精选合集：把「不知道吃什么」的场景变成一键筛选。
+ * match 由前端解释：effect 功效 / course 品类 / slot 餐次 / maxTime 最长用时 /
+ * method 烹饪方式 / vegetarian 是否素食。
+ */
+const COLLECTIONS = [
+  {
+    key: 'lactation',
+    label: '催乳优选',
+    desc: '汤水与优质蛋白，给奶量添把劲',
+    icon: 'water',
+    match: { effect: 'lactation' }
+  },
+  {
+    key: 'blood',
+    label: '补铁补血',
+    desc: '红肉、动物肝脏与时令深绿蔬菜',
+    icon: 'heart',
+    match: { effect: 'blood' }
+  },
+  {
+    key: 'quick-breakfast',
+    label: '快手早餐',
+    desc: '20 分钟内端上桌，睡醒就能吃',
+    icon: 'clock',
+    match: { slot: 'breakfast', maxTime: 20 }
+  },
+  {
+    key: 'stew',
+    label: '一锅炖汤',
+    desc: '食材下锅慢炖，汤和肉一起吃',
+    icon: 'flame',
+    match: { course: 'soup', method: '炖煮' }
+  },
+  {
+    key: 'lowfat-dinner',
+    label: '低脂晚餐',
+    desc: '清爽不油腻，晚上也好消化',
+    icon: 'leaf',
+    match: { effect: 'lowfat', slot: 'dinner' }
+  },
+  {
+    key: 'calcium',
+    label: '高钙食谱',
+    desc: '奶类、豆制品与深绿色蔬菜',
+    icon: 'sparkle',
+    match: { effect: 'calcium' }
+  },
+  {
+    key: 'snack',
+    label: '解馋加餐',
+    desc: '小份温热甜点，解馋不负担',
+    icon: 'bookmark',
+    match: { course: 'snack' }
+  },
+  {
+    key: 'vegetarian',
+    label: '素食友好',
+    desc: '不含肉蛋水产，也能吃得均衡',
+    icon: 'leaf',
+    match: { vegetarian: true }
+  }
+];
+
 const LOG_OPTIONS = {
   moods: ['很好', '不错', '一般', '疲惫', '低落'],
   moodEmoji: { 很好: '😄', 不错: '🙂', 一般: '😐', 疲惫: '😪', 低落: '😔' },
@@ -139,6 +203,7 @@ module.exports = {
   FEEDINGS,
   CALORIE_PRESETS,
   EFFECT_GROUPS,
+  COLLECTIONS,
   LOG_OPTIONS,
   stageInfo,
   restrictionTerms
