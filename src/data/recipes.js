@@ -1529,7 +1529,7 @@ function imageForRecipe(r) {
   if (r.course === 'staple') {
     if (/面|馄饨|云吞/.test(n)) return '/images/noodle.jpg';
     if (/饭/.test(n)) return '/images/rice.jpg';
-    if (/饺|包|馒头|发糕|糕|饼/.test(n)) return '/images/bun.jpg';
+    if (/饺|包|馒头|发糕|糕|饼/.test(n)) return '/images/bun.jpg?v=2';
     return '/images/staple.jpg';
   }
   if (r.course === 'veg') return '/images/veg.jpg';
@@ -1541,9 +1541,10 @@ function imageForRecipe(r) {
     return '/images/dessert.jpg';
   }
   if (r.course === 'main') {
-    if (/虾/.test(n)) return '/images/shrimp.jpg';
+    if (/虾/.test(n)) return '/images/shrimp.jpg?v=2';
     if (/鸡/.test(n)) return '/images/chicken.jpg';
     if (/牛|羊/.test(n)) return '/images/beef.jpg';
+    if (/鸭/.test(n)) return '/images/duck.jpg';
     if (/鱼|蟹|贝|蛤蜊|海参/.test(n)) return '/images/main.jpg';
     if (/豆腐|豆干|腐竹|豆腐皮/.test(n)) return '/images/tofu.jpg';
     if (/蛋/.test(n)) return '/images/egg.jpg';
