@@ -1566,4 +1566,4 @@ const RECIPES = RAW.map((r) =>
 
 const RECIPE_MAP = new Map(RECIPES.map((r) => [r.id, r]));
 
-module.exports = { RECIPES, RECIPE_MAP };
+module.exports = { RECIPES, RECIPE_MAP, imageForRecipe };

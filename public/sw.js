@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'nuanyue-v4.1';
+const CACHE = 'nuanyue-v4.2';
 const CORE = ['/', '/styles.css', '/app.js', '/icon.svg', '/manifest.webmanifest', '/images/hero.jpg'];
 
 self.addEventListener('install', (event) => {
@@ -23,6 +23,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/')) return;
+  if (url.pathname.startsWith('/admin')) return;
 
   if (req.mode === 'navigate') {
     event.respondWith(

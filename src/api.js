@@ -25,8 +25,9 @@ const {
   COLLECTIONS,
   LOG_OPTIONS
 } = require('./data/meta');
-const { ARTICLES, ARTICLE_MAP } = require('./data/articles');
+const { ARTICLE_MAP } = require('./data/articles');
 const { decorateRecipe, inferCategory, INGREDIENT_CATEGORIES } = require('./data/recipe-utils');
+const content = require('./content');
 const planner = require('./planner');
 
 const DEMO_USERNAME = 'demo';
@@ -83,7 +84,14 @@ function requireUser(req) {
   if (!payload) throw new ApiError(401, '登录已过期，请重新登录', 'UNAUTHORIZED');
   const user = findUserById(payload.uid);
   if (!user) throw new ApiError(401, '账号不存在，请重新登录', 'UNAUTHORIZED');
+  if (user.disabled) throw new ApiError(403, '该账号已被停用，请联系管理员', 'ACCOUNT_DISABLED');
   ensureCollections(user);
+  return user;
+}
+
+function requireAdmin(req) {
+  const user = requireUser(req);
+  if (user.role !== 'admin') throw new ApiError(403, '该账号没有管理权限', 'FORBIDDEN');
   return user;
 }
 
@@ -136,6 +144,9 @@ function createUserRecord({ username, password, name }) {
     salt,
     hash,
     name: name || username,
+    role: 'user',
+    disabled: false,
+    lastLoginAt: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     profile: defaultProfile(name || username),
@@ -152,7 +163,13 @@ function createUserRecord({ username, password, name }) {
 }
 
 function publicUser(user) {
-  return { id: user.id, username: user.username, name: user.name, createdAt: user.createdAt };
+  return {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    role: user.role === 'admin' ? 'admin' : 'user',
+    createdAt: user.createdAt
+  };
 }
 
 function authPayload(user, date) {
@@ -312,6 +329,29 @@ function ensureDemoUser() {
   }
 }
 
+function ensureAdminUser() {
+  const username = 'admin';
+  let admin = findUserByUsername(username);
+  if (!admin) {
+    admin = createUserRecord({ username, password: 'admin123456', name: '暖月管理员' });
+    admin.role = 'admin';
+    admin.profile = {
+      ...admin.profile,
+      name: '暖月管理员',
+      deliveryDate: planner.addDays(planner.todayStr(), -30),
+      onboarded: true
+    };
+    addUser(admin);
+    console.log('[seed] admin account created');
+    return admin;
+  }
+  if (admin.role !== 'admin') {
+    admin.role = 'admin';
+    save();
+  }
+  return admin;
+}
+
 function buildDemoRecipe(ownerId) {
   return decorateRecipe({
     id: newId('c'),
@@ -379,7 +419,8 @@ async function handleMeta(req, res) {
     methods,
     logOptions: LOG_OPTIONS,
     ingredientCategories: INGREDIENT_CATEGORIES,
-    recipeCount: RECIPES.length,
+    recipeCount: RECIPES.filter((r) => r.available !== false).length,
+    articleCount: content.publicArticles().length,
     demo: { username: DEMO_USERNAME, password: DEMO_PASSWORD }
   });
 }
@@ -412,6 +453,8 @@ async function handleLogin(req, res) {
   if (!user || !verifyPassword(password, user.salt, user.hash)) {
     throw new ApiError(401, '账号或密码不正确', 'INVALID_CREDENTIALS');
   }
+  if (user.disabled) throw new ApiError(403, '该账号已被停用，请联系管理员', 'ACCOUNT_DISABLED');
+  user.lastLoginAt = new Date().toISOString();
   touchUser(user);
   const date = planner.isValidDate(body.date) ? body.date : planner.todayStr();
   const payload = authPayload(user, date);
@@ -482,7 +525,8 @@ async function handleRecipes(req, res, url) {
   const user = optionalUser(req);
 
   const ownCustom = user ? (user.customRecipes || []).filter((r) => r && !r.deleted) : [];
-  let list = ownCustom.length ? [...RECIPES, ...ownCustom] : RECIPES;
+  let list = ownCustom.length ? [...RECIPES, ...ownCustom] : RECIPES.slice();
+  list = list.filter((r) => r.available !== false);
   if (ids) {
     const wanted = new Set(ids.split(',').map((s) => s.trim()));
     list = list.filter((r) => wanted.has(r.id));
@@ -507,13 +551,13 @@ async function handleRecipes(req, res, url) {
 async function handleRecipeDetail(req, res, id) {
   const user = optionalUser(req);
   const recipe = RECIPE_MAP.get(id);
-  if (!recipe) throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
+  if (!recipe || recipe.available === false) throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
   if (recipe.custom && (!user || recipe.customOwnerId !== user.id)) {
     throw new ApiError(404, '没有找到这道菜', 'NOT_FOUND');
   }
   const pool = user && recipe.custom ? [...RECIPES, ...(user.customRecipes || [])] : RECIPES;
   const similar = pool
-    .filter((r) => r.id !== id && r.course === recipe.course)
+    .filter((r) => r.id !== id && r.available !== false && r.course === recipe.course)
     .slice(0, 3)
     .map((r) => ({ id: r.id, name: r.name, image: r.image, kcal: r.kcal, time: r.time }));
   sendJson(res, 200, {
@@ -1072,9 +1116,10 @@ async function handleExport(req, res) {
 }
 
 async function handleArticles(req, res) {
+  const list = content.publicArticles();
   sendJson(res, 200, {
-    total: ARTICLES.length,
-    articles: ARTICLES.map((a) => ({
+    total: list.length,
+    articles: list.map((a) => ({
       id: a.id,
       title: a.title,
       summary: a.summary,
@@ -1086,8 +1131,390 @@ async function handleArticles(req, res) {
 
 async function handleArticleDetail(req, res, id) {
   const article = ARTICLE_MAP.get(id);
-  if (!article) throw new ApiError(404, '没有找到这篇文章', 'NOT_FOUND');
+  if (!article || article.available === false) throw new ApiError(404, '没有找到这篇文章', 'NOT_FOUND');
   sendJson(res, 200, { article });
+}
+
+// ------------------------- 管理后台 -------------------------
+
+function adminRecipeView(recipe) {
+  return {
+    ...planner.publicRecipe(recipe),
+    price: Number(recipe.price) || 0,
+    available: recipe.available !== false,
+    admin: Boolean(recipe.admin)
+  };
+}
+
+function adminArticleView(article) {
+  return {
+    id: article.id,
+    title: article.title,
+    summary: article.summary,
+    minutes: article.minutes,
+    tag: article.tag,
+    sections: article.sections || [],
+    available: article.available !== false,
+    admin: Boolean(article.admin)
+  };
+}
+
+function adminUserView(user) {
+  const stats = planner.computeStats(user, planner.todayStr());
+  return {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    role: user.role === 'admin' ? 'admin' : 'user',
+    disabled: Boolean(user.disabled),
+    createdAt: user.createdAt,
+    lastLoginAt: user.lastLoginAt || null,
+    profile: user.profile || {},
+    stats,
+    recordDays: Object.keys(user.logs || {}).length,
+    favorites: (user.favorites || []).length,
+    cooked: (user.cooked || []).length,
+    customRecipes: (user.customRecipes || []).length,
+    planStart: user.plan?.startDate || null,
+    planDays: user.plan?.days || 0
+  };
+}
+
+function buildAdminOverview() {
+  const users = getDb().users;
+  const now = Date.now();
+  const weekAgo = now - 7 * 86400000;
+  const recipes = content.listRecipes();
+  const articles = content.listArticles();
+  const byCourse = {};
+  for (const r of recipes) {
+    if (!byCourse[r.course]) byCourse[r.course] = { total: 0, available: 0 };
+    byCourse[r.course].total += 1;
+    if (r.available !== false) byCourse[r.course].available += 1;
+  }
+  const logCount = users.reduce((sum, u) => sum + Object.keys(u.logs || {}).length, 0);
+  const planUsers = users.filter((u) => u.plan);
+  const totalPlanDays = planUsers.reduce((sum, u) => sum + (u.plan?.days || 0), 0);
+
+  return {
+    users: {
+      total: users.length,
+      admins: users.filter((u) => u.role === 'admin').length,
+      disabled: users.filter((u) => u.disabled).length,
+      new7d: users.filter((u) => u.createdAt && new Date(u.createdAt).getTime() >= weekAgo).length,
+      active7d: users.filter((u) => u.lastLoginAt && new Date(u.lastLoginAt).getTime() >= weekAgo).length
+    },
+    plans: {
+      users: planUsers.length,
+      days: totalPlanDays,
+      records: logCount
+    },
+    recipes: {
+      total: recipes.length,
+      available: recipes.filter((r) => r.available !== false).length,
+      hidden: recipes.filter((r) => r.available === false).length,
+      byCourse
+    },
+    articles: {
+      total: articles.length,
+      available: articles.filter((a) => a.available !== false).length
+    },
+    recentUsers: users
+      .slice()
+      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+      .slice(0, 6)
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        username: u.username,
+        role: u.role === 'admin' ? 'admin' : 'user',
+        createdAt: u.createdAt,
+        disabled: Boolean(u.disabled)
+      }))
+  };
+}
+
+async function handleAdminOverview(req, res) {
+  requireAdmin(req);
+  sendJson(res, 200, buildAdminOverview());
+}
+
+async function handleAdminRecipes(req, res, url) {
+  requireAdmin(req);
+  const q = String(url.searchParams.get('q') || '').trim().toLowerCase();
+  const course = String(url.searchParams.get('course') || '');
+  const status = String(url.searchParams.get('status') || '');
+  let list = content.listRecipes();
+  if (course) list = list.filter((r) => r.course === course);
+  if (status === 'available') list = list.filter((r) => r.available !== false);
+  if (status === 'hidden') list = list.filter((r) => r.available === false);
+  if (q) {
+    list = list.filter((r) =>
+      [r.name, r.id, ...(r.tags || []), ...(r.ingredients || []).map((i) => i[0])]
+        .join(' ')
+        .toLowerCase()
+        .includes(q)
+    );
+  }
+  sendJson(res, 200, {
+    total: list.length,
+    images: content.IMAGE_OPTIONS,
+    recipes: list.map(adminRecipeView)
+  });
+}
+
+function buildAdminRecipe(body, existing) {
+  const name = String(body.name ?? existing?.name ?? '').trim();
+  if (!name || name.length > 30) throw new ApiError(400, '菜品名称需为 1-30 个字符');
+
+  const course = String(body.course ?? existing?.course ?? '');
+  if (!COURSES[course]) throw new ApiError(400, '请选择正确的菜品品类');
+
+  const compatible = SLOTS.filter((s) => s.courses.includes(course)).map((s) => s.key);
+  const requestedSlots = Array.isArray(body.slots) ? body.slots.filter((k) => compatible.includes(k)) : existing?.slots;
+  const slots = requestedSlots && requestedSlots.length ? requestedSlots : compatible;
+
+  const requestedStages = Array.isArray(body.stages) ? body.stages.map(Number) : existing?.stages;
+  const stages = [...new Set((requestedStages || [1, 2, 3, 4]).filter((n) => [1, 2, 3, 4].includes(n)))].sort();
+  if (!stages.length) throw new ApiError(400, '请至少选择一个适用阶段');
+
+  const kcal = Math.round(Number(body.kcal ?? existing?.kcal ?? 0) || 0);
+  const protein = Math.round((Number(body.protein ?? existing?.protein ?? 0) || 0) * 10) / 10;
+  const carbs = Math.round((Number(body.carbs ?? existing?.carbs ?? 0) || 0) * 10) / 10;
+  const fat = Math.round((Number(body.fat ?? existing?.fat ?? 0) || 0) * 10) / 10;
+  if (kcal < 0 || kcal > 1500) throw new ApiError(400, '热量需在 0-1500 kcal 之间');
+  if ([protein, carbs, fat].some((v) => v < 0 || v > 300)) throw new ApiError(400, '营养素数值需在 0-300 之间');
+
+  const time = Math.round(Number(body.time ?? existing?.time ?? 20) || 20);
+  if (time < 1 || time > 360) throw new ApiError(400, '用时需在 1-360 分钟之间');
+
+  const price = Math.round((Number(body.price ?? existing?.price ?? 0) || 0) * 100) / 100;
+  if (price < 0 || price > 999) throw new ApiError(400, '价格需在 0-999 元之间');
+
+  const image = String(body.image ?? existing?.image ?? 'auto');
+  if (image !== 'auto' && !content.IMAGE_OPTIONS.includes(image)) throw new ApiError(400, '图片选项不正确');
+
+  const tags = body.tags !== undefined ? normalizeTags(body.tags) : existing?.tags || [];
+  const ingredients =
+    body.ingredients !== undefined ? normalizeIngredients(body.ingredients) : existing?.ingredients;
+  if (!ingredients || !ingredients.length) throw new ApiError(400, '请至少填写一种食材');
+  const steps = body.steps !== undefined ? normalizeSteps(body.steps) : existing?.steps;
+  if (!steps || !steps.length) throw new ApiError(400, '请至少填写一个做法步骤');
+  const tips = String(body.tips ?? existing?.tips ?? '').trim();
+  if (tips.length > 200) throw new ApiError(400, '小贴士最多 200 字');
+
+  return {
+    name,
+    course,
+    slots,
+    stages,
+    tags,
+    kcal,
+    protein,
+    carbs,
+    fat,
+    time,
+    price,
+    image,
+    ingredients,
+    steps,
+    tips,
+    available: body.available !== undefined ? Boolean(body.available) : existing?.available !== false
+  };
+}
+
+async function handleAdminRecipeCreate(req, res) {
+  requireAdmin(req);
+  const body = await readJson(req);
+  const data = buildAdminRecipe(body);
+  const recipe = content.createRecipe({ ...data, proteinType: 'none' });
+  sendJson(res, 201, { recipe: adminRecipeView(recipe) });
+}
+
+async function handleAdminRecipeUpdate(req, res, id) {
+  requireAdmin(req);
+  const existing = RECIPE_MAP.get(id);
+  if (!existing) throw new ApiError(404, '菜品不存在', 'NOT_FOUND');
+  const body = await readJson(req);
+  const data = buildAdminRecipe(body, existing);
+  const recipe = content.updateRecipe(id, data);
+  sendJson(res, 200, { recipe: adminRecipeView(recipe) });
+}
+
+async function handleAdminRecipeStatus(req, res, id) {
+  requireAdmin(req);
+  const body = await readJson(req);
+  const recipe = content.setRecipeAvailable(id, Boolean(body.available));
+  if (!recipe) throw new ApiError(404, '菜品不存在', 'NOT_FOUND');
+  sendJson(res, 200, { recipe: adminRecipeView(recipe) });
+}
+
+async function handleAdminRecipeDelete(req, res, id) {
+  requireAdmin(req);
+  const result = content.removeRecipe(id);
+  if (result.error) throw new ApiError(400, result.error);
+  for (const user of getDb().users) {
+    if (Array.isArray(user.favorites)) user.favorites = user.favorites.filter((fid) => fid !== id);
+    if (Array.isArray(user.cooked)) user.cooked = user.cooked.filter((cid) => cid !== id);
+    if (user.recipeNotes) delete user.recipeNotes[id];
+  }
+  save();
+  sendJson(res, 200, { ok: true });
+}
+
+function buildAdminArticle(body, existing) {
+  const title = String(body.title ?? existing?.title ?? '').trim();
+  if (!title || title.length > 60) throw new ApiError(400, '标题需为 1-60 个字符');
+  const summary = String(body.summary ?? existing?.summary ?? '').trim();
+  if (summary.length > 160) throw new ApiError(400, '摘要最多 160 字');
+  const tag = String(body.tag ?? existing?.tag ?? '饮食调养').trim();
+  if (tag.length > 20) throw new ApiError(400, '标签最多 20 个字符');
+  const minutes = Math.round(Number(body.minutes ?? existing?.minutes ?? 3) || 3);
+  if (minutes < 1 || minutes > 60) throw new ApiError(400, '阅读时长需在 1-60 分钟之间');
+
+  const rawSections = body.sections !== undefined ? body.sections : existing?.sections;
+  if (!Array.isArray(rawSections) || !rawSections.length) throw new ApiError(400, '请至少填写一个内容段落');
+  if (rawSections.length > 12) throw new ApiError(400, '内容段落最多 12 个');
+  const sections = rawSections.map((s) => {
+    const h = String(s?.h || '').trim();
+    const paragraphs = (Array.isArray(s?.p) ? s.p : []).map((p) => String(p).trim()).filter(Boolean);
+    if (!h || h.length > 60) throw new ApiError(400, '段落标题需为 1-60 个字符');
+    if (!paragraphs.length) throw new ApiError(400, `「${h}」至少需要一段正文`);
+    if (paragraphs.some((p) => p.length > 600)) throw new ApiError(400, '单段正文最多 600 字');
+    return { h, p: paragraphs };
+  });
+
+  return {
+    title,
+    summary,
+    tag,
+    minutes,
+    sections,
+    available: body.available !== undefined ? Boolean(body.available) : existing?.available !== false
+  };
+}
+
+async function handleAdminArticles(req, res) {
+  requireAdmin(req);
+  const list = content.listArticles();
+  sendJson(res, 200, { total: list.length, articles: list.map(adminArticleView) });
+}
+
+async function handleAdminArticleCreate(req, res) {
+  requireAdmin(req);
+  const body = await readJson(req);
+  const article = content.createArticle(buildAdminArticle(body));
+  sendJson(res, 201, { article: adminArticleView(article) });
+}
+
+async function handleAdminArticleUpdate(req, res, id) {
+  requireAdmin(req);
+  if (!ARTICLE_MAP.get(id)) throw new ApiError(404, '文章不存在', 'NOT_FOUND');
+  const body = await readJson(req);
+  const article = content.updateArticle(id, buildAdminArticle(body, ARTICLE_MAP.get(id)));
+  sendJson(res, 200, { article: adminArticleView(article) });
+}
+
+async function handleAdminArticleStatus(req, res, id) {
+  requireAdmin(req);
+  const body = await readJson(req);
+  const article = content.setArticleAvailable(id, Boolean(body.available));
+  if (!article) throw new ApiError(404, '文章不存在', 'NOT_FOUND');
+  sendJson(res, 200, { article: adminArticleView(article) });
+}
+
+async function handleAdminArticleDelete(req, res, id) {
+  requireAdmin(req);
+  const result = content.removeArticle(id);
+  if (result.error) throw new ApiError(400, result.error);
+  sendJson(res, 200, { ok: true });
+}
+
+async function handleAdminUsers(req, res) {
+  requireAdmin(req);
+  const users = getDb().users
+    .slice()
+    .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+    .map(adminUserView);
+  sendJson(res, 200, { total: users.length, users });
+}
+
+async function handleAdminUserDetail(req, res, id) {
+  requireAdmin(req);
+  const user = findUserById(id);
+  if (!user) throw new ApiError(404, '用户不存在', 'NOT_FOUND');
+  const today = planner.todayStr();
+  const recentLogs = [];
+  for (let i = 0; i < 14; i += 1) {
+    const date = planner.addDays(today, -i);
+    const log = user.logs?.[date];
+    if (log) recentLogs.push({ date, ...log });
+  }
+  sendJson(res, 200, {
+    user: adminUserView(user),
+    recentLogs,
+    favorites: (user.favorites || []).map((fid) => RECIPE_MAP.get(fid)).filter(Boolean).map((r) => ({ id: r.id, name: r.name })),
+    cooked: (user.cooked || []).map((cid) => RECIPE_MAP.get(cid)).filter(Boolean).map((r) => ({ id: r.id, name: r.name }))
+  });
+}
+
+async function handleAdminUserUpdate(req, res, id) {
+  const me = requireAdmin(req);
+  const user = findUserById(id);
+  if (!user) throw new ApiError(404, '用户不存在', 'NOT_FOUND');
+  const body = await readJson(req);
+  const activeAdmins = getDb().users.filter((u) => u.role === 'admin' && !u.disabled && u.id !== id).length;
+
+  if (body.role !== undefined) {
+    if (!['admin', 'user'].includes(body.role)) throw new ApiError(400, '角色不正确');
+    if (id === me.id && body.role !== 'admin') throw new ApiError(400, '不能取消自己的管理员权限');
+    if (user.role === 'admin' && body.role === 'user' && activeAdmins === 0) {
+      throw new ApiError(400, '至少保留一名可用管理员');
+    }
+    user.role = body.role;
+  }
+
+  if (body.disabled !== undefined) {
+    if (id === me.id && body.disabled) throw new ApiError(400, '不能停用当前登录的账号');
+    if (body.disabled && user.role === 'admin' && activeAdmins === 0) {
+      throw new ApiError(400, '至少保留一名可用管理员');
+    }
+    user.disabled = Boolean(body.disabled);
+  }
+
+  if (body.name !== undefined) {
+    const name = String(body.name).trim();
+    if (!name || name.length > 20) throw new ApiError(400, '称呼需为 1-20 个字符');
+    user.name = name;
+    if (user.profile) user.profile.name = name;
+  }
+
+  if (body.resetPassword !== undefined) {
+    const password = String(body.resetPassword || '');
+    if (password.length < 6) throw new ApiError(400, '新密码至少 6 位');
+    const { salt, hash } = hashPassword(password);
+    user.salt = salt;
+    user.hash = hash;
+  }
+
+  touchUser(user);
+  sendJson(res, 200, { user: adminUserView(user) });
+}
+
+async function handleAdminUserDelete(req, res, id) {
+  const me = requireAdmin(req);
+  if (id === me.id) throw new ApiError(400, '不能删除当前登录的账号');
+  const user = findUserById(id);
+  if (!user) throw new ApiError(404, '用户不存在', 'NOT_FOUND');
+  if (user.role === 'admin' && getDb().users.filter((u) => u.role === 'admin' && !u.disabled).length <= 1) {
+    throw new ApiError(400, '至少保留一名可用管理员');
+  }
+  for (const recipe of user.customRecipes || []) RECIPE_MAP.delete(recipe.id);
+  const users = getDb().users;
+  const idx = users.findIndex((u) => u.id === id);
+  if (idx >= 0) users.splice(idx, 1);
+  save();
+  sendJson(res, 200, { ok: true });
 }
 
 // ------------------------- 路由分发 -------------------------
@@ -1102,6 +1529,30 @@ async function handle(req, res, url) {
       return;
     }
     if (path === '/api/meta' && method === 'GET') return await handleMeta(req, res);
+
+    if (path === '/api/admin/overview' && method === 'GET') return await handleAdminOverview(req, res);
+    if (path === '/api/admin/recipes' && method === 'GET') return await handleAdminRecipes(req, res, url);
+    if (path === '/api/admin/recipes' && method === 'POST') return await handleAdminRecipeCreate(req, res);
+    if (path === '/api/admin/users' && method === 'GET') return await handleAdminUsers(req, res);
+    if (path === '/api/admin/articles' && method === 'GET') return await handleAdminArticles(req, res);
+    if (path === '/api/admin/articles' && method === 'POST') return await handleAdminArticleCreate(req, res);
+
+    const adminRecipeStatus = path.match(/^\/api\/admin\/recipes\/([\w-]+)\/status$/);
+    if (adminRecipeStatus && method === 'PATCH') return await handleAdminRecipeStatus(req, res, adminRecipeStatus[1]);
+    const adminRecipe = path.match(/^\/api\/admin\/recipes\/([\w-]+)$/);
+    if (adminRecipe && method === 'PUT') return await handleAdminRecipeUpdate(req, res, adminRecipe[1]);
+    if (adminRecipe && method === 'DELETE') return await handleAdminRecipeDelete(req, res, adminRecipe[1]);
+
+    const adminArticleStatus = path.match(/^\/api\/admin\/articles\/([\w-]+)\/status$/);
+    if (adminArticleStatus && method === 'PATCH') return await handleAdminArticleStatus(req, res, adminArticleStatus[1]);
+    const adminArticle = path.match(/^\/api\/admin\/articles\/([\w-]+)$/);
+    if (adminArticle && method === 'PUT') return await handleAdminArticleUpdate(req, res, adminArticle[1]);
+    if (adminArticle && method === 'DELETE') return await handleAdminArticleDelete(req, res, adminArticle[1]);
+
+    const adminUser = path.match(/^\/api\/admin\/users\/([\w-]+)$/);
+    if (adminUser && method === 'GET') return await handleAdminUserDetail(req, res, adminUser[1]);
+    if (adminUser && method === 'PATCH') return await handleAdminUserUpdate(req, res, adminUser[1]);
+    if (adminUser && method === 'DELETE') return await handleAdminUserDelete(req, res, adminUser[1]);
 
     if (path === '/api/auth/register' && method === 'POST') return await handleRegister(req, res);
     if (path === '/api/auth/login' && method === 'POST') return await handleLogin(req, res);
@@ -1172,6 +1623,8 @@ function registerCustomRecipes() {
 }
 
 function createApi() {
+  content.applyContent();
+  ensureAdminUser();
   ensureDemoUser();
   registerCustomRecipes();
   return { handle };

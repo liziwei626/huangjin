@@ -581,6 +581,7 @@ function renderMain(opts = {}) {
 
   $('#app').innerHTML = `
     <div class="app-layout">
+      ${sideNavHTML()}
       <main class="scroll" id="main-scroll">${view}</main>
       ${tabbarHTML()}
     </div>`;
@@ -607,6 +608,44 @@ function tabbarHTML() {
           <span>${t.label}</span>
         </button>`).join('')}
     </nav>`;
+}
+
+function sideNavHTML() {
+  const tabs = [
+    { key: 'today', label: '今日餐单', icon: 'sun' },
+    { key: 'recipes', label: '食谱库', icon: 'book' },
+    { key: 'records', label: '健康记录', icon: 'trend' },
+    { key: 'grocery', label: '采购清单', icon: 'basket' },
+    { key: 'me', label: '个人中心', icon: 'user' }
+  ];
+  const name = S.profile?.name || S.me?.name || '宝妈';
+  const stage = S.stage || {};
+  return `
+    <aside class="side-nav">
+      <div class="side-brand">
+        <span class="side-mark">暖月</span>
+        <small>月子餐智能搭配</small>
+      </div>
+      <nav class="side-menu">
+        ${tabs.map((t) => `
+          <button type="button" class="${S.tab === t.key ? 'active' : ''}" data-action="tab" data-tab="${t.key}">
+            ${icon(t.icon, 19)}<span>${t.label}</span>
+          </button>`).join('')}
+      </nav>
+      <div class="side-stage">
+        <span>${esc(stage.week || '产后调养')}</span>
+        <strong>产后第 ${stage.postpartumDay || postpartumDays(S.profile?.deliveryDate)} 天</strong>
+        <p>${esc(stage.title || '温和调养，按阶段吃得对')}</p>
+      </div>
+      <div class="side-foot">
+        ${S.me?.role === 'admin' ? `<a class="side-admin" href="/admin" target="_blank" rel="noreferrer">${icon('lock', 16)} 管理后台</a>` : ''}
+        <button class="side-user" type="button" data-action="tab" data-tab="me">
+          <span class="avatar">${esc((name || '暖').slice(0, 1))}</span>
+          <span class="side-user-text"><strong>${esc(name)}</strong><small>${esc(S.profile?.deliveryType || '')} · ${esc(S.profile?.feeding || '')}</small></span>
+          ${icon('chevron', 15)}
+        </button>
+      </div>
+    </aside>`;
 }
 
 /* ------------------------------ 今日 ------------------------------ */
@@ -668,23 +707,23 @@ function todayHTML() {
       </div>`
     : '';
 
-  let content = '';
+  let mainContent = '';
+  let asideContent = '';
   if (!day) {
-    content = `
+    mainContent = `
       <div class="empty-card">
         <h3>这一天还没有餐单</h3>
         <p>根据你的产后阶段和忌口，生成一份新的餐单吧。</p>
         <button class="btn btn-primary" type="button" data-action="open-generate">生成餐单</button>
       </div>`;
   } else {
-    content = `
+    mainContent = `
       <div class="section-head" style="padding-top:14px">
         <h2>${dateLabelCN(day.date)} · 今日安排</h2>
         <span class="small muted">${eaten.length}/${mealCount} 已吃${skipped.length ? ` · ${skipped.length} 跳过` : ''}</span>
       </div>
-      ${day.meals.map((meal) => mealCardHTML(meal, day.date, eaten, skipped)).join('')}
-      ${nutritionHTML(day)}
-      ${tipsHTML(stage)}`;
+      ${day.meals.map((meal) => mealCardHTML(meal, day.date, eaten, skipped)).join('')}`;
+    asideContent = `${nutritionHTML(day)}${tipsHTML(stage)}`;
   }
 
   return `
@@ -700,7 +739,10 @@ function todayHTML() {
     </header>
     ${heroCard}
     ${weekStrip}
-    ${content}`;
+    <div class="today-columns">
+      <div class="today-main">${mainContent}</div>
+      ${asideContent ? `<aside class="today-aside">${asideContent}</aside>` : ''}
+    </div>`;
 }
 
 function mealCardHTML(meal, date, eaten, skipped = []) {
@@ -1651,12 +1693,17 @@ function meHTML() {
         <span class="ico">${icon('info', 18)}</span>关于暖月与免责声明
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
+      ${S.me?.role === 'admin' ? `
+      <a class="menu-row" href="/admin" target="_blank" rel="noreferrer">
+        <span class="ico">${icon('lock', 18)}</span>管理后台
+        <span class="chev">${icon('chevron', 16)}</span>
+      </a>` : ''}
       <button class="menu-row danger" type="button" data-action="logout">
         <span class="ico">${icon('logout', 18)}</span>退出登录
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
     </div>
-    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v4.1<br />饮食建议仅供参考，具体请遵医嘱</p>`;
+    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v4.2<br />饮食建议仅供参考，具体请遵医嘱</p>`;
 }
 
 /* ------------------------------ 弹层 ------------------------------ */

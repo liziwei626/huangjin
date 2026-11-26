@@ -1,12 +1,17 @@
 # 暖月 · 月子餐智能搭配
 
-一个移动端优先的月子餐搭配小程序（H5）。根据产后天数、分娩方式、喂养方式与忌口，自动生成 7 / 28 天不重样的三餐三点餐单，并汇总采购清单、记录每日体重饮水睡眠、统计打卡与恢复进度。
+一个移动端优先、桌面端自适应的月子餐搭配小程序（H5）。根据产后天数、分娩方式、喂养方式与忌口，自动生成 7 / 28 天不重样的三餐三点餐单，并汇总采购清单、记录每日体重饮水睡眠、统计打卡与恢复进度。
+
+同时提供独立的电脑端管理后台（`/admin`），用于维护菜品、知识库内容与用户账号，并为后续自助点餐预留了价格、上下架与角色体系。
 
 前后端一体，零第三方运行时依赖，可直接部署为单个 Node.js 20 Web 服务。
 
 ## 功能
 
 - **账号体系**：注册 / 登录（scrypt 加盐哈希 + HMAC 签名 Token）、修改密码、内置体验账号
+- **电脑端适配**：宽度 ≥1000px 时自动切换为侧边导航 + 宽屏内容区，今日页双栏、食谱 4-5 列、详情弹层居中，手机端保持原底部 Tab 体验
+- **管理后台**：`/admin` 独立桌面端后台，概览用户/菜品/内容指标，支持菜品与文章的增改删、上架下架、价格维护，以及用户角色、停用、重置密码与删除
+- **点餐基础数据**：菜品包含价格与上下架状态，后台创建/编辑的菜品会实时同步到前台，为后续自助点餐直接复用
 - **产后档案**：分娩日期、分娩方式、喂养方式、口味、热量目标、每日餐次
 - **阶段化搭配**：按产后第 1 周 / 第 2 周 / 第 3-4 周 / 第 5 周起四个阶段匹配食谱与调养重点
 - **智能餐单**：7 / 28 天餐单自动生成，28 天按周切换；避开忌口、控制重复、荤素与蛋白质轮换
@@ -28,7 +33,7 @@
 
 ## 技术栈
 
-- 前端：原生 HTML / CSS / JavaScript（无构建步骤，移动端优先，Service Worker 离线缓存）
+- 前端：原生 HTML / CSS / JavaScript（无构建步骤，移动端优先并适配桌面端，Service Worker 离线缓存）
 - 后端：Node.js 20 原生 `http` 模块，自建轻量路由
 - 存储：JSON 文件（运行时写入 `${TMPDIR:-/tmp}/nuanyue-data`），无需数据库
 - 依赖：**0 个 npm 运行时依赖**
@@ -45,12 +50,15 @@ PORT=8000 node server.js
 
 体验账号：`demo` / `demo123456`
 
+管理后台：<http://localhost:8000/admin>，初始管理员 `admin` / `admin123456`（登录后请及时修改密码）。
+
 ## 目录结构
 
 ```
 server.js              HTTP 服务入口（静态资源 + API 分发）
 src/
   api.js               全部 API 路由与业务处理
+  content.js           后台菜品/内容覆盖存储与管理
   auth.js              密码哈希与 Token 签发/校验
   db.js                JSON 存储与种子数据
   planner.js           阶段计算、餐单生成、换菜、清单汇总、统计
@@ -61,7 +69,10 @@ src/
 public/
   index.html           应用外壳
   app.js               单页应用逻辑
-  styles.css           移动端样式
+  styles.css           移动端 + 桌面端自适应样式
+  admin.html           管理后台外壳
+  admin.js             管理后台单页逻辑
+  admin.css            管理后台桌面端样式
   sw.js                Service Worker 离线缓存
   images/              分类配图
 ```
@@ -101,6 +112,22 @@ public/
 | GET | `/api/articles/:id` | 知识文章详情 |
 | GET | `/api/meta` | 阶段、餐次、忌口、功效、记录选项等配置 |
 
+### 管理后台 API
+
+以下接口需在 `Authorization: Bearer <token>` 中携带管理员 Token。
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/admin/overview` | 用户、菜品、内容与打卡概览 |
+| GET/POST | `/api/admin/recipes` | 菜品列表（含下架）/ 新增菜品 |
+| PUT/DELETE | `/api/admin/recipes/:id` | 编辑 / 删除后台创建的菜品 |
+| PATCH | `/api/admin/recipes/:id/status` | 上架 / 下架 |
+| GET/POST | `/api/admin/articles` | 文章列表 / 新增文章 |
+| PUT/DELETE | `/api/admin/articles/:id` | 编辑 / 删除后台创建的文章 |
+| PATCH | `/api/admin/articles/:id/status` | 上架 / 下架 |
+| GET | `/api/admin/users` | 用户列表（含角色、使用情况） |
+| GET/PATCH/DELETE | `/api/admin/users/:id` | 用户详情 / 角色与状态、重置密码 / 删除 |
+
 ## 部署
 
 项目为单进程 Node.js 20 应用，监听 `PORT`（默认 8000），绑定 `0.0.0.0`。
@@ -118,7 +145,7 @@ cd dist && PORT=8000 node server.js
 
 ### 数据说明
 
-- 账号、餐单、打卡记录保存在实例的临时目录 `${TMPDIR:-/tmp}/nuanyue-data/db.json`，用于功能演示与个人使用。
+- 账号、餐单、打卡记录与后台内容（菜品/文章编辑、上下架）保存在实例的临时目录 `${TMPDIR:-/tmp}/nuanyue-data/db.json`，用于功能演示与个人使用。
 - 实例重启后数据会重新播种，不适合作为长期生产数据存储；如需长期保存请接入外部数据库。
 
 ## 免责声明

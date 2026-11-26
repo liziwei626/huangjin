@@ -78,8 +78,10 @@ function enabledSlots(profile) {
 }
 
 function recipePool(course, slot, stage, terms) {
-  // 忌口优先：任何情况下都不会放宽忌口条件。
-  const allowed = RECIPES.filter((r) => r.course === course && !isExcluded(r, terms));
+  // 忌口优先：任何情况下都不会放宽忌口条件；下架菜品不参与新搭配。
+  const allowed = RECIPES.filter(
+    (r) => r.available !== false && r.course === course && !isExcluded(r, terms)
+  );
   if (!allowed.length) return [];
   const tiers = [
     allowed.filter((r) => r.slots.includes(slot) && r.stages.includes(stage)),
@@ -228,6 +230,8 @@ function publicRecipe(r) {
     cautions: r.cautions,
     substitutes: r.substitutes,
     vegetarian: Boolean(r.vegetarian),
+    price: Number(r.price) || 0,
+    available: r.available !== false,
     custom: Boolean(r.custom)
   };
 }

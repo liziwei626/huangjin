@@ -95,6 +95,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (url.pathname === '/admin' || url.pathname === '/admin/') {
+    sendFile(req, res, path.join(PUBLIC_DIR, 'admin.html'));
+    return;
+  }
+
   try {
     serveStatic(req, res, url.pathname);
   } catch (err) {
