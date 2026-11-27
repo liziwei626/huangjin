@@ -6,10 +6,12 @@ const crypto = require('node:crypto');
 
 /**
  * 轻量 JSON 存储。
- * 平台的文件系统除 TMPDIR 外均为只读，因此数据写入 ${TMPDIR:-/tmp}/nuanyue-data。
- * 运行期间数据在进程内保持一致，实例重启后重新落盘（个人自用/演示场景足够）。
+ * 默认写入 ${TMPDIR:-/tmp}/nuanyue-data；可通过 NUANYUE_DATA_DIR 指定持久目录，
+ * 避免实例重启或重新部署后账号、菜品与上传图片丢失。
  */
-const DATA_DIR = path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data');
+const DATA_DIR = process.env.NUANYUE_DATA_DIR
+  ? path.resolve(process.env.NUANYUE_DATA_DIR)
+  : path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 let db = null;
@@ -104,6 +106,7 @@ function newId(prefix) {
 module.exports = {
   getDb,
   save,
+  flush,
   findUserById,
   findUserByUsername,
   addUser,

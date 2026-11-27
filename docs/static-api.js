@@ -11,6 +11,8 @@
 
   const { RECIPES, RECIPE_MAP, ARTICLES, ARTICLE_MAP, planner, data, utils } = window.NUANYUE;
   const DB_KEY = 'nuanyue-static-db-v1';
+  const STORAGE_QUOTA_CHARS = 5 * 1024 * 1024;
+  let persistedRaw = '';
   const BASE_RECIPES = RECIPES.map((r) => ({ ...r }));
   const BASE_ARTICLES = ARTICLES.map((a) => ({
     ...a,
@@ -196,6 +198,7 @@
         const parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.users) && parsed.content) {
           memoryDb = parsed;
+          persistedRaw = raw;
           for (const user of memoryDb.users) ensureUser(user);
           if (!memoryDb.content.recipes) memoryDb.content.recipes = [];
           if (!memoryDb.content.articles) memoryDb.content.articles = [];
@@ -215,10 +218,25 @@
   }
 
   function saveDb(db) {
+    const serialized = JSON.stringify(db);
     try {
-      localStorage.setItem(DB_KEY, JSON.stringify(db));
+      localStorage.setItem(DB_KEY, serialized);
+      persistedRaw = serialized;
     } catch (err) {
-      fail(400, '浏览器本地存储空间不足，请减少上传图片或清理旧数据');
+      // 写入失败时回退到上一次成功落盘的数据，避免界面显示“已保存”但刷新后丢失。
+      if (persistedRaw) {
+        try {
+          memoryDb = JSON.parse(persistedRaw);
+          for (const user of memoryDb.users) ensureUser(user);
+          rebuildRuntime(memoryDb);
+        } catch {
+          memoryDb = null;
+        }
+      }
+      const sizeText = serialized.length >= 1024 * 1024
+        ? `${(serialized.length / 1024 / 1024).toFixed(1)} MB`
+        : `${Math.max(1, Math.round(serialized.length / 1024))} KB`;
+      fail(400, `浏览器本地存储空间不足（当前数据约 ${sizeText}，上限约 5 MB），已撤销本次修改。请先在「数据概览 → 数据备份」导出备份，并清理部分上传图片后重试。`);
     }
   }
 
@@ -594,7 +612,12 @@
           role: u.role === 'admin' ? 'admin' : 'user',
           createdAt: u.createdAt,
           disabled: Boolean(u.disabled)
-        }))
+        })),
+      storage: {
+        mode: 'local',
+        usedChars: JSON.stringify(db).length,
+        quotaChars: STORAGE_QUOTA_CHARS
+      }
     };
   }
 
@@ -1141,6 +1164,62 @@
     if (pathname === '/admin/overview' && method === 'GET') {
       requireAdmin(db, token);
       return overview(db);
+    }
+
+    if (pathname === '/admin/backup' && method === 'GET') {
+      requireAdmin(db, token);
+      // 深拷贝，避免调用方持有运行时数据引用导致备份内容被后续修改影响。
+      const snapshot = JSON.parse(JSON.stringify({ users: db.users, content: db.content }));
+      return {
+        app: 'nuanyue-static',
+        kind: 'admin-backup',
+        version: 1,
+        exportedAt: now(),
+        db: snapshot
+      };
+    }
+
+    if (pathname === '/admin/restore' && method === 'POST') {
+      const me = requireAdmin(db, token);
+      const snapshot = body && body.db ? body.db : body;
+      if (!snapshot || !Array.isArray(snapshot.users) || !snapshot.content || typeof snapshot.content !== 'object') {
+        fail(400, '备份文件格式不正确，请选择由本后台导出的 JSON 文件');
+      }
+      const nextUsers = [];
+      const seenIds = new Set();
+      for (const raw of snapshot.users) {
+        if (!raw || typeof raw !== 'object' || !raw.id || !raw.username) continue;
+        if (seenIds.has(raw.id)) continue;
+        seenIds.add(raw.id);
+        const user = ensureUser(raw);
+        if (!user.profile || typeof user.profile !== 'object') {
+          user.profile = defaultProfile(user.name || user.username);
+        }
+        nextUsers.push(user);
+      }
+      if (!nextUsers.length) fail(400, '备份中没有可用的账号数据');
+      let self = nextUsers.find((u) => u.id === me.id) ||
+        nextUsers.find((u) => String(u.username).toLowerCase() === String(me.username).toLowerCase());
+      if (!self) {
+        self = ensureUser(me);
+        nextUsers.push(self);
+      }
+      self.role = 'admin';
+      self.disabled = false;
+      const source = snapshot.content;
+      memoryDb = {
+        version: 1,
+        users: nextUsers,
+        content: {
+          recipes: Array.isArray(source.recipes) ? source.recipes.filter((r) => r && r.id) : [],
+          articles: Array.isArray(source.articles) ? source.articles.filter((a) => a && a.id) : [],
+          recipeOverrides: source.recipeOverrides && typeof source.recipeOverrides === 'object' ? source.recipeOverrides : {},
+          articleOverrides: source.articleOverrides && typeof source.articleOverrides === 'object' ? source.articleOverrides : {}
+        }
+      };
+      rebuildRuntime(memoryDb);
+      saveDb(memoryDb);
+      return { ok: true, token: self.id, users: nextUsers.length };
     }
 
     if (pathname === '/admin/recipes' && method === 'GET') {

@@ -285,6 +285,57 @@ async function refreshOverview() {
   A.overview = await api('/admin/overview');
 }
 
+function downloadJson(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+async function exportBackup(btn) {
+  if (btn) btn.disabled = true;
+  try {
+    const data = await api('/admin/backup');
+    downloadJson(data, `nuanyue-admin-backup-${fmtDate(new Date().toISOString())}.json`);
+    toast('备份已导出，请保存到安全位置', 'success');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function importBackup(file) {
+  if (!file) return;
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    throw new Error('备份文件不是有效的 JSON');
+  }
+  if (!data || !data.db || !Array.isArray(data.db.users) || !data.db.content) {
+    throw new Error('请选择由管理后台「导出备份」生成的文件');
+  }
+  const userCount = data.db.users.length;
+  const contentCount = (data.db.content.recipes || []).length + (data.db.content.articles || []).length;
+  const uploadCount = data.uploads ? Object.keys(data.uploads).length : 0;
+  const ok = window.confirm(
+    `即将恢复 ${userCount} 个账号、${contentCount} 条后台内容${uploadCount ? `、${uploadCount} 张上传图片` : ''}。\n\n导入会覆盖当前全部数据，确定继续吗？`
+  );
+  if (!ok) return;
+  const res = await api('/admin/restore', { method: 'POST', body: data });
+  if (res.token) setToken(res.token);
+  A.meta = await api('/meta');
+  await loadAll();
+  A.view = 'overview';
+  A.page = { recipes: 1, articles: 1, users: 1 };
+  renderShell();
+  toast(`备份已恢复：${res.users} 个账号${res.uploads ? `、${res.uploads} 张图片` : ''}`, 'success');
+}
+
 /* ------------------------------ 外壳 ------------------------------ */
 
 const VIEW_META = {
@@ -385,6 +436,12 @@ function overviewViewHTML() {
   const priced = A.recipes.filter((r) => r.available !== false && Number(r.price) > 0).length;
   const available = o.recipes.available || 0;
   const pricePct = available ? Math.round((priced / available) * 100) : 0;
+  const storage = o.storage;
+  const usedMb = storage ? storage.usedChars / 1048576 : 0;
+  const quotaMb = storage ? storage.quotaChars / 1048576 : 0;
+  const storagePct = storage && storage.quotaChars
+    ? Math.min(100, Math.round((storage.usedChars / storage.quotaChars) * 100))
+    : 0;
 
   return `
     <section class="adm-stat-grid">
@@ -469,6 +526,29 @@ function overviewViewHTML() {
           <div><span>用户健康记录</span><strong>${o.plans.records} 条</strong></div>
         </div>
       </article>
+    </section>
+
+    <section class="adm-card adm-backup-card">
+      <div class="adm-card-head">
+        <div>
+          <h2>数据备份</h2>
+          <p>导出 JSON 备份，可在清理浏览器缓存、更换设备或重新部署后恢复</p>
+        </div>
+        <div class="adm-backup-actions">
+          <button class="adm-btn adm-btn-primary adm-btn-sm" type="button" data-action="backup-export">导出备份</button>
+          <button class="adm-btn adm-btn-ghost adm-btn-sm" type="button" data-action="backup-import">导入备份</button>
+          <input id="adm-backup-file" type="file" accept="application/json,.json" hidden />
+        </div>
+      </div>
+      ${storage ? `
+        <div class="adm-storage">
+          <div class="adm-storage-head">
+            <span>浏览器本地存储</span>
+            <strong>${usedMb.toFixed(1)} MB / 约 ${quotaMb.toFixed(0)} MB</strong>
+          </div>
+          <div class="adm-progress"><span style="width:${storagePct}%;${storagePct >= 80 ? 'background:#c4553f' : ''}"></span></div>
+        </div>` : ''}
+      <p class="adm-muted adm-backup-note">备份包含菜品、文章、账号与上传图片。导入会覆盖当前数据，建议操作前先导出当前备份。</p>
     </section>`;
 }
 
@@ -1718,6 +1798,14 @@ function handleClick(event) {
     }
     return;
   }
+  if (action === 'backup-export') {
+    exportBackup(target).catch((err) => toast(err.message, 'error'));
+    return;
+  }
+  if (action === 'backup-import') {
+    $('#adm-backup-file')?.click();
+    return;
+  }
   if (action === 'view') {
     const view = target.dataset.view;
     if (!VIEW_META[view]) return;
@@ -1880,6 +1968,14 @@ function handleChange(event) {
     }
     if (el.id === 'adm-recipe-image-file') {
       uploadRecipeImage(el.files?.[0])
+        .catch((err) => toast(err.message, 'error'))
+        .finally(() => {
+          el.value = '';
+        });
+      return;
+    }
+    if (el.id === 'adm-backup-file') {
+      importBackup(el.files?.[0])
         .catch((err) => toast(err.message, 'error'))
         .finally(() => {
           el.value = '';

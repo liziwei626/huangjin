@@ -11,6 +11,13 @@ const { ARTICLES, ARTICLE_MAP } = require('./data/articles');
 const { decorateRecipe } = require('./data/recipe-utils');
 const { getDb, save, newId } = require('./db');
 
+// 保留内置内容的原始快照，恢复备份后可完整重建运行时数据。
+const BASE_RECIPE_SNAPSHOT = RECIPES.map((r) => ({ ...r }));
+const BASE_ARTICLE_SNAPSHOT = ARTICLES.map((a) => ({
+  ...a,
+  sections: (a.sections || []).map((s) => ({ h: s.h, p: [...(s.p || [])] }))
+}));
+
 const DERIVED_RECIPE_FIELDS = [
   'searchText',
   'nutrients',
@@ -124,6 +131,26 @@ function applyContent() {
     if (idx < 0) continue;
     syncArticle(normalizeArticle({ ...ARTICLES[idx], ...snapshot, id }));
   }
+}
+
+/**
+ * 恢复备份后使用：丢弃内存中的所有覆盖与后台新增内容，
+ * 回到内置数据后再套用当前 db.content。
+ */
+function resetRuntime() {
+  RECIPES.length = 0;
+  for (const recipe of BASE_RECIPE_SNAPSHOT) RECIPES.push({ ...recipe, ingredients: [...(recipe.ingredients || [])], steps: [...(recipe.steps || [])] });
+  RECIPE_MAP.clear();
+  for (const recipe of RECIPES) RECIPE_MAP.set(recipe.id, recipe);
+
+  ARTICLES.length = 0;
+  for (const article of BASE_ARTICLE_SNAPSHOT) {
+    ARTICLES.push({ ...article, sections: article.sections.map((s) => ({ h: s.h, p: [...s.p] })) });
+  }
+  ARTICLE_MAP.clear();
+  for (const article of ARTICLES) ARTICLE_MAP.set(article.id, article);
+
+  applyContent();
 }
 
 function listRecipes() {
@@ -243,6 +270,7 @@ module.exports = {
   IMAGE_OPTIONS,
   ensureContent,
   applyContent,
+  resetRuntime,
   listRecipes,
   listArticles,
   createRecipe,

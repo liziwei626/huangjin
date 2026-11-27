@@ -15,6 +15,7 @@
 - **智能配图**：菜品编辑支持「联网配图」与「AI 生成」；抓取文章后自动识别文中提到的食谱，可单道或批量生成配图并直接写回菜品
 - **公开抓取接口**：`POST /api/fetch-article` 为 GitHub Pages 纯静态后台提供文章抓取通道（带 CORS 与频控），静态版后台可在抓取框中更换服务地址
 - **点餐基础数据**：菜品包含价格与上下架状态，后台创建/编辑的菜品会实时同步到前台，为后续自助点餐直接复用
+- **数据备份与恢复**：后台「数据概览 → 数据备份」可一键导出 JSON（含账号、菜品、文章与上传图片），也可导入备份覆盖恢复；静态版同时显示本地存储用量，写入超限时会回滚本次修改并提示
 - **产后档案**：分娩日期、分娩方式、喂养方式、口味、热量目标、每日餐次
 - **阶段化搭配**：按产后第 1 周 / 第 2 周 / 第 3-4 周 / 第 5 周起四个阶段匹配食谱与调养重点
 - **智能餐单**：7 / 28 天餐单自动生成，28 天按周切换；避开忌口、控制重复、荤素与蛋白质轮换
@@ -39,7 +40,7 @@
 
 - 前端：原生 HTML / CSS / JavaScript（无构建步骤，移动端优先并适配桌面端，Service Worker 离线缓存）
 - 后端：Node.js 20 原生 `http` 模块，自建轻量路由
-- 存储：JSON 文件（运行时写入 `${TMPDIR:-/tmp}/nuanyue-data`），无需数据库
+- 存储：JSON 文件（默认 `${TMPDIR:-/tmp}/nuanyue-data`，可用 `NUANYUE_DATA_DIR` 指定持久目录），无需数据库
 - 依赖：**0 个 npm 运行时依赖**
 
 ## 本地运行
@@ -56,6 +57,16 @@ PORT=8000 node server.js
 
 管理后台：<http://localhost:8000/admin>，初始管理员 `admin` / `admin123456`（登录后请及时修改密码）。
 
+### 数据保存与备份
+
+服务端数据默认写入 `${TMPDIR:-/tmp}/nuanyue-data`。如果希望本地长期保存，可指定一个持久目录：
+
+```bash
+NUANYUE_DATA_DIR=/var/lib/nuanyue PORT=8000 node server.js
+```
+
+后台「数据概览 → 数据备份」可以导出包含账号、菜品、文章与上传图片的 JSON 备份；导入备份会覆盖当前数据，适用于重新部署、迁移服务器或清理浏览器后的恢复。
+
 ## GitHub Pages 纯静态版
 
 GitHub Pages 只能托管静态文件，因此额外提供了纯前端版本：
@@ -68,7 +79,8 @@ node scripts/build-pages.js
 
 - 前台：https://liziwei626.github.io/huangjin/
 - 后台：https://liziwei626.github.io/huangjin/admin.html
-- 静态版限制：账号与数据仅当前浏览器可见；文章抓取默认通过 `https://37lq1tfihyzcugo02dp.traesite.cn/api/fetch-article` 代理完成，后台「抓取服务」中可替换为自己的抓取服务；服务不可用时可手动粘贴正文。
+- 静态版限制：账号与数据仅当前浏览器可见，浏览器缓存也会计入本地存储上限；后台「数据备份」可导出/导入完整数据，建议定期备份。
+- 文章抓取默认通过 `https://37lq1tfihyzcugo02dp.traesite.cn/api/fetch-article` 代理完成，后台「抓取服务」中可替换为自己的抓取服务；服务不可用时可手动粘贴正文。
 
 更新线上静态版时，先运行 `node scripts/build-pages.js`，再把 `docs/` 内容同步到 `gh-pages` 分支并推送。
 
@@ -156,6 +168,8 @@ scripts/
 | PATCH | `/api/admin/articles/:id/status` | 上架 / 下架 |
 | POST | `/api/admin/articles/fetch` | 抓取网页文章并生成草稿 |
 | POST | `/api/admin/upload` | 上传菜品图片（base64，≤5MB） |
+| GET | `/api/admin/backup` | 导出账号、菜品、文章与上传图片的 JSON 备份 |
+| POST | `/api/admin/restore` | 从备份恢复全部数据并返回新的登录 Token |
 | POST | `/api/fetch-article` | 公开文章抓取（CORS，供静态版后台使用，带频控） |
 | GET | `/api/admin/users` | 用户列表（含角色、使用情况） |
 | GET/PATCH/DELETE | `/api/admin/users/:id` | 用户详情 / 角色与状态、重置密码 / 删除 |

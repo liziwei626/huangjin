@@ -11,7 +11,8 @@ const {
   findUserByUsername,
   addUser,
   newId,
-  touchUser
+  touchUser,
+  DATA_DIR
 } = require('./db');
 const { hashPassword, verifyPassword, signToken, verifyToken } = require('./auth');
 const { RECIPES, RECIPE_MAP } = require('./data/recipes');
@@ -37,7 +38,7 @@ const planner = require('./planner');
 
 const DEMO_USERNAME = 'demo';
 const DEMO_PASSWORD = 'demo123456';
-const UPLOAD_DIR = path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data', 'uploads');
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 class ApiError extends Error {
@@ -1475,6 +1476,116 @@ async function handleAdminUpload(req, res) {
   sendJson(res, 201, { url: `/uploads/${name}`, size: buffer.length });
 }
 
+const UPLOAD_NAME_RE = /^[a-f0-9]{24}\.(?:jpg|png|webp)$/i;
+
+/** 导出后台内容、账号与内容中引用的上传图片（base64）。 */
+async function handleAdminBackup(req, res) {
+  requireAdmin(req);
+  const db = getDb();
+  const refs = new Set();
+  const scan = (value) => {
+    if (typeof value === 'string') {
+      if (value.startsWith('/uploads/')) refs.add(value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(scan);
+      return;
+    }
+    if (value && typeof value === 'object') Object.values(value).forEach(scan);
+  };
+  scan(db.content || {});
+
+  const uploads = {};
+  for (const ref of refs) {
+    const name = ref.split('/').pop();
+    if (!UPLOAD_NAME_RE.test(name)) continue;
+    try {
+      const buffer = fs.readFileSync(path.join(UPLOAD_DIR, name));
+      const ext = imageExtFromBuffer(buffer);
+      if (!ext || buffer.length > MAX_IMAGE_BYTES) continue;
+      const mime = ext === 'jpg' ? 'jpeg' : ext;
+      uploads[name] = `data:image/${mime};base64,${buffer.toString('base64')}`;
+    } catch {
+      /* 图片已丢失时忽略，不影响其余数据导出 */
+    }
+  }
+
+  sendJson(res, 200, {
+    app: 'nuanyue',
+    kind: 'admin-backup',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    dataDir: DATA_DIR,
+    db: { users: db.users, content: db.content || {} },
+    uploads
+  });
+}
+
+/** 从备份文件恢复账号、菜品、文章与上传图片。 */
+async function handleAdminRestore(req, res) {
+  const me = requireAdmin(req);
+  const body = await readJson(req, 96 * 1024 * 1024);
+  const snapshot = body && body.db ? body.db : null;
+  if (!snapshot || !Array.isArray(snapshot.users) || !snapshot.content || typeof snapshot.content !== 'object') {
+    throw new ApiError(400, '备份文件格式不正确，请选择由本后台导出的 JSON 文件');
+  }
+
+  const users = [];
+  const seen = new Set();
+  for (const raw of snapshot.users) {
+    if (!raw || typeof raw !== 'object' || !raw.id || !raw.username) continue;
+    if (seen.has(raw.id)) continue;
+    seen.add(raw.id);
+    users.push(raw);
+  }
+  if (!users.length) throw new ApiError(400, '备份中没有可用的账号数据');
+
+  let self = users.find((u) => u.id === me.id) ||
+    users.find((u) => String(u.username).toLowerCase() === String(me.username).toLowerCase());
+  if (!self) {
+    self = { ...me };
+    users.push(self);
+  }
+  self.role = 'admin';
+  self.disabled = false;
+  if (!users.some((u) => u.role === 'admin' && !u.disabled)) users.push({ ...me, role: 'admin', disabled: false });
+
+  const source = snapshot.content;
+  const db = getDb();
+  db.users = users;
+  db.content = {
+    recipes: Array.isArray(source.recipes) ? source.recipes.filter((r) => r && r.id) : [],
+    articles: Array.isArray(source.articles) ? source.articles.filter((a) => a && a.id) : [],
+    recipeOverrides: source.recipeOverrides && typeof source.recipeOverrides === 'object' ? source.recipeOverrides : {},
+    articleOverrides: source.articleOverrides && typeof source.articleOverrides === 'object' ? source.articleOverrides : {}
+  };
+
+  let restored = 0;
+  if (body.uploads && typeof body.uploads === 'object') {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    for (const [name, dataUrl] of Object.entries(body.uploads)) {
+      if (!UPLOAD_NAME_RE.test(name)) continue;
+      const match = /^data:image\/(?:png|jpe?g|webp);base64,([A-Za-z0-9+/=\s]+)$/i.exec(String(dataUrl || ''));
+      if (!match) continue;
+      const buffer = Buffer.from(match[1].replace(/\s+/g, ''), 'base64');
+      if (!buffer.length || buffer.length > MAX_IMAGE_BYTES) continue;
+      fs.writeFileSync(path.join(UPLOAD_DIR, name), buffer);
+      restored += 1;
+    }
+  }
+
+  content.resetRuntime();
+  registerCustomRecipes();
+  save();
+  sendJson(res, 200, {
+    ok: true,
+    token: signToken(self.id, getDb().secret),
+    users: users.length,
+    uploads: restored
+  });
+}
+
 async function handleAdminArticleFetch(req, res) {
   requireAdmin(req);
   const body = await readJson(req);
@@ -1632,6 +1743,8 @@ async function handle(req, res, url) {
     if (path === '/api/meta' && method === 'GET') return await handleMeta(req, res);
 
     if (path === '/api/admin/overview' && method === 'GET') return await handleAdminOverview(req, res);
+    if (path === '/api/admin/backup' && method === 'GET') return await handleAdminBackup(req, res);
+    if (path === '/api/admin/restore' && method === 'POST') return await handleAdminRestore(req, res);
     if (path === '/api/admin/recipes' && method === 'GET') return await handleAdminRecipes(req, res, url);
     if (path === '/api/admin/recipes' && method === 'POST') return await handleAdminRecipeCreate(req, res);
     if (path === '/api/admin/users' && method === 'GET') return await handleAdminUsers(req, res);

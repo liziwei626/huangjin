@@ -5,11 +5,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { createApi } = require('./src/api');
+const { DATA_DIR, flush } = require('./src/db');
 
 const PORT = Number(process.env.PORT || 8000);
 const HOST = '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const UPLOAD_DIR = path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data', 'uploads');
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 const UPLOAD_NAME = /^[a-f0-9]{24}\.(jpg|png|webp)$/;
 const DISH_IMAGE_INDEX = require('./src/data/dish-images-index.json');
 const DISH_IMAGE_PACK = path.join(__dirname, 'src', 'data', 'dish-images.bin');
@@ -149,6 +150,11 @@ server.listen(PORT, HOST, () => {
 
 function shutdown(signal) {
   console.log(`[nuanyue] received ${signal}, shutting down`);
+  try {
+    flush();
+  } catch (err) {
+    console.error('[db] flush on shutdown failed:', err.message);
+  }
   server.close(() => process.exit(0));
   setTimeout(() => process.exit(0), 3000).unref();
 }

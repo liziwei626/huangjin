@@ -2699,11 +2699,7 @@ async function copyGrocery() {
 
 async function exportData() {
   try {
-    const res = await fetch('/api/export', {
-      headers: S.token ? { Authorization: `Bearer ${S.token}` } : {}
-    });
-    if (!res.ok) throw new Error('导出失败');
-    const data = await res.json();
+    const data = await api('/export');
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -3303,8 +3299,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('submit', onSubmit);
   document.addEventListener('input', onInput);
   document.addEventListener('change', onChange);
+  window.addEventListener('beforeunload', (event) => {
+    if (!S.logDirty) return;
+    event.preventDefault();
+    event.returnValue = '';
+  });
   boot();
   if ('serviceWorker' in navigator && !window.NUANYUE_STATIC) {
-    navigator.serviceWorker.register('/sw.js?v=4.3').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=4.9').catch(() => {});
   }
 });
