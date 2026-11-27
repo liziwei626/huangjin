@@ -62,11 +62,13 @@ GitHub Pages 只能托管静态文件，因此额外提供了纯前端版本：
 node scripts/build-pages.js
 ```
 
-构建产物在 `docs/`，可直接由 GitHub Pages 从 `main` 分支的 `/docs` 目录发布。静态版把账号、餐单、健康记录、收藏、后台菜品/文章修改保存在当前浏览器的 `localStorage`，不依赖 Node 服务。
+构建产物在 `docs/`，GitHub Pages 从 `gh-pages` 分支根目录发布。静态版把账号、餐单、健康记录、收藏、后台菜品/文章修改保存在当前浏览器的 `localStorage`，不依赖 Node 服务。
 
-- 前台：`https://<用户名>.github.io/<仓库名>/`
-- 后台：`https://<用户名>.github.io/<仓库名>/admin.html`
+- 前台：https://liziwei626.github.io/huangjin/
+- 后台：https://liziwei626.github.io/huangjin/admin.html
 - 静态版限制：账号与数据仅当前浏览器可见；文章抓取受浏览器跨域限制，失败时可将正文粘贴到「正文」框后发布。
+
+更新线上静态版时，先运行 `node scripts/build-pages.js`，再把 `docs/` 内容同步到 `gh-pages` 分支并推送。
 
 开发期配图脚本：`node scripts/fetch-dish-images.js`，打包脚本：`node scripts/pack-dish-images.js`。
 
