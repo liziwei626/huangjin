@@ -206,9 +206,154 @@ function extractPage({ data, base }, url) {
   return { records, detailLinks };
 }
 
-async function* jsonld({ input, request, maxPages = 100 }) {
+const siteSources = {
+  meishichina: {
+    homepage: 'https://home.meishichina.com/',
+    imageHosts: ['i3.meishichina.com', 'i8.meishichina.com', 'i9.meishichina.com'],
+    recipePath: /^\/recipe-(\d+)\.html$/,
+    delayMs: 500
+  },
+  xiachufang: {
+    homepage: 'https://www.xiachufang.com/',
+    imageHosts: ['i1.chuimg.com', 'i2.chuimg.com', 'i3.chuimg.com', 'i4.chuimg.com', 'i5.chuimg.com'],
+    recipePath: /^\/recipe\/(\d+)\/?$/,
+    delayMs: 10000
+  }
+};
+
+function parseSiteHtml(html) {
+  const root = { children: [] };
+  const stack = [root];
+  const tokens = /<!--[\s\S]*?(?:-->|$)|<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>|<(\/?)([a-z][\w:-]*)\b((?:"[^"]*"|'[^']*'|[^'">])*)>|([^<]+)/gi;
+  const voidTags = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+  for (const [, rawTag, closing, tag, markup, content] of html.matchAll(tokens)) {
+    if (rawTag) continue;
+    if (content) {
+      stack.at(-1).children.push(content);
+      continue;
+    }
+    if (!tag) continue;
+    const name = tag.toLowerCase();
+    if (closing) {
+      const index = stack.findLastIndex((node) => node.tag === name);
+      if (index > 0) stack.length = index;
+      continue;
+    }
+    const node = { tag: name, attrs: attributes(markup), children: [] };
+    stack.at(-1).children.push(node);
+    if (!voidTags.has(name) && !markup.endsWith('/')) stack.push(node);
+  }
+  return root;
+}
+
+function select(root, predicate) {
+  const matches = [];
+  const pending = [...(root?.children || [])].reverse();
+  while (pending.length) {
+    const node = pending.pop();
+    if (typeof node === 'string') continue;
+    if (predicate(node)) matches.push(node);
+    for (let i = node.children.length - 1; i >= 0; i--) pending.push(node.children[i]);
+  }
+  return matches;
+}
+
+function nodeText(node) {
+  if (!node) return '';
+  if (typeof node === 'string') return decodeEntities(node);
+  if (node.tag === 'br') return '\n';
+  return node.children.map(nodeText).join('').trim();
+}
+
+const withClass = (name) => (node) => (node.attrs.class || '').split(/\s+/).includes(name);
+const tagIs = (name) => (node) => node.tag === name;
+const firstClass = (node, name) => select(node, withClass(name))[0];
+
+function meishichinaStepText(node) {
+  const children = node?.children || [];
+  const index = children.findIndex((child) => nodeText(child).trim());
+  const marker = children[index];
+  if (marker?.tag === 'div' && /^\d+$/.test(nodeText(marker))) {
+    return children.slice(index + 1).map(nodeText).join('').trim();
+  }
+  return nodeText(node);
+}
+
+function sitePage(body, url, site) {
+  const html = body.toString('utf8');
+  const tree = parseSiteHtml(html);
+  const title = nodeText(select(tree, tagIs('title'))[0]);
+  if (/滑动验证|安全验证|人机验证|Just a moment|Access Denied/i.test(title)) {
+    throw new Error('站点要求访问验证，采集已停止');
+  }
+  const parsed = readPage(body, url);
+  const result = extractPage(parsed, url);
+  const sameSite = (value) => {
+    const address = remoteUrl(value, url);
+    return address && new URL(address).origin === new URL(site.homepage).origin && address;
+  };
+  const canonicalRecipe = (value) => {
+    const address = sameSite(value);
+    if (!address) return null;
+    const { pathname } = new URL(address);
+    const match = pathname.match(site.recipePath);
+    if (!match) return null;
+    const canonicalPath = site === siteSources.xiachufang ? `/recipe/${match[1]}/` : pathname;
+    return new URL(canonicalPath, site.homepage).href;
+  };
+  const canonical = canonicalRecipe(url);
+  if (canonical) {
+    const sourceId = new URL(canonical).pathname.match(site.recipePath)[1];
+    const xcf = site === siteSources.xiachufang;
+    const images = (root) => select(root, tagIs('img')).map(({ attrs }) =>
+      remoteUrl(attrs['data-src'] || attrs['data-original'] || attrs['data-cfsrc'] || attrs.src, url)).filter(Boolean);
+    const cover = firstClass(tree, xcf ? 'cover' : 'recipe_De_imgBox') || firstClass(tree, 'recipe_De_img');
+    const ogImage = select(tree, (node) => node.tag === 'meta' && node.attrs.property === 'og:image')[0];
+    const hero = remoteUrl(ogImage?.attrs.content, url) || images(cover)[0];
+    const ingredients = xcf
+      ? select(firstClass(tree, 'ings'), tagIs('tr')).map((row) => ({
+        name: nodeText(firstClass(row, 'name')), amountText: nodeText(firstClass(row, 'unit'))
+      }))
+      : select(tree, withClass('recipeCategory_sub_R')).flatMap((group) => select(group, tagIs('li'))).map((row) => ({
+        name: nodeText(firstClass(row, 'category_s1')), amountText: nodeText(firstClass(row, 'category_s2'))
+      }));
+    const steps = xcf
+      ? select(firstClass(tree, 'steps'), tagIs('li')).map((step) => ({
+        text: nodeText(firstClass(step, 'text') || select(step, tagIs('p'))[0]), images: images(step)
+      }))
+      : select(tree, withClass('recipeStep')).flatMap((group) => select(group, tagIs('li'))).map((step) => ({
+        text: meishichinaStepText(firstClass(step, 'recipeStep_word')),
+        images: images(firstClass(step, 'recipeStep_img'))
+      }));
+    const categoryRoot = firstClass(tree, xcf ? 'recipe-cats' : 'recipeTip');
+    const categories = select(categoryRoot, tagIs('a')).map(nodeText).filter(Boolean);
+    const name = nodeText(select(tree, (node) => node.tag === 'h1' || node.attrs.id === 'recipe_title')[0]);
+    const structured = result.records.find(({ recipe }) => recipe.ingredients.length && recipe.steps.length)?.recipe;
+    const native = { name, ingredients: ingredients.filter((item) => item.name), steps: steps.filter((step) => step.text),
+      categories, images: hero ? [hero] : [] };
+    const recipe = structured ? {
+      ...structured,
+      categories: [...new Set([...structured.categories, ...categories])],
+      images: structured.images.length ? structured.images : native.images,
+      steps: native.steps.some((step) => step.images.length) ? native.steps : structured.steps
+    } : native;
+    if (!recipe.name || !recipe.ingredients.length || !recipe.steps.length) throw new Error('菜谱详情缺少菜名、食材或做法');
+    return { records: [{ recipe: { ...recipe, sourceId, sourceUrl: canonical }, explicitUrl: canonical }], detailLinks: [], next: [] };
+  }
+  const links = select(tree, tagIs('a'));
+  const detailLinks = [...new Set([...result.detailLinks, ...links.map((node) => node.attrs.href)].map(canonicalRecipe).filter(Boolean))];
+  const next = [...parsed.next, ...links.filter((node) => /^下一页\s*[›»>]?$/u.test(nodeText(node))).map((node) => node.attrs.href)]
+    .map(sameSite).filter((address) => address && !canonicalRecipe(address));
+  if (!detailLinks.length && !next.length && !result.records.length) throw new Error('页面中没有发现菜谱链接');
+  return { records: result.records, detailLinks, next };
+}
+
+async function* jsonld({ input, request, maxPages = 100 }, site) {
   const start = remoteUrl(input);
   if (!start) throw new Error(`Invalid recipe page URL: ${input}`);
+  if (site && new URL(start).origin !== new URL(site.homepage).origin) {
+    throw new Error(`请输入 ${new URL(site.homepage).host} 的网页链接`);
+  }
   if (!Number.isSafeInteger(maxPages) || maxPages < 1) {
     throw new Error(`Invalid maxPages (${maxPages}) for ${start}: expected a positive integer`);
   }
@@ -225,8 +370,13 @@ async function* jsonld({ input, request, maxPages = 100 }) {
       resolved = pageUrl(remoteUrl(response.url, url) ?? url);
       let page = fetched.get(resolved);
       if (!page) {
-        const parsed = readPage(response.body, resolved);
-        page = { url: resolved, next: parsed.next, ...extractPage(parsed, resolved) };
+        if (site) {
+          if (new URL(resolved).origin !== new URL(site.homepage).origin) throw new Error('详情重定向到站外');
+          page = { url: resolved, ...sitePage(response.body, resolved, site) };
+        } else {
+          const parsed = readPage(response.body, resolved);
+          page = { url: resolved, next: parsed.next, ...extractPage(parsed, resolved) };
+        }
       }
       fetched.set(resolved, page);
       fetched.set(url, page);
@@ -281,4 +431,9 @@ async function* jsonld({ input, request, maxPages = 100 }) {
   yield* recipes.values();
 }
 
-module.exports = { adapters: { json, jsonld } };
+const adapters = { json, jsonld };
+for (const [name, config] of Object.entries(siteSources)) {
+  adapters[name] = (options) => jsonld({ ...options, input: options.input || config.homepage }, config);
+}
+
+module.exports = { adapters, siteSources };

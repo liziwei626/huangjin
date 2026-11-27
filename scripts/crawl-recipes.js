@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createHash, randomUUID } = require('node:crypto');
 const { COURSES } = require('../src/data/meta');
-const { adapters } = require('./crawler/adapters');
+const { adapters, siteSources } = require('./crawler/adapters');
 const { createRequester } = require('./crawler/request');
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -145,12 +145,12 @@ async function crawl({ source, input, out, request, maxPages = 100, onError = co
   }
 }
 
-const HELP = `用法：npm run crawl:recipes -- --source <json|jsonld> --input <文件或网址> --out <目录>
-  --page-hosts <host[,host]>    允许采集的网页主机（jsonld 默认仅入口主机）
-  --image-hosts <host[,host]>   允许下载的图片主机（默认与网页主机相同）
+const HELP = `用法：npm run crawl:recipes -- --source <json|jsonld|meishichina|xiachufang> --out <目录> [--input <文件或网址>]
+  --page-hosts <host[,host]>    允许采集的网页主机（专用来源固定为对应站点）
+  --image-hosts <host[,host]>   允许下载的图片主机（专用来源已配置常用图片 CDN）
   --max-pages <数量>           最大列表和详情页请求数（默认 100）
-  --delay-ms <毫秒>            同源请求间隔（默认 500）
-  --timeout-ms <毫秒>          单次请求超时（默认 10000）
+  --delay-ms <毫秒>            同源请求间隔（默认 500；下厨房最少 10000）
+  --timeout-ms <毫秒>          单次请求超时（通用来源默认 10000，专用来源默认 45000）
 
 json 支持数组或 {"recipes":[...]}，每项含 sourceId 或 sourceUrl、name、categories、
 ingredients（字符串或 {name, amountText}）、steps（字符串或 {text, images}）及 images。
@@ -172,8 +172,11 @@ async function main(args) {
     }
     options[key] = value;
   }
-  const { source, input, out } = options;
+  const { source, out } = options;
+  const site = Object.hasOwn(siteSources, source) ? siteSources[source] : null;
+  const input = options.input || site?.homepage;
   if (!source || !input || !out || !Object.hasOwn(adapters, source)) throw new Error('请指定有效的 --source、--input 和 --out。');
+  if (site && options['page-hosts']) throw new Error('专用来源的网页主机不可覆盖');
   const integer = (key, fallback, min) => {
     if (!options[key]) return fallback;
     const value = Number(options[key]);
@@ -183,9 +186,11 @@ async function main(args) {
     return value;
   };
   const hosts = (key) => (options[key] || '').split(',').map((host) => host.trim()).filter(Boolean);
-  const pageHosts = options['page-hosts'] ? hosts('page-hosts') : source === 'jsonld' ? [new URL(normalizeUrl(input)).host] : [];
-  const imageHosts = options['image-hosts'] ? hosts('image-hosts') : pageHosts;
-  const request = createRequester({ pageHosts, imageHosts, delayMs: integer('delay-ms', 500, 0), timeoutMs: integer('timeout-ms', 10000, 1) });
+  const pageHosts = site ? [new URL(site.homepage).host] : options['page-hosts'] ? hosts('page-hosts')
+    : source === 'jsonld' ? [new URL(normalizeUrl(input)).host] : [];
+  const imageHosts = options['image-hosts'] ? hosts('image-hosts') : [...pageHosts, ...(site?.imageHosts || [])];
+  const request = createRequester({ pageHosts, imageHosts, delayMs: integer('delay-ms', site?.delayMs ?? 500, site?.delayMs ?? 0),
+    timeoutMs: integer('timeout-ms', site ? 45000 : 10000, 1) });
   const result = await crawl({ source, input, out, request, maxPages: integer('max-pages', 100, 1) }).catch(() => {
     process.exitCode = 1;
     return null;

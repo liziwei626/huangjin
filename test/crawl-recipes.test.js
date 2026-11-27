@@ -91,3 +91,68 @@ test('网页来源跟随分页并去重，拒绝访问及超时保留旧清单',
   assert.ok(!visits.includes('/blocked'));
   assert.equal(await fs.readFile(file, 'utf8'), snapshot);
 });
+
+for (const site of [
+  {
+    source: 'meishichina', origin: 'https://home.meishichina.com', recipePath: '/recipe-123.html',
+    photoHost: 'https://i3.meishichina.com', category: '汤羹', course: 'soup',
+    markup: `<h1 id="recipe_title">南瓜汤</h1><ul class="recipeCategory_sub_R"><li>
+      <span class="category_s1"><a>南瓜</a></span><span class="category_s2">适量</span></li></ul>
+      <div class="recipeTip"><a>汤羹</a></div><div class="recipeStep"><ul>
+      <li><div class="recipeStep_word"><div>1</div>切块</div></li>
+      <li><div class="recipeStep_img"><img data-src="STEP"></div><div class="recipeStep_word"><div>2</div>煮熟</div></li>
+      </ul></div>`
+  },
+  {
+    source: 'xiachufang', origin: 'https://www.xiachufang.com', recipePath: '/recipe/123/',
+    photoHost: 'https://i2.chuimg.com', category: '主食', course: 'staple',
+    markup: `<h1 class="page-title">南瓜饭</h1><div class="ings"><table><tr>
+      <td class="name"><a>南瓜</a></td><td class="unit">适量</td></tr></table></div>
+      <div class="recipe-cats"><a>主食</a></div><div class="steps"><ol>
+      <li><p class="text">切块</p></li><li><p class="text">煮熟</p><img data-src="STEP"></li>
+      </ol></div>`
+  }
+]) {
+  test(`${site.source} 发现菜谱、保存分类和步骤照片，遇验证页或 403 保留旧清单`, async (t) => {
+    const out = await workspace(t);
+    const input = `${site.origin}/`;
+    const recipeUrl = `${site.origin}${site.recipePath}`;
+    const stepUrl = `${site.photoHost}/step.png`;
+    const coverUrl = `${site.photoHost}/cover.png`;
+    const visits = [];
+    let blocked = false;
+    const request = async (url, kind) => {
+      visits.push([url, kind]);
+      const respond = (html) => ({ url, body: Buffer.from(html) });
+      if (url === input) return respond(`<a href="${site.recipePath}">菜谱</a><a rel="next" href="/second">下一页</a>`);
+      if (url === `${site.origin}/second`) return respond(`<a href="${site.recipePath}?ref=listing#top">重复菜谱</a><a href="https://example.com${site.recipePath}">外站</a>`);
+      if (url === recipeUrl) {
+        if (blocked && site.source === 'meishichina') throw new Error('HTTP 403');
+        if (blocked) return respond('<title>滑动验证</title>');
+        return respond(`<meta property="og:image" content="${coverUrl}">${site.markup.replace('STEP', stepUrl)}`);
+      }
+      assert.equal(kind, 'image');
+      assert.ok([stepUrl, coverUrl].includes(url), `Unexpected request: ${url}`);
+      return { url, body: photo };
+    };
+    const options = { source: site.source, input, out, request, maxPages: 3, onError() {} };
+    assert.deepEqual(await crawl(options), { recipes: 1, images: 1 });
+    assert.equal(visits.filter(([url]) => url === recipeUrl).length, 1);
+    const manifest = path.join(out, 'recipes.json');
+    const snapshot = await fs.readFile(manifest, 'utf8');
+    const [recipe] = JSON.parse(snapshot).recipes;
+    assert.equal(recipe.sourceId, '123');
+    assert.equal(recipe.sourceUrl, recipeUrl);
+    assert.deepEqual(recipe.categories, [site.category]);
+    assert.equal(recipe.course, site.course);
+    assert.deepEqual(recipe.ingredients, [{ name: '南瓜', amountText: '适量' }]);
+    assert.deepEqual(recipe.steps.map(({ text }) => text), ['切块', '煮熟']);
+    assert.equal(recipe.steps[1].images[0].source, stepUrl);
+    assert.equal(recipe.images[0].source, coverUrl);
+    assert.equal(recipe.steps[1].images[0].path, recipe.images[0].path);
+    assert.deepEqual(await fs.readFile(path.join(out, recipe.images[0].path)), photo);
+    blocked = true;
+    await assert.rejects(crawl(options), /403|站点要求访问验证/);
+    assert.equal(await fs.readFile(manifest, 'utf8'), snapshot);
+  });
+}
