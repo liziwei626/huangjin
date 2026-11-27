@@ -207,6 +207,12 @@ function extractPage({ data, base }, url) {
 }
 
 const siteSources = {
+  douguo: {
+    homepage: 'https://www.douguo.com/',
+    imageHosts: ['cp1.douguo.com', 'cp2.douguo.com', 'cp3.douguo.com'],
+    recipePath: /^\/cookbook\/(\d+)\.html$/,
+    delayMs: 1000
+  },
   meishichina: {
     homepage: 'https://home.meishichina.com/',
     imageHosts: ['i3.meishichina.com', 'i8.meishichina.com', 'i9.meishichina.com'],
@@ -279,6 +285,31 @@ function meishichinaStepText(node) {
   return nodeText(node);
 }
 
+function douguoRecipe(tree, result, url) {
+  const byId = (id) => select(tree, (node) => node.attrs.id === id)[0];
+  const photo = (node) => remoteUrl(node?.attrs['data-origin'] || node?.attrs['data-src'] || node?.attrs.src, url);
+  const ingredients = select(firstClass(tree, 'retamr'), tagIs('td')).map((cell) => ({
+    name: nodeText(firstClass(cell, 'scname')),
+    amountText: nodeText(firstClass(cell, 'scnum'))
+  })).filter(({ name }) => name);
+  const steps = select(firstClass(tree, 'step'), withClass('stepcont')).map((step) => {
+    const info = firstClass(step, 'stepinfo');
+    const marker = select(info, tagIs('p')).find((node) => /^步骤\s*\d+$/.test(nodeText(node)));
+    const instruction = (info?.children || []).filter((node) => node !== marker).map(nodeText).join('').trim();
+    const image = photo(select(step, (node) => Boolean(node.attrs['data-origin']))[0]) || photo(select(step, tagIs('img'))[0]);
+    return { text: instruction, images: image ? [image] : [] };
+  }).filter((step) => step.text);
+  const structured = result.records[0]?.recipe;
+  const cover = photo(byId('banner')) || photo(select(byId('banner'), tagIs('img'))[0]);
+  return {
+    name: nodeText(select(tree, tagIs('h1'))[0]) || structured?.name,
+    categories: structured?.categories || [],
+    ingredients: ingredients.length ? ingredients : structured?.ingredients || [],
+    steps: steps.length ? steps : structured?.steps || [],
+    images: cover ? [cover] : structured?.images || []
+  };
+}
+
 function sitePage(body, url, site) {
   const html = body.toString('utf8');
   const tree = parseSiteHtml(html);
@@ -304,6 +335,11 @@ function sitePage(body, url, site) {
   const canonical = canonicalRecipe(url);
   if (canonical) {
     const sourceId = new URL(canonical).pathname.match(site.recipePath)[1];
+    if (site === siteSources.douguo) {
+      const recipe = douguoRecipe(tree, result, url);
+      if (!recipe.name || !recipe.ingredients.length || !recipe.steps.length) throw new Error('豆果详情缺少菜名、食材或做法');
+      return { records: [{ recipe: { ...recipe, sourceId, sourceUrl: canonical }, explicitUrl: canonical }], detailLinks: [], next: [] };
+    }
     const xcf = site === siteSources.xiachufang;
     const images = (root) => select(root, tagIs('img')).map(({ attrs }) =>
       remoteUrl(attrs['data-src'] || attrs['data-original'] || attrs['data-cfsrc'] || attrs.src, url)).filter(Boolean);
@@ -431,7 +467,8 @@ async function* jsonld({ input, request, maxPages = 100 }, site) {
   yield* recipes.values();
 }
 
-const adapters = { json, jsonld };
+const { howtocook } = require('./howtocook');
+const adapters = { json, jsonld, howtocook };
 for (const [name, config] of Object.entries(siteSources)) {
   adapters[name] = (options) => jsonld({ ...options, input: options.input || config.homepage }, config);
 }

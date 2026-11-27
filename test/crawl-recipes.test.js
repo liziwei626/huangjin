@@ -18,6 +18,25 @@ async function workspace(t) {
   return root;
 }
 
+test('HowToCook 读取 Markdown 食材、分类和本地配图', async (t) => {
+  const root = await workspace(t);
+  const input = path.join(root, 'dishes', 'vegetable_dish');
+  const out = path.join(root, 'out');
+  await fs.mkdir(input, { recursive: true });
+  await fs.writeFile(path.join(input, '封面.png'), photo);
+  await fs.writeFile(path.join(input, '菜心.md'), [
+    '# 菜心的做法', '![封面](./封面.png)', '## 必备原料和工具', '- 菜心',
+    '## 计算', '- 菜心 250g', '- 盐 适量', '## 操作', '1. 洗净', '2. 焯熟'
+  ].join('\n'));
+  assert.deepEqual(await crawl({ source: 'howtocook', input: root, out }), { recipes: 1, images: 1 });
+  const [recipe] = JSON.parse(await fs.readFile(path.join(out, 'recipes.json'), 'utf8')).recipes;
+  assert.equal(recipe.name, '菜心');
+  assert.equal(recipe.course, 'veg');
+  assert.deepEqual(recipe.ingredients, [{ name: '菜心', amountText: '250g' }, { name: '盐', amountText: '适量' }]);
+  assert.deepEqual(recipe.steps.map((step) => step.text), ['洗净', '焯熟']);
+  assert.deepEqual(await fs.readFile(path.join(out, recipe.images[0].path)), photo);
+});
+
 test('本地数据包统一分类、保存照片并原子替换清单', async (t) => {
   const root = await workspace(t);
   const input = path.join(root, 'source.json');
@@ -94,6 +113,15 @@ test('网页来源跟随分页并去重，拒绝访问及超时保留旧清单',
 
 for (const site of [
   {
+    source: 'douguo', origin: 'https://www.douguo.com', recipePath: '/cookbook/123.html',
+    photoHost: 'https://cp1.douguo.com', category: '汤羹', course: 'soup',
+    markup: `<h1>南瓜汤</h1><div id="banner" data-origin="COVER"></div><table class="retamr"><tr>
+      <td><span class="scname">南瓜</span><span class="scnum">适量</span></td></tr></table>
+      ${structured({ '@type': 'Recipe', name: '南瓜汤', recipeCategory: '汤羹' })}
+      <div class="step"><div class="stepcont"><div class="stepinfo"><p>步骤1</p>切块</div></div>
+      <div class="stepcont"><a data-origin="STEP"></a><div class="stepinfo"><p>步骤2</p>煮熟</div></div></div>`
+  },
+  {
     source: 'meishichina', origin: 'https://home.meishichina.com', recipePath: '/recipe-123.html',
     photoHost: 'https://i3.meishichina.com', category: '汤羹', course: 'soup',
     markup: `<h1 id="recipe_title">南瓜汤</h1><ul class="recipeCategory_sub_R"><li>
@@ -129,7 +157,7 @@ for (const site of [
       if (url === recipeUrl) {
         if (blocked && site.source === 'meishichina') throw new Error('HTTP 403');
         if (blocked) return respond('<title>滑动验证</title>');
-        return respond(`<meta property="og:image" content="${coverUrl}">${site.markup.replace('STEP', stepUrl)}`);
+        return respond(`<meta property="og:image" content="${coverUrl}">${site.markup.replace('STEP', stepUrl).replace('COVER', coverUrl)}`);
       }
       assert.equal(kind, 'image');
       assert.ok([stepUrl, coverUrl].includes(url), `Unexpected request: ${url}`);
@@ -145,6 +173,7 @@ for (const site of [
     assert.equal(recipe.sourceUrl, recipeUrl);
     assert.deepEqual(recipe.categories, [site.category]);
     assert.equal(recipe.course, site.course);
+    assert.equal(recipe.reviewStatus, site.source === 'douguo' ? 'candidate' : undefined);
     assert.deepEqual(recipe.ingredients, [{ name: '南瓜', amountText: '适量' }]);
     assert.deepEqual(recipe.steps.map(({ text }) => text), ['切块', '煮熟']);
     assert.equal(recipe.steps[1].images[0].source, stepUrl);

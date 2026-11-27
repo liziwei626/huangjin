@@ -38,14 +38,15 @@ function normalizeRecipe(raw, source) {
   if (!ingredients.length || ingredients.some((item) => !item.name)) throw new Error('食材列表为空或缺少食材名称');
   if (!steps.length || steps.some((step) => !step.text)) throw new Error('做法列表为空或存在空步骤');
   return { id: JSON.stringify([source, sourceId || sourceUrl]), source, sourceId, sourceUrl,
-    name, categories, course, ingredients, steps, images: raw.images || [] };
+    name, categories, course, ingredients, steps, images: raw.images || [],
+    ...(source === 'douguo' ? { reviewStatus: 'candidate' } : {}) };
 }
 
 function imageExtension(body) {
   if (body.length >= 24 && body.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) &&
       body.toString('ascii', 12, 16) === 'IHDR') return 'png';
   if (body.length >= 5 && body.subarray(0, 3).equals(Buffer.from('ffd8ff', 'hex')) &&
-      body.subarray(-2).equals(Buffer.from('ffd9', 'hex'))) return 'jpg';
+      body.subarray(Math.max(3, body.length - 64)).includes(Buffer.from('ffd9', 'hex'))) return 'jpg';
   if (body.length >= 20 && body.toString('ascii', 0, 4) === 'RIFF' && body.toString('ascii', 8, 12) === 'WEBP' &&
       body.readUInt32LE(4) + 8 === body.length) return 'webp';
   throw new Error('图片内容无效或格式不受支持（支持 JPG、PNG、WebP）');
@@ -145,7 +146,7 @@ async function crawl({ source, input, out, request, maxPages = 100, onError = co
   }
 }
 
-const HELP = `用法：npm run crawl:recipes -- --source <json|jsonld|meishichina|xiachufang> --out <目录> [--input <文件或网址>]
+const HELP = `用法：npm run crawl:recipes -- --source <json|jsonld|howtocook|douguo|meishichina|xiachufang> --out <目录> [--input <文件或网址>]
   --page-hosts <host[,host]>    允许采集的网页主机（专用来源固定为对应站点）
   --image-hosts <host[,host]>   允许下载的图片主机（专用来源已配置常用图片 CDN）
   --max-pages <数量>           最大列表和详情页请求数（默认 100）
@@ -155,6 +156,8 @@ const HELP = `用法：npm run crawl:recipes -- --source <json|jsonld|meishichin
 json 支持数组或 {"recipes":[...]}，每项含 sourceId 或 sourceUrl、name、categories、
 ingredients（字符串或 {name, amountText}）、steps（字符串或 {text, images}）及 images。
 本地图片路径相对于输入 JSON。jsonld 读取网页中 schema.org Recipe 结构化数据。
+howtocook 的 --input 为本地仓库目录或单个菜谱 Markdown 文件。
+douguo 支持首页和菜谱详情链接，输出标记为待审核候选，默认同源间隔 1000 毫秒。
 `;
 
 async function main(args) {
