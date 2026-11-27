@@ -191,15 +191,21 @@
   let memoryDb = null;
 
   function loadDb() {
-    if (memoryDb) return memoryDb;
     try {
       const raw = localStorage.getItem(DB_KEY);
+      if (memoryDb && raw === persistedRaw) return memoryDb;
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.users) && parsed.content) {
           memoryDb = parsed;
           persistedRaw = raw;
-          for (const user of memoryDb.users) ensureUser(user);
+          for (const user of memoryDb.users) {
+            ensureUser(user);
+            if (user.username === 'demo') {
+              user.profile ||= defaultProfile(user.name);
+              user.profile.onboarded = true;
+            }
+          }
           if (!memoryDb.content.recipes) memoryDb.content.recipes = [];
           if (!memoryDb.content.articles) memoryDb.content.articles = [];
           if (!memoryDb.content.recipeOverrides) memoryDb.content.recipeOverrides = {};

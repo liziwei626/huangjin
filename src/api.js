@@ -318,21 +318,9 @@ function ensureDemoUser() {
   }
 
   ensureCollections(demo);
-  if (!demo.cooked.length) demo.cooked = ['p01', 'm02', 's01', 'k04'];
-  if (!Object.keys(demo.recipeNotes).length) {
-    demo.recipeNotes = {
-      p01: '鲫鱼煎过再冲开水，汤色更白；豆腐最后放，别煮老。',
-      m02: '温水按 1.5 倍加，蒸出来真的很嫩。'
-    };
-  }
-
-  // 演示账号的餐单过期时自动顺延，保证体验始终可用。
-  if (!demo.plan || !demo.plan.items?.[planner.todayStr()]) {
-    demo.plan = planner.generatePlan(demo.profile, planner.todayStr(), 7);
-    demo.eaten = {};
-    demo.skipped = {};
-    demo.profile.deliveryDate = planner.addDays(planner.todayStr(), -12);
-    if (!Object.keys(demo.logs || {}).length) demo.logs = buildDemoLogs();
+  if (!demo.profile) demo.profile = defaultProfile(demo.name);
+  if (!demo.profile.onboarded) {
+    demo.profile.onboarded = true;
     save();
   }
 }

@@ -488,9 +488,9 @@ function renderOnboarding() {
       <div class="form-block">
         <h3>忌口与过敏（可多选）</h3>
         <div class="option-grid">
-          ${(S.meta.restrictions || []).map((r) => `<button type="button" class="option ${d.restrictions.includes(r.key) ? 'active' : ''}" data-action="onb-restrict" data-key="${esc(r.key)}">${esc(r.label)}</button>`).join('')}
+          ${(S.meta.restrictions || []).map((r) => `<button type="button" class="option ${d.restrictions.includes(r.key) ? 'active' : ''}" data-action="onb-restrict" data-key="${esc(r.key)}" aria-pressed="${d.restrictions.includes(r.key)}">${esc(r.label)}</button>`).join('')}
         </div>
-        <p class="small muted" style="margin-top:10px;line-height:1.7">已选 ${d.restrictions.length} 项。生成餐单和换菜时都会自动排除相关食材。</p>
+        <p class="small muted" style="margin-top:10px;line-height:1.7">已选 <span data-restriction-count aria-live="polite">${d.restrictions.length}</span> 项。生成餐单和换菜时都会自动排除相关食材。</p>
       </div>
       <div class="form-block">
         <h3>口味偏好</h3>
@@ -2196,7 +2196,7 @@ function editSheetHTML() {
       <div class="edit-section">
         <h3>忌口与过敏</h3>
         <div class="option-grid">
-          ${(S.meta.restrictions || []).map((r) => `<button type="button" class="option ${e.restrictions.includes(r.key) ? 'active' : ''}" data-action="edit-restrict" data-key="${esc(r.key)}">${esc(r.label)}</button>`).join('')}
+          ${(S.meta.restrictions || []).map((r) => `<button type="button" class="option ${e.restrictions.includes(r.key) ? 'active' : ''}" data-action="edit-restrict" data-key="${esc(r.key)}" aria-pressed="${e.restrictions.includes(r.key)}">${esc(r.label)}</button>`).join('')}
         </div>
       </div>
       <div class="edit-section">
@@ -3138,7 +3138,9 @@ async function onClick(e) {
       const idx = list.indexOf(key);
       if (idx >= 0) list.splice(idx, 1);
       else list.push(key);
-      renderOnboarding();
+      el.classList.toggle('active', idx < 0);
+      el.setAttribute('aria-pressed', String(idx < 0));
+      $('[data-restriction-count]').textContent = list.length;
       break;
     }
     case 'onb-slot': {
@@ -3181,7 +3183,8 @@ async function onClick(e) {
       const idx = list.indexOf(key);
       if (idx >= 0) list.splice(idx, 1);
       else list.push(key);
-      renderSheet();
+      el.classList.toggle('active', idx < 0);
+      el.setAttribute('aria-pressed', String(idx < 0));
       break;
     }
     case 'edit-slot': {
@@ -3306,6 +3309,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   boot();
   if ('serviceWorker' in navigator && !window.NUANYUE_STATIC) {
-    navigator.serviceWorker.register('/sw.js?v=4.9').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=4.10').catch(() => {});
   }
 });

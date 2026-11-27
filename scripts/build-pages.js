@@ -97,7 +97,7 @@ function rewriteHtml(file, scriptPlaceholder, replacements) {
   let html = read(file);
   html = html.replace(
     scriptPlaceholder,
-    `<script>window.NUANYUE_STATIC = true;</script>\n  <script src="static-data.js?v=4.9" defer></script>\n  <script src="static-api.js?v=4.9" defer></script>\n  ${scriptPlaceholder}`
+    `<script>window.NUANYUE_STATIC = true;</script>\n  <script src="static-data.js?v=4.9" defer></script>\n  <script src="static-api.js?v=4.10" defer></script>\n  ${scriptPlaceholder}`
   );
   html = html.replace(/="\/([^"]*)"/g, '="$1"');
   for (const [from, to] of replacements) html = html.split(from).join(to);
@@ -131,7 +131,7 @@ function build() {
     fs.writeFileSync(target, stripImagesPaths(fs.readFileSync(target, 'utf8')));
   }
 
-  rewriteHtml('public/index.html', '<script src="/app.js?v=4.9" defer></script>', []);
+  rewriteHtml('public/index.html', '<script src="/app.js?v=4.10" defer></script>', []);
   rewriteHtml('public/admin.html', '<script src="/admin.js?v=4.9" defer></script>', []);
   rewriteManifest();
 
