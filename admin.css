@@ -1677,3 +1677,41 @@ ul {
     grid-template-columns: 1fr;
   }
 }
+
+/* ------------------------------ 数据备份 ------------------------------ */
+
+.adm-backup-card {
+  margin-top: 20px;
+}
+
+.adm-backup-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adm-storage {
+  margin: 4px 0 10px;
+}
+
+.adm-storage-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.adm-storage-head strong {
+  font-size: 12.5px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.adm-backup-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
