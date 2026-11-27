@@ -7,6 +7,7 @@
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const HOME_URL = window.NUANYUE_STATIC ? 'index.html' : '/';
 
 const TOKEN_KEY = 'ny_admin_token';
 const PAGE_SIZE = 10;
@@ -128,6 +129,7 @@ function setToken(token) {
 }
 
 async function api(path, options = {}) {
+  if (window.__NUANYUE_API__) return window.__NUANYUE_API__(path, options, A.token);
   const headers = { 'Content-Type': 'application/json' };
   if (A.token) headers.Authorization = `Bearer ${A.token}`;
   let res;
@@ -203,7 +205,7 @@ function renderLogin(message = '') {
             <strong>初始账号</strong> admin&nbsp;/&nbsp;admin123456
             <br />登录后请在左下角「修改密码」及时更换。
           </div>
-          <a class="adm-login-back" href="/">${icon('arrowLeft', 15)} 返回前台</a>
+          <a class="adm-login-back" href="${HOME_URL}">${icon('arrowLeft', 15)} 返回前台</a>
         </div>
       </section>
     </div>`;
@@ -338,7 +340,7 @@ function renderShell() {
               <div><strong>${esc(A.me.name || A.me.username)}</strong><small>管理员</small></div>
             </div>` : ''}
           <button type="button" data-action="open-password">${icon('lock', 16)} 修改密码</button>
-          <a href="/" target="_blank" rel="noreferrer">${icon('arrowLeft', 16)} 返回前台</a>
+          <a href="${HOME_URL}" target="_blank" rel="noreferrer">${icon('arrowLeft', 16)} 返回前台</a>
           <button type="button" data-action="logout">${icon('logout', 16)} 退出登录</button>
         </div>
       </aside>
@@ -832,7 +834,7 @@ function recipeFormHTML(recipe) {
               <img id="adm-image-preview" src="${esc(imageValue === 'auto' ? '/images/main.jpg' : imageValue)}" alt="" />
               <div class="adm-image-side">
                 <select name="image" id="adm-image-select" data-image-select>
-                  ${images.map((img) => `<option value="${esc(img)}" ${imageValue === img ? 'selected' : ''}>${img === 'auto' ? '按菜名自动匹配' : img.startsWith('/uploads/') ? '已上传图片' : img.includes('/dishes/') ? `专属图 ${img.replace('/images/dishes/', '')}` : img.replace('/images/', '')}</option>`).join('')}
+                  ${images.map((img) => `<option value="${esc(img)}" ${imageValue === img ? 'selected' : ''}>${img === 'auto' ? '按菜名自动匹配' : img.startsWith('data:') ? '已上传图片' : img.startsWith('/uploads/') ? '已上传图片' : img.includes('/dishes/') ? `专属图 ${img.replace(/^\/?images\/dishes\//, '')}` : img.replace(/^\/?images\//, '')}</option>`).join('')}
                 </select>
                 <div class="adm-image-actions">
                   <button type="button" class="adm-btn adm-btn-sm" data-action="pick-recipe-image">上传图片</button>
@@ -1021,7 +1023,7 @@ function articleFormHTML(article) {
             <input name="sourceUrl" placeholder="粘贴文章链接，例如 https://..." autocomplete="off" />
             <button type="button" class="adm-btn adm-btn-sm" data-action="fetch-article">抓取正文</button>
           </div>
-          <p class="adm-muted">抓取结果会填入下方表单，核对内容与来源后再发布。</p>
+          <p class="adm-muted">${window.NUANYUE_STATIC ? '静态版受浏览器跨域限制；抓取失败时可直接在下方粘贴正文。' : '抓取结果会填入下方表单，核对内容与来源后再发布。'}</p>
         </div>
         <label class="adm-field"><span>文章标题</span><input name="title" maxlength="60" required value="${esc(a.title || '')}" placeholder="例如：产后第一周怎么吃" /></label>
         <div class="adm-grid-3">

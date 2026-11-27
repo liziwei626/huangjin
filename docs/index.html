@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F7F2EA" />
+  <title>暖月 · 月子餐智能搭配</title>
+  <meta name="description" content="按产后阶段、分娩方式和忌口，自动搭配一周不重样的月子餐，附采购清单与打卡记录。" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="暖月" />
+  <link rel="stylesheet" href="styles.css?v=4.3" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <div class="boot">
+      <div class="boot-mark">暖月</div>
+      <p>正在为你准备温热的餐单…</p>
+    </div>
+  </div>
+  <div id="overlay-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+  <script>window.NUANYUE_STATIC = true;</script>
+  <script src="static-data.js" defer></script>
+  <script src="static-api.js" defer></script>
+  <script src="app.js?v=4.3" defer></script>
+</body>
+</html>

@@ -6,6 +6,7 @@
  * ------------------------------------------------------------------ */
 
 const $ = (sel, root = document) => root.querySelector(sel);
+const ADMIN_URL = window.NUANYUE_STATIC ? 'admin.html' : '/admin';
 
 const S = {
   token: localStorage.getItem('ny_token') || '',
@@ -159,6 +160,7 @@ function stageNumberForDay(day) {
 /* ------------------------------ API ------------------------------ */
 
 async function api(path, options = {}) {
+  if (window.__NUANYUE_API__) return window.__NUANYUE_API__(path, options, S.token);
   const headers = { 'Content-Type': 'application/json' };
   if (S.token) headers.Authorization = `Bearer ${S.token}`;
   let res;
@@ -638,7 +640,7 @@ function sideNavHTML() {
         <p>${esc(stage.title || '温和调养，按阶段吃得对')}</p>
       </div>
       <div class="side-foot">
-        ${S.me?.role === 'admin' ? `<a class="side-admin" href="/admin" target="_blank" rel="noreferrer">${icon('lock', 16)} 管理后台</a>` : ''}
+        ${S.me?.role === 'admin' ? `<a class="side-admin" href="${ADMIN_URL}" target="_blank" rel="noreferrer">${icon('lock', 16)} 管理后台</a>` : ''}
         <button class="side-user" type="button" data-action="tab" data-tab="me">
           <span class="avatar">${esc((name || '暖').slice(0, 1))}</span>
           <span class="side-user-text"><strong>${esc(name)}</strong><small>${esc(S.profile?.deliveryType || '')} · ${esc(S.profile?.feeding || '')}</small></span>
@@ -1694,7 +1696,7 @@ function meHTML() {
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
       ${S.me?.role === 'admin' ? `
-      <a class="menu-row" href="/admin" target="_blank" rel="noreferrer">
+      <a class="menu-row" href="${ADMIN_URL}" target="_blank" rel="noreferrer">
         <span class="ico">${icon('lock', 18)}</span>管理后台
         <span class="chev">${icon('chevron', 16)}</span>
       </a>` : ''}
@@ -3302,7 +3304,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('input', onInput);
   document.addEventListener('change', onChange);
   boot();
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=4.1').catch(() => {});
+  if ('serviceWorker' in navigator && !window.NUANYUE_STATIC) {
+    navigator.serviceWorker.register('/sw.js?v=4.3').catch(() => {});
   }
 });
