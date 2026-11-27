@@ -1488,6 +1488,38 @@ async function handleAdminArticleFetch(req, res) {
   }
 }
 
+const publicFetchHits = new Map();
+
+function allowPublicFetch(ip) {
+  const now = Date.now();
+  const hits = (publicFetchHits.get(ip) || []).filter((t) => now - t < 60000);
+  if (hits.length >= 30) return false;
+  hits.push(now);
+  publicFetchHits.set(ip, hits);
+  return true;
+}
+
+/**
+ * 供 GitHub Pages 纯静态后台调用的文章抓取通道。
+ * 只抓取公开网页，无鉴权，带简单频控与 CORS。
+ */
+async function handlePublicArticleFetch(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const ip = req.socket.remoteAddress || 'unknown';
+  if (!allowPublicFetch(ip)) throw new ApiError(429, '抓取过于频繁，请稍后再试', 'RATE_LIMITED');
+  const body = await readJson(req);
+  const url = String(body.url || '').trim();
+  if (!url || url.length > 2048) throw new ApiError(400, '请填写正确的文章链接');
+  try {
+    const article = await fetchArticle(url);
+    sendJson(res, 200, { article });
+  } catch (err) {
+    throw new ApiError(400, err.message || '抓取失败，请稍后再试');
+  }
+}
+
 async function handleAdminUsers(req, res) {
   requireAdmin(req);
   const users = getDb().users
@@ -1586,6 +1618,17 @@ async function handle(req, res, url) {
       sendJson(res, 200, { ok: true, time: new Date().toISOString() });
       return;
     }
+    if (path === '/api/fetch-article' && method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '86400'
+      });
+      res.end();
+      return;
+    }
+    if (path === '/api/fetch-article' && method === 'POST') return await handlePublicArticleFetch(req, res);
     if (path === '/api/meta' && method === 'GET') return await handleMeta(req, res);
 
     if (path === '/api/admin/overview' && method === 'GET') return await handleAdminOverview(req, res);

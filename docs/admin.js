@@ -31,6 +31,7 @@ const A = {
   userRole: 'all',
   userStatus: 'all',
   page: { recipes: 1, articles: 1, users: 1 },
+  generating: new Set(),
   busy: false
 };
 
@@ -838,8 +839,11 @@ function recipeFormHTML(recipe) {
                 </select>
                 <div class="adm-image-actions">
                   <button type="button" class="adm-btn adm-btn-sm" data-action="pick-recipe-image">上传图片</button>
+                  <button type="button" class="adm-btn adm-btn-sm" data-action="generate-recipe-image" data-mode="search">联网配图</button>
+                  <button type="button" class="adm-btn adm-btn-sm" data-action="generate-recipe-image" data-mode="ai">AI 生成</button>
                   <small class="adm-muted">JPG / PNG / WebP，≤5MB</small>
                 </div>
+                <span id="adm-image-status" class="adm-muted"></span>
                 <input type="file" id="adm-recipe-image-file" accept="image/jpeg,image/png,image/webp" hidden />
               </div>
             </div>
@@ -934,10 +938,388 @@ async function uploadRecipeImage(file) {
   toast('图片已上传，保存菜品后生效', 'success');
 }
 
+/* ------------------------- AI 菜品配图 ------------------------- */
+
+function loadImageElement(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('图片加载失败'));
+    img.src = src;
+  });
+}
+
+function buildDishImagePrompt(recipe) {
+  const ingredients = (recipe.ingredients || [])
+    .slice(0, 4)
+    .map((item) => (Array.isArray(item) ? item[0] : item && item.name))
+    .filter(Boolean)
+    .join('、');
+  return [
+    recipe.name,
+    courseLabel(recipe.course),
+    ingredients ? `主要食材${ingredients}` : '',
+    '中式月子餐',
+    '成品菜特写',
+    '真实美食摄影',
+    '自然光',
+    '白瓷餐具',
+    '无文字',
+    '无人物',
+    '高清',
+    'Chinese home-style dish, realistic food photography, close-up, natural light'
+  ]
+    .filter(Boolean)
+    .join('，');
+}
+
+function cropGeneratedImage(img) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 600;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  // 生成服务会在右下角带小水印，裁掉底部约 4.5% 再居中裁成 4:3。
+  const usableHeight = Math.max(1, img.height - Math.round(img.height * 0.045));
+  const targetRatio = 4 / 3;
+  let sourceWidth = img.width;
+  let sourceHeight = usableHeight;
+  if (sourceWidth / sourceHeight > targetRatio) sourceWidth = sourceHeight * targetRatio;
+  else sourceHeight = sourceWidth / targetRatio;
+  const sourceX = Math.max(0, (img.width - sourceWidth) / 2);
+  const sourceY = Math.max(0, (usableHeight - sourceHeight) / 2);
+  ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, 800, 600);
+  return canvas.toDataURL('image/jpeg', 0.86);
+}
+
+async function generateAiDishImageDataUrl(recipe) {
+  const name = String((recipe && recipe.name) || '').trim();
+  if (!name) throw new Error('请先填写菜品名称');
+  const prompt = buildDishImagePrompt(recipe);
+  let lastError;
+  for (let attempt = 0; attempt < 1; attempt += 1) {
+    const seed = Math.floor(Math.random() * 1e9);
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=600&nologo=true&seed=${seed}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+      if (!response.ok) throw new Error(`AI 图片服务返回 ${response.status}`);
+      const type = String(response.headers.get('content-type') || '');
+      if (!type.includes('image/')) throw new Error('AI 图片服务返回内容异常');
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      try {
+        const img = await loadImageElement(objectUrl);
+        return cropGeneratedImage(img);
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    } catch (err) {
+      lastError = err;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  const reason = lastError && lastError.name === 'AbortError' ? '生成超时' : (lastError && lastError.message) || '生成失败';
+  throw new Error(`AI 配图${reason}`);
+}
+
+function search360DishImages(query) {
+  return new Promise((resolve, reject) => {
+    const callback = `__ny360_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const script = document.createElement('script');
+    let done = false;
+    const finish = (err, data) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      script.remove();
+      try {
+        delete window[callback];
+      } catch {
+        /* ignore */
+      }
+      if (err) reject(err);
+      else resolve(data);
+    };
+    const timer = setTimeout(() => finish(new Error('联网搜图超时')), 15000);
+    window[callback] = (data) => finish(null, data);
+    script.onerror = () => finish(new Error('联网搜图失败'));
+    script.src = `https://image.so.com/j?q=${encodeURIComponent(query)}&src=srp&sn=0&pn=30&callback=${callback}`;
+    document.head.appendChild(script);
+  });
+}
+
+function rankDishImageCandidates(list, name, relaxed = false) {
+  const productRe = /(袋装|包邮|旗舰店|天猫|淘宝|京东|拼多多|优惠|促销|批发|礼盒|罐装|瓶装|代餐粉|\d+\s*(?:g|克|kg)\b)/i;
+  const junkRe = /(壁纸|海报|素材|模板|展板|电路|玩具|枪|动漫|电影|明星|穿搭|楼盘|招聘)/i;
+  const blockHosts = ['babybus', 'learn.', 'logo', 'icon', 'so.com'];
+  const preferred = ['xiachufang', 'douguo', 'meishichina', 'meishij', 'sohu', 'baijiahao', 'xiangha'];
+  return (Array.isArray(list) ? list : [])
+    .filter((item) => {
+      if (!item || !item.thumb) return false;
+      const title = String(item.title || '');
+      const link = String(item.link || '');
+      if (junkRe.test(title)) return false;
+      if (blockHosts.some((host) => link.includes(host))) return false;
+      const width = Number(item.width) || 0;
+      const height = Number(item.height) || 0;
+      if (width && height) {
+        const ratio = width / height;
+        if (relaxed) {
+          if (width < 260 || ratio < 0.65) return false;
+        } else if (width < 400 || ratio < 0.9) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .map((item, index) => {
+      const title = String(item.title || '');
+      const link = String(item.link || '');
+      let score = title.includes(name) ? 20 : 0;
+      if (preferred.some((host) => link.includes(host))) score += 10;
+      if (productRe.test(title)) score -= 30;
+      return { ...item, score, index };
+    })
+    .filter((item) => item.score > -10)
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, 10);
+}
+
+async function searchDishImageDataUrl(recipe) {
+  const name = String((recipe && recipe.name) || '').trim();
+  if (!name) throw new Error('请先填写菜品名称');
+  const queries = [`${name} 成品`, `${name} 美食`, name];
+  for (const query of queries) {
+    let data;
+    try {
+      data = await search360DishImages(query);
+    } catch (err) {
+      continue;
+    }
+    const strict = rankDishImageCandidates(data && data.list, name, false);
+    const relaxed = rankDishImageCandidates(data && data.list, name, true);
+    const seen = new Set();
+    const candidates = [...strict, ...relaxed].filter((item) => {
+      if (seen.has(item.thumb)) return false;
+      seen.add(item.thumb);
+      return true;
+    });
+    for (const item of candidates) {
+      try {
+        const response = await fetch(item.thumb, { mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer' });
+        if (!response.ok) continue;
+        const blob = await response.blob();
+        if (!String(blob.type || '').includes('image/')) continue;
+        const objectUrl = URL.createObjectURL(blob);
+        try {
+          const img = await loadImageElement(objectUrl);
+          return cropGeneratedImage(img);
+        } finally {
+          URL.revokeObjectURL(objectUrl);
+        }
+      } catch {
+        /* try next candidate */
+      }
+    }
+  }
+  throw new Error('未能匹配到合适的菜品图，请手动上传');
+}
+
+async function generateDishImageDataUrl(recipe, mode = 'search') {
+  if (mode === 'ai') {
+    try {
+      return { dataUrl: await generateAiDishImageDataUrl(recipe), source: 'ai' };
+    } catch (aiError) {
+      console.warn('[ai-image] fallback to search:', aiError.message);
+      const dataUrl = await searchDishImageDataUrl(recipe);
+      return { dataUrl, source: 'search' };
+    }
+  }
+  try {
+    return { dataUrl: await searchDishImageDataUrl(recipe), source: 'search' };
+  } catch (searchError) {
+    console.warn('[ai-image] search failed, trying AI:', searchError.message);
+    const dataUrl = await generateAiDishImageDataUrl(recipe);
+    return { dataUrl, source: 'ai' };
+  }
+}
+
+async function generateImageForRecipe(recipe, mode = 'search') {
+  if (!recipe || !recipe.id) throw new Error('菜品信息不完整');
+  if (A.generating.has(recipe.id)) throw new Error('这道菜正在生成配图');
+  A.generating.add(recipe.id);
+  try {
+    const generated = await generateDishImageDataUrl(recipe, mode);
+    const uploaded = await api('/admin/upload', { method: 'POST', body: { dataUrl: generated.dataUrl } });
+    const image = uploaded.url;
+    await api(`/admin/recipes/${encodeURIComponent(recipe.id)}`, {
+      method: 'PUT',
+      body: { ...recipe, image }
+    });
+    const index = A.recipes.findIndex((item) => item.id === recipe.id);
+    if (index >= 0) A.recipes[index] = { ...A.recipes[index], image };
+    return { image, source: generated.source };
+  } finally {
+    A.generating.delete(recipe.id);
+  }
+}
+
+async function generateFormRecipeImage(btn) {
+  const form = btn.closest('form');
+  const name = String(form?.elements?.name?.value || '').trim();
+  if (!name) throw new Error('请先填写菜品名称');
+  const recipe = {
+    name,
+    course: form.elements.course?.value || 'main',
+    ingredients: parseIngredientLines(form.elements.ingredients?.value || '')
+  };
+  const mode = btn.dataset.mode === 'ai' ? 'ai' : 'search';
+  const status = $('#adm-image-status');
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '处理中…';
+  if (status) status.textContent = mode === 'ai' ? 'AI 正在生成菜品图，约 20-60 秒…' : '正在联网匹配菜品图…';
+  try {
+    const generated = await generateDishImageDataUrl(recipe, mode);
+    const uploaded = await api('/admin/upload', { method: 'POST', body: { dataUrl: generated.dataUrl } });
+    const select = $('#adm-image-select');
+    const preview = $('#adm-image-preview');
+    if (select) {
+      const option = document.createElement('option');
+      option.value = uploaded.url;
+      option.textContent = generated.source === 'ai' ? 'AI 生成图片' : '联网匹配图片';
+      select.appendChild(option);
+      select.value = uploaded.url;
+    }
+    if (preview) preview.src = uploaded.url;
+    if (status) status.textContent = '已生成，可继续生成或保存菜品。';
+    toast(generated.source === 'ai' ? 'AI 菜品图已生成，保存菜品后生效' : '已联网匹配菜品图，保存菜品后生效', 'success');
+  } catch (err) {
+    if (status) status.textContent = err.message;
+    throw err;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = old;
+  }
+}
+
+/* ---------------------- 文章菜品识别 ---------------------- */
+
+function articlePlainText(form) {
+  return [
+    form?.elements?.title?.value || '',
+    form?.elements?.summary?.value || '',
+    form?.elements?.sections?.value || ''
+  ].join('\n');
+}
+
+function detectArticleDishes(form) {
+  const text = articlePlainText(form);
+  if (!text.trim()) return [];
+  return A.recipes
+    .filter((recipe) => recipe.available !== false && recipe.name && text.includes(recipe.name))
+    .sort((a, b) => b.name.length - a.name.length)
+    .slice(0, 8);
+}
+
+function renderArticleDishes(form, options = {}) {
+  const box = $('#adm-article-dishes', form);
+  if (!box) return [];
+  const matches = detectArticleDishes(form);
+  if (!matches.length) {
+    box.innerHTML = '<p class="adm-muted">未在文中识别到食谱库里的菜品。可在正文中写出完整菜名后点击「识别文中菜品」。</p>';
+    return [];
+  }
+  box.innerHTML = `
+    <div class="adm-article-dish-head">
+      <div><strong>文中提到的菜品</strong><small>${matches.length} 道 · 可生成专属配图</small></div>
+      <button type="button" class="adm-btn adm-btn-sm adm-btn-primary" data-action="generate-article-images">批量生成配图</button>
+    </div>
+    <div class="adm-article-dish-list">
+      ${matches.map((recipe) => `
+        <div class="adm-article-dish" data-id="${esc(recipe.id)}">
+          <img src="${esc(recipe.image)}" alt="" />
+          <div><strong>${esc(recipe.name)}</strong><small>${esc(courseLabel(recipe.course))}</small></div>
+          <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm" data-action="generate-article-dish" data-id="${esc(recipe.id)}">智能配图</button>
+        </div>`).join('')}
+    </div>`;
+  if (options.notify) toast(`识别到 ${matches.length} 道文中菜品，可生成配图`, 'success');
+  return matches;
+}
+
+async function generateArticleDish(btn) {
+  const id = btn.dataset.id;
+  const recipe = findRecipe(id);
+  if (!recipe) throw new Error('菜品不存在');
+  const chip = btn.closest('.adm-article-dish');
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '生成中…';
+  try {
+    const result = await generateImageForRecipe(recipe);
+    const img = chip?.querySelector('img');
+    if (img) img.src = result.image;
+    btn.textContent = '重新生成';
+    toast(result.source === 'ai' ? `「${recipe.name}」AI 配图已生成` : `「${recipe.name}」已联网匹配菜品图`, 'success');
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    if (btn.textContent === '生成中…') btn.textContent = old;
+  }
+}
+
+async function generateArticleImages(btn) {
+  const form = btn.closest('form');
+  const chips = [...(form?.querySelectorAll('.adm-article-dish') || [])];
+  const ids = [...new Set(chips.map((chip) => chip.dataset.id))];
+  if (!ids.length) throw new Error('请先识别文中菜品');
+  const targets = ids.slice(0, 5);
+  if (ids.length > 5) toast('一次最多生成 5 道，已处理前 5 道');
+  if (!window.confirm(`将为 ${targets.length} 道菜生成 AI 配图，每张约 20-60 秒，是否继续？`)) return;
+  const old = btn.textContent;
+  btn.disabled = true;
+  let ok = 0;
+  let failed = 0;
+  try {
+    for (let i = 0; i < targets.length; i += 1) {
+      const recipe = findRecipe(targets[i]);
+      if (!recipe) { failed += 1; continue; }
+      btn.textContent = `生成中 ${i + 1}/${targets.length}…`;
+      try {
+        const result = await generateImageForRecipe(recipe);
+        const chip = form.querySelector(`.adm-article-dish[data-id="${CSS.escape(recipe.id)}"]`);
+        if (chip) {
+          const img = chip.querySelector('img');
+          if (img) img.src = result.image;
+          const chipBtn = chip.querySelector('button');
+          if (chipBtn) chipBtn.textContent = '重新生成';
+        }
+        ok += 1;
+      } catch (err) {
+        console.warn('[ai-image]', recipe.name, err);
+        failed += 1;
+      }
+    }
+    toast(`配图生成完成：成功 ${ok} 道${failed ? `，失败 ${failed} 道` : ''}`, ok ? 'success' : 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = old;
+  }
+}
+
 async function fetchArticleIntoForm(btn) {
   const form = btn.closest('form');
   const url = String(form?.elements?.sourceUrl?.value || '').trim();
   if (!url) throw new Error('请先粘贴文章链接');
+  if (window.NUANYUE_STATIC && form?.elements?.fetchHelper) {
+    const helper = String(form.elements.fetchHelper.value || '').trim();
+    if (helper) localStorage.setItem('nuanyue_fetch_helper', helper);
+    else localStorage.removeItem('nuanyue_fetch_helper');
+  }
   const old = btn.textContent;
   btn.disabled = true;
   btn.textContent = '抓取中…';
@@ -949,6 +1331,7 @@ async function fetchArticleIntoForm(btn) {
     if (form.elements.tag) form.elements.tag.value = article.tag || '网络摘录';
     if (form.elements.minutes) form.elements.minutes.value = article.minutes || 3;
     if (form.elements.sections) form.elements.sections.value = sectionsToText(article.sections || []);
+    renderArticleDishes(form, { notify: true });
     toast('已抓取正文，核对后点击保存文章', 'success');
   } finally {
     btn.disabled = false;
@@ -1023,7 +1406,8 @@ function articleFormHTML(article) {
             <input name="sourceUrl" placeholder="粘贴文章链接，例如 https://..." autocomplete="off" />
             <button type="button" class="adm-btn adm-btn-sm" data-action="fetch-article">抓取正文</button>
           </div>
-          <p class="adm-muted">${window.NUANYUE_STATIC ? '静态版受浏览器跨域限制；抓取失败时可直接在下方粘贴正文。' : '抓取结果会填入下方表单，核对内容与来源后再发布。'}</p>
+          ${window.NUANYUE_STATIC ? `<label class="adm-field adm-fetch-helper"><span>抓取服务（静态版使用）</span><input name="fetchHelper" value="${esc(localStorage.getItem('nuanyue_fetch_helper') || 'https://37lq1tfihyzcugo02dp.traesite.cn/api/fetch-article')}" /></label>` : ''}
+          <p class="adm-muted">${window.NUANYUE_STATIC ? '抓取失败时可直接在下方粘贴正文，再点击「识别文中菜品」。' : '抓取结果会填入下方表单，核对内容与来源后再发布。'}</p>
         </div>
         <label class="adm-field"><span>文章标题</span><input name="title" maxlength="60" required value="${esc(a.title || '')}" placeholder="例如：产后第一周怎么吃" /></label>
         <div class="adm-grid-3">
@@ -1041,6 +1425,11 @@ function articleFormHTML(article) {
         <label class="adm-field"><span>正文（用 ## 开头表示小节标题）</span>
           <textarea name="sections" rows="14" placeholder="## 第一周怎么吃&#10;饮食清淡、少油少盐…&#10;&#10;## 推荐食材&#10;小米、山药、鲫鱼…">${esc(sectionsToText(a.sections))}</textarea>
         </label>
+        <div class="adm-article-tools">
+          <button type="button" class="adm-btn adm-btn-sm" data-action="detect-article-dishes">识别文中菜品</button>
+          <span class="adm-muted">自动关联食谱库中提到的菜品，可一键生成 AI 配图</span>
+        </div>
+        <div id="adm-article-dishes" class="adm-article-dishes"></div>
       </div>
       <div class="adm-form-foot">
         <button type="button" class="adm-btn" data-action="close-modal">取消</button>
@@ -1359,6 +1748,22 @@ function handleClick(event) {
     $('#adm-recipe-image-file')?.click();
     return;
   }
+  if (action === 'generate-recipe-image') {
+    generateFormRecipeImage(target).catch((err) => toast(err.message, 'error'));
+    return;
+  }
+  if (action === 'detect-article-dishes') {
+    renderArticleDishes(target.closest('form'), { notify: true });
+    return;
+  }
+  if (action === 'generate-article-dish') {
+    generateArticleDish(target).catch((err) => toast(err.message, 'error'));
+    return;
+  }
+  if (action === 'generate-article-images') {
+    generateArticleImages(target).catch((err) => toast(err.message, 'error'));
+    return;
+  }
   if (action === 'fetch-article') {
     fetchArticleIntoForm(target).catch((err) => toast(err.message, 'error'));
     return;
@@ -1382,7 +1787,10 @@ function handleClick(event) {
   }
   if (action === 'edit-article') {
     const article = findArticle(target.dataset.id);
-    if (article) openModal(articleFormHTML(article), true);
+    if (article) {
+      openModal(articleFormHTML(article), true);
+      renderArticleDishes($('#adm-modal-root form[data-form="article"]'));
+    }
     return;
   }
   if (action === 'toggle-article') {

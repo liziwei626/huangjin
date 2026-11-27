@@ -1574,3 +1574,106 @@ ul {
     flex-direction: column;
   }
 }
+
+/* ---------- AI 配图与文章菜品识别 ---------- */
+
+#adm-image-status {
+  min-height: 16px;
+  line-height: 1.6;
+}
+
+.adm-article-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: -4px;
+}
+
+.adm-article-dishes {
+  border: 1px solid var(--line);
+  background: #fffaf3;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.adm-article-dishes:empty {
+  display: none;
+}
+
+.adm-article-dish-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.adm-article-dish-head strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.adm-article-dish-head small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.adm-article-dish-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
+}
+
+.adm-article-dish {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.adm-article-dish img {
+  width: 48px;
+  height: 48px;
+  border-radius: 9px;
+  object-fit: cover;
+  background: var(--bg-deep);
+  flex: 0 0 auto;
+}
+
+.adm-article-dish > div {
+  min-width: 0;
+}
+
+.adm-article-dish strong {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-article-dish small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.adm-article-dish button {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .adm-article-dish-list {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1270,14 +1270,52 @@
       requireAdmin(db, token);
       const url = String(body.url || '').trim();
       if (!url) fail(400, '请先粘贴文章链接');
-      let response;
-      try {
-        response = await fetch(url, { mode: 'cors' });
-      } catch (err) {
-        fail(400, '浏览器跨域限制，抓取失败。请复制正文粘贴到下方的「正文」框后直接发布');
+      const encoded = encodeURIComponent(url);
+      const sources = [
+        url,
+        `https://api.allorigins.win/raw?url=${encoded}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encoded}`
+      ];
+      let html = '';
+      for (const source of sources) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 15000);
+        try {
+          const response = await fetch(source, { mode: 'cors', signal: controller.signal });
+          if (!response.ok) continue;
+          const text = await response.text();
+          if (text && text.length >= 300) {
+            html = text;
+            break;
+          }
+        } catch {
+          /* 尝试下一个抓取通道 */
+        } finally {
+          clearTimeout(timer);
+        }
       }
-      if (!response.ok) fail(400, `目标页面返回 ${response.status}，暂时无法抓取`);
-      const html = await response.text();
+      if (!html) {
+        const helper = (
+          localStorage.getItem('nuanyue_fetch_helper') ||
+          'https://37lq1tfihyzcugo02dp.traesite.cn/api/fetch-article'
+        ).trim();
+        if (helper) {
+          try {
+            const response = await fetch(helper, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url })
+            });
+            if (response.ok) {
+              const data = await response.json();
+              if (data && data.article) return { article: data.article };
+            }
+          } catch {
+            /* 抓取服务不可用时走手动粘贴 */
+          }
+        }
+        fail(400, '抓取失败。该网站可能限制浏览器跨域访问，请复制正文粘贴到「正文」框后直接发布');
+      }
       try {
         return { article: parseArticleHtml(html, url) };
       } catch (err) {

@@ -132,7 +132,7 @@ function build() {
   }
 
   rewriteHtml('public/index.html', '<script src="/app.js?v=4.3" defer></script>', []);
-  rewriteHtml('public/admin.html', '<script src="/admin.js?v=4.3" defer></script>', []);
+  rewriteHtml('public/admin.html', '<script src="/admin.js?v=4.8" defer></script>', []);
   rewriteManifest();
 
   const count = unpackDishImages();

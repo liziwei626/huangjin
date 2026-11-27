@@ -12,6 +12,8 @@
 - **电脑端适配**：宽度 ≥1000px 时自动切换为侧边导航 + 宽屏内容区，今日页双栏、食谱 4-5 列、详情弹层居中，手机端保持原底部 Tab 体验
 - **管理后台**：`/admin` 独立桌面端后台，概览用户/菜品/内容指标，支持菜品与文章的增改删、上架下架、价格维护，以及用户角色、停用、重置密码与删除
 - **文章抓取**：后台粘贴网页链接即可抓取标题、摘要与正文，自动生成草稿，核对修改后再发布；也可直接手动撰写发布
+- **智能配图**：菜品编辑支持「联网配图」与「AI 生成」；抓取文章后自动识别文中提到的食谱，可单道或批量生成配图并直接写回菜品
+- **公开抓取接口**：`POST /api/fetch-article` 为 GitHub Pages 纯静态后台提供文章抓取通道（带 CORS 与频控），静态版后台可在抓取框中更换服务地址
 - **点餐基础数据**：菜品包含价格与上下架状态，后台创建/编辑的菜品会实时同步到前台，为后续自助点餐直接复用
 - **产后档案**：分娩日期、分娩方式、喂养方式、口味、热量目标、每日餐次
 - **阶段化搭配**：按产后第 1 周 / 第 2 周 / 第 3-4 周 / 第 5 周起四个阶段匹配食谱与调养重点
@@ -66,7 +68,7 @@ node scripts/build-pages.js
 
 - 前台：https://liziwei626.github.io/huangjin/
 - 后台：https://liziwei626.github.io/huangjin/admin.html
-- 静态版限制：账号与数据仅当前浏览器可见；文章抓取受浏览器跨域限制，失败时可将正文粘贴到「正文」框后发布。
+- 静态版限制：账号与数据仅当前浏览器可见；文章抓取默认通过 `https://37lq1tfihyzcugo02dp.traesite.cn/api/fetch-article` 代理完成，后台「抓取服务」中可替换为自己的抓取服务；服务不可用时可手动粘贴正文。
 
 更新线上静态版时，先运行 `node scripts/build-pages.js`，再把 `docs/` 内容同步到 `gh-pages` 分支并推送。
 
@@ -154,6 +156,7 @@ scripts/
 | PATCH | `/api/admin/articles/:id/status` | 上架 / 下架 |
 | POST | `/api/admin/articles/fetch` | 抓取网页文章并生成草稿 |
 | POST | `/api/admin/upload` | 上传菜品图片（base64，≤5MB） |
+| POST | `/api/fetch-article` | 公开文章抓取（CORS，供静态版后台使用，带频控） |
 | GET | `/api/admin/users` | 用户列表（含角色、使用情况） |
 | GET/PATCH/DELETE | `/api/admin/users/:id` | 用户详情 / 角色与状态、重置密码 / 删除 |
 
