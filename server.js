@@ -11,6 +11,9 @@ const HOST = '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const UPLOAD_DIR = path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data', 'uploads');
 const UPLOAD_NAME = /^[a-f0-9]{24}\.(jpg|png|webp)$/;
+const DISH_IMAGE_INDEX = require('./src/data/dish-images-index.json');
+const DISH_IMAGE_PACK = path.join(__dirname, 'src', 'data', 'dish-images.bin');
+let dishImagePack = null;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -110,6 +113,24 @@ const server = http.createServer((req, res) => {
       return;
     }
     sendFile(req, res, file);
+    return;
+  }
+
+  const dishImage = url.pathname.match(/^\/images\/dishes\/([\w-]+)\.jpg$/);
+  if (dishImage) {
+    const entry = DISH_IMAGE_INDEX[dishImage[1]];
+    if (!entry) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not Found');
+      return;
+    }
+    if (!dishImagePack) dishImagePack = fs.readFileSync(DISH_IMAGE_PACK);
+    const body = dishImagePack.subarray(entry.offset, entry.offset + entry.length);
+    res.writeHead(200, {
+      'Content-Type': 'image/jpeg',
+      'Content-Length': body.length,
+      'Cache-Control': 'public, max-age=604800'
+    });
+    res.end(req.method === 'HEAD' ? undefined : body);
     return;
   }
 

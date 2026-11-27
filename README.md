@@ -67,6 +67,8 @@ src/
   db.js                JSON 存储与种子数据
   planner.js           阶段计算、餐单生成、换菜、清单汇总、统计
   data/recipes.js      212 道月子餐食谱库
+  data/dish-images.bin 212 道菜品的成品图二进制包
+  data/dish-images-index.json 菜品图偏移索引
   data/recipe-utils.js 营养估算、烹饪方式、注意事项与食材替换规则
   data/meta.js         阶段、餐次、忌口、功效、记录选项等配置
   data/articles.js     月子知识库文章
@@ -79,9 +81,9 @@ public/
   admin.css            管理后台桌面端样式
   sw.js                Service Worker 离线缓存
   images/              分类配图
-  images/dishes/       212 道菜品的独立成品图
 scripts/
   fetch-dish-images.js 开发期菜品配图抓取与去重脚本
+  pack-dish-images.js  将菜品图打包为部署用二进制文件
 ```
 
 ## API 一览
