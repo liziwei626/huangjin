@@ -1703,7 +1703,7 @@ function meHTML() {
         <span class="chev">${icon('chevron', 16)}</span>
       </button>
     </div>
-    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v4.2<br />饮食建议仅供参考，具体请遵医嘱</p>`;
+    <p class="small muted" style="text-align:center;padding:10px 20px 26px;line-height:1.8">暖月 · 月子餐智能搭配 v4.3<br />饮食建议仅供参考，具体请遵医嘱</p>`;
 }
 
 /* ------------------------------ 弹层 ------------------------------ */
@@ -2239,7 +2239,7 @@ function aboutSheetHTML() {
       <p><strong>免责声明：</strong>食谱、营养数据与功效说明均为日常饮食参考，不构成医疗建议。产后饮食需结合个人体质、伤口恢复、哺乳情况和医生建议调整；如出现过敏、发热、伤口异常、恶露异常等情况，请及时就医。</p>
       <p><strong>忌口说明：</strong>勾选忌口或过敏项后，生成餐单与换菜时会自动排除相关食材；母乳喂养或混合喂养会默认排除含酒精的菜品。</p>
       <p><strong>数据说明：</strong>账号、餐单与打卡记录保存在服务端实例中，仅用于功能演示。请勿填写身份证号、住址等敏感个人信息。</p>
-      <p class="muted">暖月 v4.1 · 用一日三餐，好好照顾自己。</p>
+      <p class="muted">暖月 v4.3 · 用一日三餐，好好照顾自己。</p>
     </div>`;
 }
 

@@ -790,8 +790,8 @@ function recipeFormHTML(recipe) {
     tips: ''
   };
   const stages = new Set(r.stages || []);
-  const images = ['auto', ...(A.recipeImages || [])];
   const imageValue = r.image || 'auto';
+  const images = [...new Set(['auto', imageValue, ...(A.recipeImages || [])])];
   return `
     <form class="adm-form" data-form="recipe" data-id="${esc(r.id || '')}">
       ${modalHead(recipe ? '编辑菜品' : '新增菜品', recipe ? '保存后立即同步到前台' : '新菜品默认上架，可随时下架')}
@@ -827,11 +827,21 @@ function recipeFormHTML(recipe) {
           <label class="adm-field"><span>价格（元）</span><input name="price" type="number" min="0" max="999" step="0.01" value="${Number(r.price) || 0}" /></label>
         </div>
         <div class="adm-grid-2">
-          <label class="adm-field"><span>菜品图片</span>
-            <select name="image">
-              ${images.map((img) => `<option value="${esc(img)}" ${imageValue === img ? 'selected' : ''}>${img === 'auto' ? '按菜名自动匹配' : img.replace('/images/', '')}</option>`).join('')}
-            </select>
-          </label>
+          <div class="adm-field"><span>菜品图片</span>
+            <div class="adm-image-edit">
+              <img id="adm-image-preview" src="${esc(imageValue === 'auto' ? '/images/main.jpg' : imageValue)}" alt="" />
+              <div class="adm-image-side">
+                <select name="image" id="adm-image-select" data-image-select>
+                  ${images.map((img) => `<option value="${esc(img)}" ${imageValue === img ? 'selected' : ''}>${img === 'auto' ? '按菜名自动匹配' : img.startsWith('/uploads/') ? '已上传图片' : img.includes('/dishes/') ? `专属图 ${img.replace('/images/dishes/', '')}` : img.replace('/images/', '')}</option>`).join('')}
+                </select>
+                <div class="adm-image-actions">
+                  <button type="button" class="adm-btn adm-btn-sm" data-action="pick-recipe-image">上传图片</button>
+                  <small class="adm-muted">JPG / PNG / WebP，≤5MB</small>
+                </div>
+                <input type="file" id="adm-recipe-image-file" accept="image/jpeg,image/png,image/webp" hidden />
+              </div>
+            </div>
+          </div>
           <div class="adm-field"><span>上架状态</span>
             <label class="adm-toggle">
               <input type="checkbox" name="available" ${r.available !== false ? 'checked' : ''} />
@@ -892,6 +902,56 @@ function collectRecipePayload(form) {
     steps: String(fd.get('steps') || '').split('\n').map((s) => s.trim()).filter(Boolean),
     tips: String(fd.get('tips') || '').trim()
   };
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('读取图片失败'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadRecipeImage(file) {
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) throw new Error('图片最大 5MB');
+  const dataUrl = await readFileAsDataURL(file);
+  toast('正在上传图片…');
+  const data = await api('/admin/upload', { method: 'POST', body: { dataUrl } });
+  const select = $('#adm-image-select');
+  const preview = $('#adm-image-preview');
+  if (select) {
+    const option = document.createElement('option');
+    option.value = data.url;
+    option.textContent = '已上传图片';
+    select.appendChild(option);
+    select.value = data.url;
+  }
+  if (preview) preview.src = data.url;
+  toast('图片已上传，保存菜品后生效', 'success');
+}
+
+async function fetchArticleIntoForm(btn) {
+  const form = btn.closest('form');
+  const url = String(form?.elements?.sourceUrl?.value || '').trim();
+  if (!url) throw new Error('请先粘贴文章链接');
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '抓取中…';
+  try {
+    const data = await api('/admin/articles/fetch', { method: 'POST', body: { url } });
+    const article = data.article;
+    if (form.elements.title) form.elements.title.value = article.title || '';
+    if (form.elements.summary) form.elements.summary.value = article.summary || '';
+    if (form.elements.tag) form.elements.tag.value = article.tag || '网络摘录';
+    if (form.elements.minutes) form.elements.minutes.value = article.minutes || 3;
+    if (form.elements.sections) form.elements.sections.value = sectionsToText(article.sections || []);
+    toast('已抓取正文，核对后点击保存文章', 'success');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = old;
+  }
 }
 
 async function saveRecipe(form) {
@@ -956,6 +1016,13 @@ function articleFormHTML(article) {
     <form class="adm-form" data-form="article" data-id="${esc(a.id || '')}">
       ${modalHead(article ? '编辑文章' : '新增文章', article ? '保存后立即同步到前台知识库' : '新文章默认上架')}
       <div class="adm-form-body">
+        <div class="adm-fetch-box">
+          <div class="adm-fetch-row">
+            <input name="sourceUrl" placeholder="粘贴文章链接，例如 https://..." autocomplete="off" />
+            <button type="button" class="adm-btn adm-btn-sm" data-action="fetch-article">抓取正文</button>
+          </div>
+          <p class="adm-muted">抓取结果会填入下方表单，核对内容与来源后再发布。</p>
+        </div>
         <label class="adm-field"><span>文章标题</span><input name="title" maxlength="60" required value="${esc(a.title || '')}" placeholder="例如：产后第一周怎么吃" /></label>
         <div class="adm-grid-3">
           <label class="adm-field"><span>标签</span><input name="tag" maxlength="20" value="${esc(a.tag || '')}" /></label>
@@ -1286,6 +1353,14 @@ function handleClick(event) {
     openModal(recipeFormHTML(null), true);
     return;
   }
+  if (action === 'pick-recipe-image') {
+    $('#adm-recipe-image-file')?.click();
+    return;
+  }
+  if (action === 'fetch-article') {
+    fetchArticleIntoForm(target).catch((err) => toast(err.message, 'error'));
+    return;
+  }
   if (action === 'edit-recipe') {
     const recipe = findRecipe(target.dataset.id);
     if (recipe) openModal(recipeFormHTML(recipe), true);
@@ -1391,6 +1466,19 @@ function handleChange(event) {
       const course = el.value;
       const box = $('#adm-slot-options');
       if (box) box.innerHTML = slotOptionsHTML(course, []);
+      return;
+    }
+    if (el.id === 'adm-recipe-image-file') {
+      uploadRecipeImage(el.files?.[0])
+        .catch((err) => toast(err.message, 'error'))
+        .finally(() => {
+          el.value = '';
+        });
+      return;
+    }
+    if (el.id === 'adm-image-select') {
+      const preview = $('#adm-image-preview');
+      if (preview && el.value !== 'auto') preview.src = el.value;
     }
     return;
   }

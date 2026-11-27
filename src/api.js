@@ -1,5 +1,9 @@
 'use strict';
 
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+
 const {
   getDb,
   save,
@@ -28,10 +32,13 @@ const {
 const { ARTICLE_MAP } = require('./data/articles');
 const { decorateRecipe, inferCategory, INGREDIENT_CATEGORIES } = require('./data/recipe-utils');
 const content = require('./content');
+const { fetchArticle } = require('./article-fetch');
 const planner = require('./planner');
 
 const DEMO_USERNAME = 'demo';
 const DEMO_PASSWORD = 'demo123456';
+const UPLOAD_DIR = path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data', 'uploads');
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 class ApiError extends Error {
   constructor(status, message, code) {
@@ -51,12 +58,12 @@ function sendJson(res, status, payload) {
   res.end(body);
 }
 
-function readJson(req) {
+function readJson(req, limit = 256 * 1024) {
   return new Promise((resolve, reject) => {
     let raw = '';
     req.on('data', (chunk) => {
       raw += chunk;
-      if (raw.length > 256 * 1024) {
+      if (raw.length > limit) {
         reject(new ApiError(413, '请求内容过大', 'PAYLOAD_TOO_LARGE'));
         req.destroy();
       }
@@ -1292,7 +1299,13 @@ function buildAdminRecipe(body, existing) {
   if (price < 0 || price > 999) throw new ApiError(400, '价格需在 0-999 元之间');
 
   const image = String(body.image ?? existing?.image ?? 'auto');
-  if (image !== 'auto' && !content.IMAGE_OPTIONS.includes(image)) throw new ApiError(400, '图片选项不正确');
+  const imageAllowed =
+    image === 'auto' ||
+    image === existing?.image ||
+    content.IMAGE_OPTIONS.includes(image) ||
+    /^\/images\/dishes\/[\w-]+\.jpg(\?v=\d+)?$/.test(image) ||
+    /^\/uploads\/[a-f0-9]{24}\.(jpg|png|webp)$/.test(image);
+  if (!imageAllowed) throw new ApiError(400, '图片选项不正确');
 
   const tags = body.tags !== undefined ? normalizeTags(body.tags) : existing?.tags || [];
   const ingredients =
@@ -1430,6 +1443,51 @@ async function handleAdminArticleDelete(req, res, id) {
   sendJson(res, 200, { ok: true });
 }
 
+function imageExtFromBuffer(buffer) {
+  if (buffer.length > 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return 'jpg';
+  if (buffer.length > 8 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
+    return 'png';
+  }
+  if (
+    buffer.length > 12 &&
+    buffer.toString('ascii', 0, 4) === 'RIFF' &&
+    buffer.toString('ascii', 8, 12) === 'WEBP'
+  ) {
+    return 'webp';
+  }
+  return null;
+}
+
+async function handleAdminUpload(req, res) {
+  requireAdmin(req);
+  const body = await readJson(req, 8 * 1024 * 1024);
+  const dataUrl = String(body.dataUrl || '');
+  const match = /^data:image\/(?:png|jpe?g|webp);base64,([A-Za-z0-9+/=\s]+)$/i.exec(dataUrl);
+  if (!match) throw new ApiError(400, '请上传 JPG / PNG / WebP 图片');
+  const buffer = Buffer.from(match[1].replace(/\s+/g, ''), 'base64');
+  if (!buffer.length) throw new ApiError(400, '图片内容为空');
+  if (buffer.length > MAX_IMAGE_BYTES) throw new ApiError(400, '图片最大 5MB');
+  const ext = imageExtFromBuffer(buffer);
+  if (!ext) throw new ApiError(400, '图片格式无法识别，请重新选择');
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  const name = `${crypto.randomBytes(12).toString('hex')}.${ext}`;
+  fs.writeFileSync(path.join(UPLOAD_DIR, name), buffer);
+  sendJson(res, 201, { url: `/uploads/${name}`, size: buffer.length });
+}
+
+async function handleAdminArticleFetch(req, res) {
+  requireAdmin(req);
+  const body = await readJson(req);
+  const url = String(body.url || '').trim();
+  if (!url) throw new ApiError(400, '请先粘贴文章链接');
+  try {
+    const article = await fetchArticle(url);
+    sendJson(res, 200, { article });
+  } catch (err) {
+    throw new ApiError(400, err.message || '抓取失败，请稍后再试');
+  }
+}
+
 async function handleAdminUsers(req, res) {
   requireAdmin(req);
   const users = getDb().users
@@ -1536,6 +1594,8 @@ async function handle(req, res, url) {
     if (path === '/api/admin/users' && method === 'GET') return await handleAdminUsers(req, res);
     if (path === '/api/admin/articles' && method === 'GET') return await handleAdminArticles(req, res);
     if (path === '/api/admin/articles' && method === 'POST') return await handleAdminArticleCreate(req, res);
+    if (path === '/api/admin/articles/fetch' && method === 'POST') return await handleAdminArticleFetch(req, res);
+    if (path === '/api/admin/upload' && method === 'POST') return await handleAdminUpload(req, res);
 
     const adminRecipeStatus = path.match(/^\/api\/admin\/recipes\/([\w-]+)\/status$/);
     if (adminRecipeStatus && method === 'PATCH') return await handleAdminRecipeStatus(req, res, adminRecipeStatus[1]);

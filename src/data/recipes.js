@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('node:fs');
+const path = require('node:path');
+
 /**
  * 月子餐食谱库。
  * course: staple 主食 / main 主菜 / veg 蔬菜 / soup 汤羹 / snack 加餐
@@ -1524,7 +1527,13 @@ const RAW = [
   }
 ];
 
+const DISH_IMAGE_DIR = path.join(__dirname, '..', '..', 'public', 'images', 'dishes');
+
 function imageForRecipe(r) {
+  if (r.id) {
+    const dishImage = path.join(DISH_IMAGE_DIR, `${r.id}.jpg`);
+    if (fs.existsSync(dishImage)) return `/images/dishes/${r.id}.jpg`;
+  }
   const n = r.name;
   if (r.course === 'staple') {
     if (/面|馄饨|云吞/.test(n)) return '/images/noodle.jpg';

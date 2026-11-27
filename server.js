@@ -9,6 +9,8 @@ const { createApi } = require('./src/api');
 const PORT = Number(process.env.PORT || 8000);
 const HOST = '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
+const UPLOAD_DIR = path.join(process.env.TMPDIR || '/tmp', 'nuanyue-data', 'uploads');
+const UPLOAD_NAME = /^[a-f0-9]{24}\.(jpg|png|webp)$/;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -97,6 +99,17 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === '/admin' || url.pathname === '/admin/') {
     sendFile(req, res, path.join(PUBLIC_DIR, 'admin.html'));
+    return;
+  }
+
+  if (url.pathname.startsWith('/uploads/')) {
+    const name = url.pathname.slice('/uploads/'.length);
+    const file = UPLOAD_NAME.test(name) ? path.join(UPLOAD_DIR, name) : '';
+    if (!file || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not Found');
+      return;
+    }
+    sendFile(req, res, file);
     return;
   }
 

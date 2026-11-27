@@ -1,0 +1,2122 @@
+{
+  "s01": {
+    "name": "小米南瓜粥",
+    "signature": "cf1e2827a9e5999e114506aff134df6bf7d3ad1e",
+    "source": "http://www.xiachufang.com/dish/142685377/",
+    "imageUrl": "https://i2.chuimg.com/81d0c7d9d1af4a55b3442a96fe7b5cf4_1215w_1410h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 53956,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:37.565Z"
+  },
+  "s02": {
+    "name": "红枣小米粥",
+    "signature": "bd8f991c96685dc0673267ca147684e698b5a7d6",
+    "source": "http://www.xiachufang.com/dish/134299760/",
+    "imageUrl": "https://i2.chuimg.com/4ed69e80927a48e4b296062d1dfd58a8_1440w_2160h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 45459,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:37.858Z"
+  },
+  "s03": {
+    "name": "山药枸杞粥",
+    "signature": "9fc8ae16957cd02bf9cff73607d11712770bcc17",
+    "source": "http://www.sohu.com/a/800810704_122008955",
+    "imageUrl": "",
+    "bytes": 16656,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  },
+  "s04": {
+    "name": "燕麦牛奶粥",
+    "signature": "25cbd43d2154b1ea5ec163b9b7ac7c4def225eea",
+    "source": "https://www.xiachufang.com/recipe/104177816/",
+    "imageUrl": "https://i2.chuimg.com/c865d7003dc74bc0ab415507fddc085d_1145w_1145h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 35476,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:39.026Z"
+  },
+  "s06": {
+    "name": "青菜鸡丝面",
+    "signature": "27c1cfd1a855151027f93e57d4df33da3e1c20b2",
+    "source": "http://www.xiachufang.com/dish/131543190/",
+    "imageUrl": "https://i2.chuimg.com/95382d19086144a2b2f5b2b5a5507062_960w_1280h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 69031,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:40.254Z"
+  },
+  "s05": {
+    "name": "紫薯小米粥",
+    "signature": "19547cd7f3c15f5e44d24fb7718e917e1707e7a7",
+    "source": "https://m.xiachufang.com/recipe/1012201/",
+    "imageUrl": "https://i2.chuimg.com/b412fa8c874c11e6b87c0242ac110003_2592w_1728h.jpg?imageView2/1/w/640/h/520/q/90/format/jpg",
+    "bytes": 68942,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:40.433Z"
+  },
+  "s07": {
+    "name": "鲜肉小馄饨",
+    "signature": "e3ba4b48fcfd4c648bfb27d4dc1fa59ccd355a9a",
+    "source": "http://mwx.douguo.com/recipe/imgs/3129774?isapp=-1&step=6&usc=.html.html.html.html",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/d/f/2/600_df91a3564939c920cebdd9772084efc2.jpg",
+    "bytes": 89457,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:41.319Z"
+  },
+  "s08": {
+    "name": "红豆花生粥",
+    "signature": "e349e4fc705d6d1a9071c45e97c06945f60bfc53",
+    "source": "https://www.xiachufang.com/recipe/106589894/",
+    "imageUrl": "https://i2.chuimg.com/a2f51b1904ec4a409d784946e0c7d96d_750w_1000h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 71546,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:41.871Z"
+  },
+  "s10": {
+    "name": "软米饭",
+    "signature": "450c52dd8a8d5d9597dba4546820237af679213b",
+    "source": "http://mwx.douguo.com/recipe/imgs/1611210?step=3&amp;isapp=-1",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/4/5/c/600_457e00b0d148eb7144bd822eaeb02dfc.jpg",
+    "bytes": 55316,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:43.012Z"
+  },
+  "s09": {
+    "name": "杂粮饭",
+    "signature": "8a8a8962346846cab938350a91141cc34fcefad0",
+    "source": "https://m.xiachufang.com/recipe/106712688/",
+    "imageUrl": "https://i2.chuimg.com/13c9ca6622364cb695a951dea4712f27_1280w_1483h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 83798,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:43.185Z"
+  },
+  "s11": {
+    "name": "紫薯糙米饭",
+    "signature": "9c76494ff91f324d3fc7e8629bbf9efaca1552c8",
+    "source": "https://m.xiachufang.com/recipe/103739023/",
+    "imageUrl": "https://i2.chuimg.com/8b3bfe2239b443fea67b15e9ab4cfe15_1008w_756h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 88596,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:44.550Z"
+  },
+  "s12": {
+    "name": "鸡汤细面",
+    "signature": "8ce8c5eb0a4536021feb66103495d3ee2ee909ee",
+    "source": "http://www.sohu.com/a/403941081_349194",
+    "imageUrl": "http://p7.itc.cn/q_70/images03/20200624/e37baaa49e004448ad97b0ecbc28b7be.jpeg",
+    "bytes": 45680,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:44.640Z"
+  },
+  "s13": {
+    "name": "藜麦饭",
+    "signature": "3470041ab79ef9418808ab70687c596ada678088",
+    "source": "https://m.xiachufang.com/recipe/102915584/",
+    "imageUrl": "https://i2.chuimg.com/f6fc9e0c77fb4e3bab01ce68c58b3deb_1280w_750h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 77879,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:45.942Z"
+  },
+  "s14": {
+    "name": "山药小米饭",
+    "signature": "4bb3bac8edacd5e87d0dc56eda0a0297b1be1933",
+    "source": "http://baijiahao.baidu.com/s?id=1703646395959850636",
+    "imageUrl": "",
+    "bytes": 18130,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  },
+  "s15": {
+    "name": "黑米红枣粥",
+    "signature": "da7fb318c4800475711f1154d4e879e44f6d2570",
+    "source": "https://m.xiachufang.com/recipe/102127128/",
+    "imageUrl": "https://i2.chuimg.com/4935560091c511e6a9a10242ac110002_2080w_1560h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 47965,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:47.097Z"
+  },
+  "s16": {
+    "name": "菠菜猪肝粥",
+    "signature": "78de2bbe1e20f4ceaf8b633536fe6849cd58738d",
+    "source": "http://www.xiachufang.com/dish/801889/",
+    "imageUrl": "http://i2.chuimg.com/adebd0308e3411e5b175e0db5512b208.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 50197,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:47.513Z"
+  },
+  "s17": {
+    "name": "虾仁蔬菜面",
+    "signature": "8122d97a00f9770adf73b51320712fa2daed5d5c",
+    "source": "http://www.xiachufang.com/recipe/106630160/",
+    "imageUrl": "https://i2.chuimg.com/f612ee1ae48f4c84bc76e37391fddae7_1155w_865h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 75290,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:48.617Z"
+  },
+  "s18": {
+    "name": "南瓜糙米饭",
+    "signature": "0496a57355b2ad1646cb6f21d7f8f7b2f46880c7",
+    "source": "https://m.xiachufang.com/recipe/102867389/",
+    "imageUrl": "https://i2.chuimg.com/aa93ed8c04444c7f8ce9752134b3c1fc_680w_680h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 63902,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:49.552Z"
+  },
+  "s19": {
+    "name": "鸡肉香菇蒸饺",
+    "signature": "270a52bd29055faea8ae6a0b655b7a7691f248d0",
+    "source": "https://www.xiachufang.com/recipe/104041606/",
+    "imageUrl": "https://i2.chuimg.com/5cf252724eb3476fb30a090c7aa2db35_864w_879h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 53012,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:49.982Z"
+  },
+  "s20": {
+    "name": "红豆紫米饭",
+    "signature": "9bec280b8023306afe3373e4520344667f7bf6d6",
+    "source": "https://m.xiachufang.com/recipe/102260799/",
+    "imageUrl": "http://i2.chuimg.com/55328e4e21eb11e7947d0242ac110002_1992w_2656h.jpg?imageView2/1/w/720/h/440/interlace/1/q/90",
+    "bytes": 40661,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:50.916Z"
+  },
+  "m01": {
+    "name": "水煮蛋",
+    "signature": "c6a90948a7102d8f4e87416a92d1df9bca7955c5",
+    "source": "https://m.xiachufang.com/recipe/102970686/",
+    "imageUrl": "https://i2.chuimg.com/28a754a598a54edf9cc925ac210ee830_2448w_3264h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 37599,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:51.186Z"
+  },
+  "m02": {
+    "name": "蒸蛋羹",
+    "signature": "152b6611a7b0e9c989ec97525bf1b3bcfdbd3757",
+    "source": "http://www.xiachufang.com/dish/115805214/",
+    "imageUrl": "http://s1.cdn.xiachufang.com/27484940051011e6a7c20321546f8812.jpg@2o_50sh_1pr_1l_600w_90q_1wh.jpg",
+    "bytes": 41434,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:52.337Z"
+  },
+  "m03": {
+    "name": "虾仁蒸蛋",
+    "signature": "677013ae13cf3d9ea4b34c7d9ba2b27bc433b705",
+    "source": "http://www.xiachufang.com/recipe/100533549/",
+    "imageUrl": "https://i2.chuimg.com/a8db8f2c894911e6a9a10242ac110002_750w_750h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 70322,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:52.981Z"
+  },
+  "m04": {
+    "name": "番茄炒蛋",
+    "signature": "d8dc861c5eb491ca37896b737dd9f539837384df",
+    "source": "https://m.xiachufang.com/recipe/102417386/",
+    "imageUrl": "https://i2.chuimg.com/4ac3df2f4d614f6982de76fde1cd3eee_2448w_1836h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 91199,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:53.608Z"
+  },
+  "m05": {
+    "name": "菠菜炒蛋",
+    "signature": "93c0cd710cdcce505ce8b88fa6accaed1e04b0b2",
+    "source": "https://www.xiachufang.com/dish/170391622/",
+    "imageUrl": "https://i2.chuimg.com/4e13b063af39458ebf6867ac12acce8f_960w_1200h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 90640,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:54.429Z"
+  },
+  "m06": {
+    "name": "清蒸鲈鱼",
+    "signature": "ca3ba555fca937d2e3d8667b386d0048152968ac",
+    "source": "https://m.xiachufang.com/recipe/102771352/",
+    "imageUrl": "https://i2.chuimg.com/67b1a0830af24fafb57e4f7834aee724_1599w_1062h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 159306,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:54.975Z"
+  },
+  "m08": {
+    "name": "香菇滑鸡",
+    "signature": "4407b697a13b1fc56ad6d42622e2fe5715a5a249",
+    "source": "http://mwx.douguo.com/recipe/imgs/1707966?f=sx%3B.html&step=9",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/1/4/4/600_1427b616488c7a2a7e125b65b6c39324.jpeg",
+    "bytes": 91798,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:55.974Z"
+  },
+  "m07": {
+    "name": "清蒸鳕鱼",
+    "signature": "f94697ae964a9998a1ebc66087750445ad5b109f",
+    "source": "http://www.xiachufang.com/dish/132213298/",
+    "imageUrl": "https://i2.chuimg.com/38668704cedb48578aaffd2abceae5e9_1280w_1280h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 71789,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:56.444Z"
+  },
+  "m09": {
+    "name": "山药炖排骨",
+    "signature": "9b77679a34efba0fe764908b3abffaeddbcb6b09",
+    "source": "http://www.xiachufang.com/dish/182170873/",
+    "imageUrl": "https://i2.chuimg.com/4fb434002bb54a9cbc8f28859f16dc4a_864w_864h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 61900,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:57.152Z"
+  },
+  "m10": {
+    "name": "菠菜猪肝",
+    "signature": "40b93df1336a38984fb6bd7e1fdfc6b9d0cbd029",
+    "source": "https://m.xiachufang.com/recipe/100432498/",
+    "imageUrl": "https://i2.chuimg.com/b97ef2e88ff111e6a9a10242ac110002_800w_530h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 85624,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:58.079Z"
+  },
+  "m11": {
+    "name": "肉末豆腐",
+    "signature": "27414c0252ecd2a53318df48424143b10e796cd8",
+    "source": "http://mwx.douguo.com/recipe/imgs/3289066?ssc=.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html&step=2",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/a/3/8/600_a3b44e46ae776819ac61f5a11e088678.jpeg",
+    "bytes": 123698,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:58.278Z"
+  },
+  "m12": {
+    "name": "虾仁滑蛋",
+    "signature": "b026c457e3f0d0b7ea37c1819dd58e2228a4a71e",
+    "source": "https://m.xiachufang.com/recipe/102819338/",
+    "imageUrl": "https://i2.chuimg.com/eadf6dac5e6e4afea861416b8f0ba706_640w_960h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 74493,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:59.545Z"
+  },
+  "m13": {
+    "name": "麻油鸡",
+    "signature": "c3dfc323bb359daf37d877c2ab82f648780c4813",
+    "source": "https://www.xiachufang.com/recipe/103711965/",
+    "imageUrl": "https://i2.chuimg.com/b316627ee05a4cbd9cf04b08ca377d8a_1000w_750h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 74113,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:02:59.871Z"
+  },
+  "m14": {
+    "name": "番茄牛腩",
+    "signature": "7595e4c80ef484257ff5cad3bd37430bea4eb636",
+    "source": "https://m.xiachufang.com/recipe/106084470/",
+    "imageUrl": "https://i2.chuimg.com/228b1b95224a4b65af6df655ff24e85b_684w_912h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 92051,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:00.706Z"
+  },
+  "m15": {
+    "name": "杜仲腰花",
+    "signature": "0e506f23e1724b29c76ba62cd65ec969a8f04fb5",
+    "source": "http://www.meishij.net/zuofa/duzhongdunyaohua_3.html",
+    "imageUrl": "http://s1.ig.meishij.net/p/20090915/5803602550e8c08e66be90a0b39869de.jpg",
+    "bytes": 76824,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:01.842Z"
+  },
+  "m16": {
+    "name": "板栗烧鸡",
+    "signature": "e83d8f966ed10967d4418193ef88eecb17600d05",
+    "source": "https://www.xiachufang.com/recipe/107106148/",
+    "imageUrl": "https://i2.chuimg.com/034ed28394db4dc7bc6d106c1be83b3a_1920w_1080h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 56960,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:02.351Z"
+  },
+  "m17": {
+    "name": "清炖羊肉萝卜",
+    "signature": "ae717cdaaf1a4d54afd6a6965688ddc60c7d1ea0",
+    "source": "https://www.xiachufang.com/dish/188075879/",
+    "imageUrl": "https://i2.chuimg.com/3a7b733a9fe84545acd4f7df3698a88b_1280w_2266h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 66511,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:03.415Z"
+  },
+  "m18": {
+    "name": "黄花菜蒸鸡",
+    "signature": "b61a844a575f4af33575b2c0d93c1b022c6a9dfa",
+    "source": "https://m.xiachufang.com/recipe/100557829/",
+    "imageUrl": "https://i2.chuimg.com/899137cc685311e7947d0242ac110002_1280w_1023h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 109214,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:03.988Z"
+  },
+  "m19": {
+    "name": "莲藕蒸肉饼",
+    "signature": "30aac55c732557eba93200cb2bf7e3fbec2ae80e",
+    "source": "http://www.xiachufang.com/recipe/107498854/",
+    "imageUrl": "https://i2.chuimg.com/af0f99f12768423ebe01bb3ce78233f6_1920w_2560h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 84391,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:05.253Z"
+  },
+  "m20": {
+    "name": "红烧牛肉土豆",
+    "signature": "df6c7a4f611c78fb8efeab1f1f3910e433d70c4f",
+    "source": "https://www.xiachufang.com/recipe/102837597/",
+    "imageUrl": "https://i2.chuimg.com/eea3d6a1749445c0999e0c7369a027e9_3024w_3024h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 94857,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:05.399Z"
+  },
+  "m22": {
+    "name": "香煎鸡胸配西兰花",
+    "signature": "5cacd58095cf7ac594ea283f4f11e3dc214461c3",
+    "source": "https://www.xiachufang.com/recipe/103015714/",
+    "imageUrl": "https://i2.chuimg.com/5df21974ff044ad7b7287352628649cd_2050w_1535h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 122750,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:06.765Z"
+  },
+  "m21": {
+    "name": "三文鱼炒时蔬",
+    "signature": "af9d27a943cf9c0fd0eb06f11fe8f3566ea0e8a8",
+    "source": "http://www.xiachufang.com/dish/144067298/",
+    "imageUrl": "https://i2.chuimg.com/5a77ba17f6f14b9093475207f453dd80_960w_1200h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 85980,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:06.838Z"
+  },
+  "m24": {
+    "name": "番茄炖豆腐",
+    "signature": "8215369233d4313ff1327eb9052536943de1f1f3",
+    "source": "http://mwx.douguo.com/recipe/imgs/2167217?step=8&usc=.html.html.html.html.html.html.html.html",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/9/5/e/600_95d71d7365fb94b02a6dfded4093af3e.jpeg",
+    "bytes": 133931,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:08.038Z"
+  },
+  "m23": {
+    "name": "香菇烧豆腐",
+    "signature": "630a818dc17061d5d8ab801b50cbabd25668d26f",
+    "source": "https://m.xiachufang.com/recipe/104388727/",
+    "imageUrl": "https://i2.chuimg.com/b38993347b7b458fa2ef5fd05849f572_684w_912h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 85584,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:08.210Z"
+  },
+  "m26": {
+    "name": "腰果西芹",
+    "signature": "f164b8950a051f17c149ce0db0c27d81d84c039d",
+    "source": "http://www.xiachufang.com/recipe/103450449/",
+    "imageUrl": "https://i2.chuimg.com/fba9cec2025f4703b136ebfad1df2fc6_1280w_1023h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 62161,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:09.359Z"
+  },
+  "m25": {
+    "name": "彩椒炒豆干",
+    "signature": "7d4270e90aafe4442ee7eb77ee49b24caa5208ff",
+    "source": "http://www.xiachufang.com/recipe/103370222/",
+    "imageUrl": "https://i2.chuimg.com/90ec62847f5944c484bb3b028523799c_1696w_1708h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 87316,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:09.425Z"
+  },
+  "m31": {
+    "name": "清炒山药木耳",
+    "signature": "6c5a6a6b59b3ac104b3aea11db5ea4b0f9e48798",
+    "source": "http://www.xiachufang.com/dish/106519289/",
+    "imageUrl": "http://i3.xiachufang.com/image/600/e2324ae4c3da11e4b870e0db5512b208.jpg",
+    "bytes": 59081,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:10.762Z"
+  },
+  "m27": {
+    "name": "素炒三菇",
+    "signature": "57fdc9841837928461f3a204696b8701acc28b16",
+    "source": "http://www.douguo.com/cookbook/2980841",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/c/7/9/yuan_c7439eade8d79f76b2dd1e08e07457d9.jpeg",
+    "bytes": 92655,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:11.262Z"
+  },
+  "m28": {
+    "name": "香煎山药饼",
+    "signature": "b99530908c99b158b044e4c3dc4c12723a51c0d9",
+    "source": "https://m.xiachufang.com/recipe/103792016/",
+    "imageUrl": "https://i2.chuimg.com/8a33fa8d37b2431ba7c0e30d4d929a01_2335w_1732h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 148476,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:12.301Z"
+  },
+  "m29": {
+    "name": "素烧豆腐青菜",
+    "signature": "b074649155dfcd1f87e011eeb99935ba3d719ca3",
+    "source": "https://m.xiachufang.com/recipe/103854996/",
+    "imageUrl": "https://i2.chuimg.com/4da65b6f6ee64d99bfd701107fb904e6_754w_889h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 83661,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:12.517Z"
+  },
+  "m32": {
+    "name": "芦笋炒虾仁",
+    "signature": "6e55ed5b356ef2659953f90f328f5d8883c5f982",
+    "source": "http://www.xiachufang.com/dish/109330433/",
+    "imageUrl": "https://i2.chuimg.com/a99e9680ac0d11e5abd5b82a72e00100.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 74619,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:13.992Z"
+  },
+  "m30": {
+    "name": "鸡丝拌菠菜",
+    "signature": "a46fc0c1a8263c63038f05ae356a67ff7f39a10f",
+    "source": "http://www.sohu.com/a/426592110_648571",
+    "imageUrl": "http://p4.itc.cn/images01/20201022/a2f2ff688ca34cf692c8be3543e7ef53.jpeg",
+    "bytes": 85482,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:14.855Z"
+  },
+  "m33": {
+    "name": "番茄龙利鱼",
+    "signature": "b9afb5e233513c0ea53fa78d50a5853b6615bc3c",
+    "source": "http://www.xiachufang.com/recipe/101937008/",
+    "imageUrl": "https://i2.chuimg.com/f7992e328bae11e6b87c0242ac110003_1080w_1300h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 74602,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:15.462Z"
+  },
+  "m34": {
+    "name": "土豆炖鸡块",
+    "signature": "e9c07fc20ab7f5b4f5d662bdc94540a1fa6c0c42",
+    "source": "https://www.xiachufang.com/dish/141891763/",
+    "imageUrl": "https://i2.chuimg.com/2fb053e2910341c99621a0ed173d2c69_960w_1280h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 81488,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:16.378Z"
+  },
+  "m35": {
+    "name": "萝卜炖牛肉",
+    "signature": "24d5f88efca5f1a710c6f8f2b65fdc61ed1cb517",
+    "source": "http://www.xiachufang.com/recipe/102840901/",
+    "imageUrl": "https://i2.chuimg.com/4fa18c4ebd944e80a49f274c710d1dca_660w_660h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 88132,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:17.294Z"
+  },
+  "m36": {
+    "name": "蒜香蒸排骨",
+    "signature": "92fc7b004bf00feab8e0e08a250fc815b7f22855",
+    "source": "https://m.xiachufang.com/recipe/102215076/",
+    "imageUrl": "https://i2.chuimg.com/395973aafbd911e6947d0242ac110002_1000w_1500h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 135903,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:18.629Z"
+  },
+  "m37": {
+    "name": "香菇牛肉饼",
+    "signature": "d58bdb76fb77d00b75b5db4a1a8d11c0b95fe102",
+    "source": "https://www.xiachufang.com/recipe/102292710/",
+    "imageUrl": "https://i2.chuimg.com/46281ae03db611e7947d0242ac110002_4032w_3024h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 116749,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:18.740Z"
+  },
+  "m38": {
+    "name": "清蒸鸡腿",
+    "signature": "bf23f9eb613f1131961ce9b2e870225f8214c541",
+    "source": "https://www.xiachufang.com/recipe/102290527/",
+    "imageUrl": "https://i2.chuimg.com/146832a03b7311e7947d0242ac110002_1280w_960h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 81248,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:19.909Z"
+  },
+  "m39": {
+    "name": "虾仁豆腐煲",
+    "signature": "58ac78878359a393e657180ee6ea3b6369411adb",
+    "source": "http://www.xiachufang.com/recipe/100447513/",
+    "imageUrl": "https://i2.chuimg.com/a3ed9a7088d911e6b87c0242ac110003_640w_640h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 67821,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:20.394Z"
+  },
+  "m40": {
+    "name": "五彩鸡丁",
+    "signature": "0147b1bbae269d9237f0a3b28d58db5bd6910497",
+    "source": "http://www.xiachufang.com/recipe/103471745",
+    "imageUrl": "https://i2.chuimg.com/79ff1d6442824ef39435fdc5c111703d_778w_724h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 77165,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:21.128Z"
+  },
+  "m41": {
+    "name": "清蒸鲳鱼",
+    "signature": "c229faa288995f7a70a1407b47b388e845bc3869",
+    "source": "https://www.xiachufang.com/recipe/106629514/",
+    "imageUrl": "https://i2.chuimg.com/ba7352fbb17644b1a2842e57024525e8_976w_732h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 78085,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:22.006Z"
+  },
+  "v01": {
+    "name": "清炒西兰花",
+    "signature": "0b6075767f59a4e49fe6e19f7d12ca8ab267582b",
+    "source": "http://www.xiachufang.com/dish/140578567/",
+    "imageUrl": "https://i2.chuimg.com/b6e4b96a66484260882d73c828fddd4e_1280w_1280h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 83338,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:22.546Z"
+  },
+  "v02": {
+    "name": "蒜蓉菠菜",
+    "signature": "4d47a827212a33dead93dc0911f09188c12b93b4",
+    "source": "https://www.xiachufang.com/dish/149968274/",
+    "imageUrl": "https://i2.chuimg.com/83aa8203a3f7481c82f01b29ecbb3fa8_1080w_810h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 92273,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:23.356Z"
+  },
+  "v03": {
+    "name": "上汤娃娃菜",
+    "signature": "0dc16b512065abcca6fc8cb4f1669ebede2336a4",
+    "source": "http://mwx.douguo.com/recipe/imgs/2059822?step=7&usc=.html.html.html.html.html.html.html.html.html.html.html",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/b/6/3/600_b6372b976b80b2e872673e5ce3c7af93.jpg",
+    "bytes": 82160,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:23.366Z"
+  },
+  "v05": {
+    "name": "香菇油菜",
+    "signature": "fabefbf18fc781e4bf1b0463d00bb576a36f02a0",
+    "source": "http://mwx.douguo.com/recipe/imgs/2462303?isapp=-1.html.html.html.html.html&step=3",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/5/6/a/600_56730cccadb310e4d7799969ced0fb0a.jpg",
+    "bytes": 84647,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:24.858Z"
+  },
+  "v04": {
+    "name": "清炒时蔬",
+    "signature": "029b9aa15aca01a6c4fb3c5d80d9ae459c98ce8b",
+    "source": "http://www.xiachufang.com/dish/144226181/",
+    "imageUrl": "https://i2.chuimg.com/90f9f136330b409d8aa732f9570a8c78_852w_640h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 86748,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:24.862Z"
+  },
+  "v06": {
+    "name": "清炒芦笋",
+    "signature": "acba626059e45c0cbbe8af964e1b726595d2ebf3",
+    "source": "http://www.xiachufang.com/dish/107650401/",
+    "imageUrl": "https://i2.chuimg.com/dcc585faa5d211e59c77d109717a7d91.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 96458,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:26.249Z"
+  },
+  "v07": {
+    "name": "蒸南瓜",
+    "signature": "7816ce2fda6e8ece1d5f532f8bbe1d9c9a99986a",
+    "source": "http://www.xiachufang.com/dish/134083304/",
+    "imageUrl": "https://i2.chuimg.com/52a019a227a349918083ea599a2866ce_1080w_1080h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 59721,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:26.312Z"
+  },
+  "v09": {
+    "name": "清炒莴笋",
+    "signature": "ba22ebe73b1b6efb158b97cd64ca286f771d7b8a",
+    "source": "http://www.xiachufang.com/dish/116641063/",
+    "imageUrl": "https://i2.chuimg.com/b8b714661bee11e69507230a47ea6e6e.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 72701,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:27.903Z"
+  },
+  "v08": {
+    "name": "胡萝卜炒木耳",
+    "signature": "8c03378cf9c5f3d3192784fa6d230fe484077d8d",
+    "source": "http://mwx.douguo.com/recipe/imgs/2300682?step=7",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/8/e/9/600_8ea4247e78d7b5e358ba527f55cc3069.jpg",
+    "bytes": 130507,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:28.915Z"
+  },
+  "v10": {
+    "name": "蒜蓉丝瓜",
+    "signature": "7ecfb9e0af02664e6511bf05594ff56095d1a60e",
+    "source": "https://m.xiachufang.com/recipe/102784874/",
+    "imageUrl": "https://i2.chuimg.com/3c785e5049b741978f81262bf9b0bee7_1000w_1506h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 105608,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:29.192Z"
+  },
+  "v11": {
+    "name": "手撕包菜",
+    "signature": "ec851921727bcdf874f846e1193467b35a67d2c2",
+    "source": "https://m.xiachufang.com/recipe/102771039/",
+    "imageUrl": "https://i2.chuimg.com/4234738af24348db8bd1c7bae9c0657b_768w_1024h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 52276,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:30.436Z"
+  },
+  "v12": {
+    "name": "番茄烩西葫芦",
+    "signature": "2a1ce2bcabdce104c8130198b452e887b8d58664",
+    "source": "http://www.xiachufang.com/dish/104118487/",
+    "imageUrl": "http://s2.cdn.xiachufang.com/553a7cd69afa11e58d24e0db5512b208.jpg?imageView2/2/w/600/interlace/1/q/90/format/jpg/.jpg",
+    "bytes": 85193,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:30.799Z"
+  },
+  "v13": {
+    "name": "清炒秋葵",
+    "signature": "268a993599ae8198271de5c2987f1b4b5d72ebb1",
+    "source": "http://www.xiachufang.com/dish/118464872/",
+    "imageUrl": "https://i2.chuimg.com/b946704f4f1411e68dcdedec14d825a8.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 74170,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:32.186Z"
+  },
+  "v14": {
+    "name": "蒜蓉茼蒿",
+    "signature": "4d91d3a524afaae8cdf9730e7654d2609d919317",
+    "source": "https://www.xiachufang.com/recipe/106604046/",
+    "imageUrl": "https://i2.chuimg.com/56e5203aa2dc490ebdef555c225558f1_1280w_958h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 90025,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:32.331Z"
+  },
+  "v15": {
+    "name": "五彩时蔬",
+    "signature": "3fb7f41efde200ab0985f4257c08107e58d18190",
+    "source": "https://m.xiachufang.com/recipe/100518628/",
+    "imageUrl": "https://i2.chuimg.com/1429a8d293b211e6b87c0242ac110003_2448w_2448h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 79500,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:33.456Z"
+  },
+  "v16": {
+    "name": "醋溜藕片",
+    "signature": "a8be8072ac9b4f64aaabafe95919af27d9542aec",
+    "source": "https://www.xiachufang.com/recipe/103501496/",
+    "imageUrl": "https://i2.chuimg.com/f45432f5aa0c4fc19ce96cfdee6e3174_1632w_1224h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 56142,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:34.034Z"
+  },
+  "v17": {
+    "name": "清炒荷兰豆",
+    "signature": "65b5164c29b75c63ba584d7db896939bb7a855ef",
+    "source": "https://www.xiachufang.com/recipe/104412254/",
+    "imageUrl": "https://i2.chuimg.com/352e3f79e27442929026c80cb893bfa2_1080w_864h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 61719,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:34.697Z"
+  },
+  "p02": {
+    "name": "山药鸡汤",
+    "signature": "75111384ff9d22a65c9b8ca855dd74c4ba707efa",
+    "source": "http://www.xiachufang.com/dish/123708979/",
+    "imageUrl": "https://i2.chuimg.com/46cd046ed63811e6947d0242ac110002_1080w_1080h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 46971,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:36.008Z"
+  },
+  "p01": {
+    "name": "鲫鱼豆腐汤",
+    "signature": "d56d6674523bcaf5dc40731511f0a090ec311f7f",
+    "source": "http://www.xiachufang.com/dish/138157201/",
+    "imageUrl": "https://i2.chuimg.com/82482f822cf44a508a2189c6485801a5_1024w_1280h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 43130,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:36.516Z"
+  },
+  "p03": {
+    "name": "冬瓜排骨汤",
+    "signature": "a324a3c4a3627f7ac97a801de8bc6816aa6c3297",
+    "source": "https://www.xiachufang.com/dish/134917237/",
+    "imageUrl": "https://i2.chuimg.com/eabea466989d47f9ad9569af6896a1c6_1280w_1009h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 47153,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:37.409Z"
+  },
+  "p04": {
+    "name": "紫菜蛋花汤",
+    "signature": "a06b8c3bcdd179af291687e99057a9a4f3428180",
+    "source": "http://www.xiachufang.com/dish/103995077/",
+    "imageUrl": "https://i2.chuimg.com/c9c8eb079ab111e5a233bf2a3a21b46a.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 82322,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:38.192Z"
+  },
+  "p05": {
+    "name": "丝瓜蛋汤",
+    "signature": "7a17838cc0f826b46c0de001ca2beca4498d9924",
+    "source": "http://www.xiachufang.com/dish/110239552/",
+    "imageUrl": "https://i2.chuimg.com/27e3877aaf9811e5ad2ae0db5512b208.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 48481,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:39.035Z"
+  },
+  "p06": {
+    "name": "莲藕花生排骨汤",
+    "signature": "901a2e640aa8dd8876b9d0ae8e8db6b1ca3523f9",
+    "source": "https://www.xiachufang.com/recipe/104418164/",
+    "imageUrl": "https://i2.chuimg.com/a33b655e0ace46f79fe467fc022b3a5d_650w_519h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 64924,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:39.356Z"
+  },
+  "p07": {
+    "name": "猪蹄花生汤",
+    "signature": "154d2cee2abd8d7d96073fcd0ebe564df241d644",
+    "source": "http://mbdbj.xiachufang.com/recipe/100592272/",
+    "imageUrl": "https://i2.chuimg.com/d7ca237a89c611e6a9a10242ac110002_2048w_1536h.jpg?imageView2/2/interlace/1/q/75",
+    "bytes": 52482,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:40.750Z"
+  },
+  "p09": {
+    "name": "红枣乌鸡汤",
+    "signature": "9a61355f40c59ea12165d6d205701cc962f1ec09",
+    "source": "https://m.xiachufang.com/recipe/103072015/",
+    "imageUrl": "https://i2.chuimg.com/5a17332065224af68f9271b1d62aae76_1917w_1125h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 73689,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:42.579Z"
+  },
+  "p10": {
+    "name": "黑鱼豆腐汤",
+    "signature": "91995bd5dc204167ff8bb1e34691440e1e7d1b1f",
+    "source": "https://m.xiachufang.com/recipe/105976500/",
+    "imageUrl": "https://i2.chuimg.com/0b96d35ae07246d5b4f50b9fabf2a83c_2048w_1536h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 65912,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:45.036Z"
+  },
+  "p08": {
+    "name": "黄花菜瘦肉汤",
+    "signature": "6a6c38361b698001c02bdf2c8f768d0c72a0de83",
+    "source": "http://mbdbj.xiachufang.com/recipe/103740364/",
+    "imageUrl": "https://i2.chuimg.com/f8efabdf6201461b8bd397622de34e58_530w_368h.jpg?imageView2/2/interlace/1/q/75",
+    "bytes": 55462,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:45.687Z"
+  },
+  "p11": {
+    "name": "玉米胡萝卜排骨汤",
+    "signature": "138467fa16aa9965e92fe2f409b6ab433c5ec75e",
+    "source": "https://m.xiachufang.com/recipe/102945987/",
+    "imageUrl": "https://i2.chuimg.com/22930b213405418d93f750393bfe1fc3_3072w_2304h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 75121,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:46.696Z"
+  },
+  "p12": {
+    "name": "菌菇鸡汤",
+    "signature": "bded714e07d146b1f2943c52cac22e8b7f5a86ff",
+    "source": "https://m.xiachufang.com/recipe/1013829/",
+    "imageUrl": "https://i2.chuimg.com/63de7700874f11e6a9a10242ac110002_550w_413h.jpg?imageView2/1/w/640/h/520/q/90/format/jpg",
+    "bytes": 62940,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:46.884Z"
+  },
+  "p13": {
+    "name": "番茄牛尾汤",
+    "signature": "08e9bb84c348460b499d06d9e058e10205336c52",
+    "source": "http://www.xiachufang.com/dish/110793180/",
+    "imageUrl": "https://i2.chuimg.com/9e966e35b19911e5928245057e63dbbb.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 64885,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:48.262Z"
+  },
+  "p14": {
+    "name": "木瓜鲫鱼汤",
+    "signature": "6f92c6bb15316baabdcfb0c8d051a07cdd1bcd22",
+    "source": "http://www.xiachufang.com/recipe/103495851/?steps-detail=2",
+    "imageUrl": "https://i2.chuimg.com/795e6d1e6fbd4da6a9c827c1f68cd7ba_744w_992h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 68429,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:48.739Z"
+  },
+  "p15": {
+    "name": "海带排骨汤",
+    "signature": "bed77317e0331c1238809c92d142f58676b8f125",
+    "source": "http://www.xiachufang.com/dish/104130267/",
+    "imageUrl": "https://i2.chuimg.com/54b89fba9b0211e599097d955b0a0623.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 59034,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:49.764Z"
+  },
+  "p16": {
+    "name": "五红汤",
+    "signature": "598216d6cf47c7a526c25e16238362907d263135",
+    "source": "https://www.xiachufang.com/recipe/106480634/",
+    "imageUrl": "https://i2.chuimg.com/0e81cfe5b6ee48f9aa0dd1b3013405e9_2976w_3968h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 59777,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:50.144Z"
+  },
+  "p18": {
+    "name": "番茄豆腐汤",
+    "signature": "e34c4072b952f07a2f43df9349991aa405f09dc9",
+    "source": "https://www.xiachufang.com/recipe/104701525/",
+    "imageUrl": "https://i2.chuimg.com/1cabdfd1da0949829c32bd565e41a2ce_1000w_750h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 60325,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:51.916Z"
+  },
+  "p17": {
+    "name": "菌菇豆腐汤",
+    "signature": "7ae86ff64fdf20f053d50db1aaf9eb422478874f",
+    "source": "http://www.xiachufang.com/recipe/106055808/",
+    "imageUrl": "https://i2.chuimg.com/62389a66f815462c92c723277c34a592_4032w_3024h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 80750,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:51.965Z"
+  },
+  "p19": {
+    "name": "山药莲藕汤",
+    "signature": "0fc89608e49dc5198ab3f98d502a8ac5fdfc36a1",
+    "source": "http://www.xiachufang.com/recipe/102798509/",
+    "imageUrl": "https://i2.chuimg.com/e6a0d63b521743ae846f00ed99a18a25_1080w_864h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 34450,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:53.334Z"
+  },
+  "p20": {
+    "name": "冬瓜木耳汤",
+    "signature": "be98c401dbf39998f87bd3022a74e76d93c32e2f",
+    "source": "https://m.xiachufang.com/recipe/102339081/",
+    "imageUrl": "https://i2.chuimg.com/a83055f666ef11e7bc9d0242ac110002_2448w_1836h.jpg?imageView2/1/w/640/h/520/q/75/format/jpg",
+    "bytes": 56005,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:53.467Z"
+  },
+  "p21": {
+    "name": "冬瓜虾仁汤",
+    "signature": "9287ed15655aaa809b269eaf48fdbe9139eb5525",
+    "source": "http://www.xiachufang.com/dish/108407699/",
+    "imageUrl": "https://i2.chuimg.com/c9fd3452a8a411e59763b82a72e00100.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 51273,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:55.164Z"
+  },
+  "p22": {
+    "name": "番茄牛肉汤",
+    "signature": "4e549500d5a904fd7557a36f094a6b5c01db2c9e",
+    "source": "http://www.xiachufang.com/dish/104526314/",
+    "imageUrl": "http://i2.chuimg.com/0d23c5dc9c2c11e58a8ab17d65b44452.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 65531,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:55.171Z"
+  },
+  "p23": {
+    "name": "山药玉米汤",
+    "signature": "e2a951da83394f6a68abf027145de1d27bab09ca",
+    "source": "https://www.xiachufang.com/recipe/102234930/",
+    "imageUrl": "https://i2.chuimg.com/b4ce510a0d1c11e7bc9d0242ac110002_800w_450h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 86083,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:56.529Z"
+  },
+  "p24": {
+    "name": "萝卜丝鲫鱼汤",
+    "signature": "a53f952d15b8cce3a9ff9b9f2aee2874924c4ec2",
+    "source": "http://www.xiachufang.com/dish/102410574/",
+    "imageUrl": "http://i3.xiachufang.com/image/600/12c61becea8111e3b71db8ca3aeed2d7.jpg",
+    "bytes": 69041,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:56.540Z"
+  },
+  "p26": {
+    "name": "栗子鸡汤",
+    "signature": "19ed36e5edbf7bf5cc4b0d05456529f4a653e769",
+    "source": "https://machtalk.xiachufang.com/recipe/106573683/",
+    "imageUrl": "https://i2.chuimg.com/8b77a967fa3a475fa4f0273f7ab64533_1280w_959h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 65584,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:58.186Z"
+  },
+  "p25": {
+    "name": "花生鸡爪汤",
+    "signature": "6c9cb21feb7927ebe0db4d69cf3adf54dd45512f",
+    "source": "https://www.xiachufang.com/recipe/101833069/",
+    "imageUrl": "https://i2.chuimg.com/77920e268b2b11e6a9a10242ac110002_4208w_3120h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 71618,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:59.368Z"
+  },
+  "p27": {
+    "name": "海带豆腐汤",
+    "signature": "1aab93b3379efb66bee65efbacf7f1490a069951",
+    "source": "https://m.xiachufang.com/recipe/106635166/",
+    "imageUrl": "https://i2.chuimg.com/a600ab1eaf224bf893190fddfdf5b1ae_964w_1280h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 76031,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:03:59.621Z"
+  },
+  "p28": {
+    "name": "丝瓜蛤蜊汤",
+    "signature": "cbd3acd30855ac725e2121738f87d02d24ee8673",
+    "source": "https://www.xiachufang.com/recipe/106880460/",
+    "imageUrl": "https://i2.chuimg.com/07500b10f5d0426fa3ae284e8f091a9b_3414w_2560h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 79631,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:00.610Z"
+  },
+  "k01": {
+    "name": "红枣桂圆茶",
+    "signature": "23d19e5f577e04a526ee194000f5763a3670f001",
+    "source": "http://www.xiachufang.com/dish/105949998/",
+    "imageUrl": "http://i2.chuimg.com/b8662042a04f11e5b3363d0b536493b1.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 69418,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:01.163Z"
+  },
+  "k02": {
+    "name": "核桃黑芝麻糊",
+    "signature": "faea1f6f738775ad7984a1f583a9a1b67b0ffbc5",
+    "source": "http://www.xiachufang.com/dish/104449544/",
+    "imageUrl": "https://i2.chuimg.com/091394b59be111e5b8e297936f5f298f.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 56193,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:02.456Z"
+  },
+  "k03": {
+    "name": "牛奶炖木瓜",
+    "signature": "3f8c26d8afb86c5a54e5ddb021f9593d194af460",
+    "source": "https://www.xiachufang.com/dish/180888117/",
+    "imageUrl": "https://i2.chuimg.com/3578e27aa2b743c48116a297a49e7464_744w_992h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 32290,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:03.361Z"
+  },
+  "k04": {
+    "name": "银耳莲子羹",
+    "signature": "028687a984d67a87ea7358a63cb407c7e0aea2a2",
+    "source": "https://m.xiachufang.com/recipe/102959363/",
+    "imageUrl": "https://i2.chuimg.com/aa45cfeda9c54637b3bfb83df249b8bf_2947w_2834h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 76421,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:04.185Z"
+  },
+  "k05": {
+    "name": "蒸苹果",
+    "signature": "3dee621d00bbd0d69f3646a0322ac19d2204b394",
+    "source": "http://www.xiachufang.com/dish/105642219/",
+    "imageUrl": "http://i2.chuimg.com/b1387a1c9f7611e58609bb26e459dd87.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 61179,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:05.142Z"
+  },
+  "k06": {
+    "name": "酸奶坚果杯",
+    "signature": "5976e5ef641686d6a7047444a78b6d6c0bfffec2",
+    "source": "http://mbdbj.xiachufang.com/recipe/106965939/",
+    "imageUrl": "https://i2.chuimg.com/93d0cafff66a4d659b4b4f4c1477840c_2643w_2114h.jpg?imageView2/2/interlace/1/q/75",
+    "bytes": 79052,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:06.354Z"
+  },
+  "k08": {
+    "name": "山药红枣糕",
+    "signature": "c8e5a8a8826b15db75c99deec88e547243498738",
+    "source": "http://www.douguo.com/cookbook/1425490",
+    "imageUrl": "",
+    "bytes": 15670,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.449Z"
+  },
+  "k09": {
+    "name": "小米米糊",
+    "signature": "f77cbf640448165564366bd25377de9e97d5e82f",
+    "source": "https://www.xiachufang.com/recipe/106641983/",
+    "imageUrl": "https://i2.chuimg.com/2da4dac85693416cb740df32cac94e9a_720w_1280h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 31165,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:08.934Z"
+  },
+  "k07": {
+    "name": "红豆沙小碗",
+    "signature": "2d00a0cb90dd34963e49e867a209aef655c35e5a",
+    "source": "https://m.xiachufang.com/recipe/102797728/",
+    "imageUrl": "https://i2.chuimg.com/f8b5f13925624c5aa3340fbfed87473d_2448w_2448h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 62601,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:09.905Z"
+  },
+  "k10": {
+    "name": "香蕉燕麦杯",
+    "signature": "a288a10cfade42fa58fc349ce7c5839fef92c1c1",
+    "source": "http://www.xiachufang.com/dish/103423415/",
+    "imageUrl": "http://i2.chuimg.com/b1fcd730990d11e58f7bad923fc2154a.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 26529,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:10.493Z"
+  },
+  "k11": {
+    "name": "酒酿蛋花",
+    "signature": "4d965ff75b5728caac6acca7fbc051bd1c9b922f",
+    "source": "http://www.xiachufang.com/recipe/103493093/",
+    "imageUrl": "https://i2.chuimg.com/81c30f3267af477c892b62c0075cd899_648w_1152h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 52298,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:11.071Z"
+  },
+  "k12": {
+    "name": "缤纷水果盘",
+    "signature": "ff2fc28999f37600cab8824f85e49b3afbbbcea5",
+    "source": "http://www.xiachufang.com/recipe/107347115/",
+    "imageUrl": "https://i2.chuimg.com/544b0cf4939b456590a51a08ffccfe55_1920w_2560h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 163263,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:11.876Z"
+  },
+  "k13": {
+    "name": "紫薯牛奶羹",
+    "signature": "6a02e16dfa8fdfbc787ee515bd7862e1f4121f4e",
+    "source": "http://www.xiachufang.com/dish/107178065/",
+    "imageUrl": "http://i1.xiachufang.com/image/600/543bc796df1011e4b77cb8ca3aeed2d7.jpg",
+    "bytes": 48824,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:12.353Z"
+  },
+  "k14": {
+    "name": "花生红枣汤",
+    "signature": "900faeceba7795fb97f46d14eea80a06af436f3b",
+    "source": "http://www.xiachufang.com/dish/146733914/",
+    "imageUrl": "https://i2.chuimg.com/9c62cd96991542e1b39a7c36af0fbbdd_828w_1242h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 64076,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:13.790Z"
+  },
+  "k15": {
+    "name": "红枣蒸蛋",
+    "signature": "fe567d0e81312cc269193e91c1bfcf50ee56df05",
+    "source": "https://m.xiachufang.com/recipe/102758865/",
+    "imageUrl": "https://i2.chuimg.com/9ca4784b5e604a4cba33b135f4ab813b_1560w_2104h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 60256,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:13.875Z"
+  },
+  "k17": {
+    "name": "南瓜牛奶羹",
+    "signature": "61bc747285a3aa8d728b38b9c68150a3893983b4",
+    "source": "http://mwx.douguo.com/recipe/imgs/2446987?step=2",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/b/8/b/600_b827ee02d0e143bb693e24e83dde7b5b.jpeg",
+    "bytes": 74642,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:15.071Z"
+  },
+  "k16": {
+    "name": "蒸雪梨",
+    "signature": "a1412b2ae1306eddb1a14340e37cc392b266dd21",
+    "source": "https://m.xiachufang.com/recipe/104089010/",
+    "imageUrl": "https://i2.chuimg.com/bdb1d4a93d924225942497d665e15712_1000w_750h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 49643,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:15.169Z"
+  },
+  "k19": {
+    "name": "紫米糕",
+    "signature": "02c01c8a9a039f1eddbda6563a2d5ad8e4e64093",
+    "source": "https://www.jxcaipu.com/recipe/912i1c86.html",
+    "imageUrl": "https://p0.ssl.qhimgs1.com/t01d4e6c2c832a3df6e.jpg",
+    "bytes": 31655,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.451Z"
+  },
+  "k18": {
+    "name": "黑米豆浆",
+    "signature": "13ae8b18292006d816af383978c980259cf8f735",
+    "source": "https://m.xiachufang.com/recipe/103405453/",
+    "imageUrl": "https://i2.chuimg.com/99eca59d981c469e8d6603aec83464a7_3072w_2272h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 86276,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:16.739Z"
+  },
+  "k20": {
+    "name": "桂圆红枣银耳羹",
+    "signature": "eb2b8197897315afaed930687a5de9c83cf8588b",
+    "source": "http://www.xiachufang.com/recipe/102137954/",
+    "imageUrl": "https://i2.chuimg.com/becee5f49e9d11e6bc9d0242ac110002_960w_1280h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 49171,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:18.024Z"
+  },
+  "s21": {
+    "name": "南瓜小米发糕",
+    "signature": "62953cac6c1416902a38bc22e899ec441d28a54b",
+    "source": "http://mwx.douguo.com/recipe/imgs/3125266?ssc=.html&step=10",
+    "imageUrl": "",
+    "bytes": 43158,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.451Z"
+  },
+  "s22": {
+    "name": "全麦鸡蛋三明治",
+    "signature": "10959310cdf65bf21d02051642e5a52a1ed278e1",
+    "source": "http://www.xiachufang.com/recipe/105933637/",
+    "imageUrl": "https://i2.chuimg.com/658419bd802e49c9aca25be361504798_773w_618h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 63740,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:19.206Z"
+  },
+  "s24": {
+    "name": "香菇鸡肉粥",
+    "signature": "401a1d83b8d5f76cc4ae92bb3a7689208c7dc926",
+    "source": "http://www.xiachufang.com/dish/103635430/",
+    "imageUrl": "https://i2.chuimg.com/60524538999811e59fcc8bf233554bf7.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 61929,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:20.897Z"
+  },
+  "s23": {
+    "name": "牛肉燕麦粥",
+    "signature": "466c1937c7db7b27aab2abae2ff48d854faa0b90",
+    "source": "http://www.xiachufang.com/recipe/107391164/",
+    "imageUrl": "https://i2.chuimg.com/013b7e9dd6884a409633451f2c90d9a3_2048w_2560h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 99486,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:21.049Z"
+  },
+  "s25": {
+    "name": "青菜瘦肉粥",
+    "signature": "fa0058d1ba9748d9124b4e6e2b38e8a799d99a5d",
+    "source": "http://www.xiachufang.com/dish/115208717/",
+    "imageUrl": "https://i2.chuimg.com/35b136cff4f911e5bb1cf59ec46c960e.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 46278,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:22.246Z"
+  },
+  "s26": {
+    "name": "虾仁小馄饨",
+    "signature": "7cf6606bff6668fd458afeb069798aa868b614e1",
+    "source": "http://www.xiachufang.com/dish/109919401/",
+    "imageUrl": "http://i2.chuimg.com/c80800deae5611e586bbb82a72e00100.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 62119,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:22.300Z"
+  },
+  "s27": {
+    "name": "红枣玉米发糕",
+    "signature": "0d063742cd24e4d2eb9ddfd1360ede8fd834c63d",
+    "source": "http://www.xiachufang.com/dish/133920486/",
+    "imageUrl": "https://i2.chuimg.com/6a8ec82027384857b29fe9ba472364c3_1728w_2304h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 61413,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:23.520Z"
+  },
+  "s28": {
+    "name": "鲜虾云吞面",
+    "signature": "603d298ba275a028e6f4b377f39b7cad00259a3e",
+    "source": "https://www.xiachufang.com/dish/120022129/",
+    "imageUrl": "https://i2.chuimg.com/278ef12877c111e69e49c348599172b7.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 62552,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:24.041Z"
+  },
+  "s29": {
+    "name": "芝麻酱拌面",
+    "signature": "05de9041bd92b381b508ca8241a27a37a4cd2933",
+    "source": "http://www.xiachufang.com/recipe/102394962/",
+    "imageUrl": "https://i2.chuimg.com/f5e7f1a66ef011e7bc9d0242ac110002_1280w_1024h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 101454,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:25.054Z"
+  },
+  "s30": {
+    "name": "番茄鸡蛋面",
+    "signature": "ff8eb7f918afcd3ab015e54c3af54bd1fccf66d7",
+    "source": "http://www.xiachufang.com/recipe/102251476/",
+    "imageUrl": "https://i2.chuimg.com/583e7a941a8411e7947d0242ac110002_593w_485h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 78737,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:26.734Z"
+  },
+  "s31": {
+    "name": "红薯糙米饭",
+    "signature": "95876d6de321f5303713be0a425a58d0e9ac113c",
+    "source": "http://home.meishichina.com/recipe-150182.html",
+    "imageUrl": "http://i8.meishichina.com/attachment/recipe/2013/11/13/20131113215517888641015.jpg@!p800",
+    "bytes": 86698,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:27.137Z"
+  },
+  "s33": {
+    "name": "板栗鸡肉焖饭",
+    "signature": "a69dafa4913d64e5ae6418c838f153df0a291f2b",
+    "source": "https://m.xiachufang.com/recipe/104164397/",
+    "imageUrl": "https://i2.chuimg.com/e05adfb8e30e4f87af8306536c2e8050_4240w_2832h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 165430,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:28.507Z"
+  },
+  "s32": {
+    "name": "紫菜饭团",
+    "signature": "fc697149a15c5e864222d521cc910dafd5443366",
+    "source": "https://m.xiachufang.com/recipe/104509009/",
+    "imageUrl": "https://i2.chuimg.com/07ccb5eeb8f24db8a34014f2b71eca63_3024w_4032h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 97368,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:28.763Z"
+  },
+  "s34": {
+    "name": "豌豆虾仁焖饭",
+    "signature": "3778e8c1b2ecf21194d2850d0a8839d2b38d5cdd",
+    "source": "https://www.xiachufang.com/recipe/1089516/",
+    "imageUrl": "https://i2.chuimg.com/9ba8a61c87ac11e6a9a10242ac110002_3264w_2448h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 99525,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:30.025Z"
+  },
+  "s36": {
+    "name": "山药牛肉粥",
+    "signature": "3a6c75bc6a5f6098c7553c00e45aa8ffcc359780",
+    "source": "https://www.xiachufang.com/recipe/104771365/",
+    "imageUrl": "https://i2.chuimg.com/12ef2c3523ac4463b4ef3e613708ec78_756w_741h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 75291,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:31.230Z"
+  },
+  "m42": {
+    "name": "蒜蓉粉丝蒸虾",
+    "signature": "aa3141915b48c9a764e350ba2a837c7456a765a1",
+    "source": "https://www.xiachufang.com/recipe/100261484/",
+    "imageUrl": "https://i2.chuimg.com/ecc82166884311e6a9a10242ac110002_650w_650h.jpg?imageView2/1/w/640/h/520/q/90/format/jpg",
+    "bytes": 92937,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:33.334Z"
+  },
+  "s35": {
+    "name": "鹰嘴豆杂粮饭",
+    "signature": "07bc42eb27e00cbd319efc6ad067675b2542e307",
+    "source": "http://mbd.baidu.com/newspage/data/dtlandingsuper?nid=dt_4476549262600026578",
+    "imageUrl": "",
+    "bytes": 29586,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.451Z"
+  },
+  "m43": {
+    "name": "白灼虾",
+    "signature": "1211ce98af310010a4af0f1fbe9a23a4e81cddc9",
+    "source": "http://www.xiachufang.com/recipe/100046086/",
+    "imageUrl": "http://i2.chuimg.com/bea17b40880511e6a9a10242ac110002_4000w_3000h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 68213,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:35.271Z"
+  },
+  "m44": {
+    "name": "虾仁炒西兰花",
+    "signature": "9d59bd08f0260b3156f69690b90e2024e90ca459",
+    "source": "http://www.xiachufang.com/recipe/100582849/",
+    "imageUrl": "https://i2.chuimg.com/dbab26d489b111e6b87c0242ac110003_2048w_2048h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 66353,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:35.294Z"
+  },
+  "m45": {
+    "name": "虾仁玉米粒",
+    "signature": "281fe994d3bc7a33c78bc55f602913d2030f0fd8",
+    "source": "https://m.xiachufang.com/recipe/103856802/",
+    "imageUrl": "https://i2.chuimg.com/dcc7bb9ecd334da2bc3db385a5f6c699_1280w_852h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 80459,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:36.448Z"
+  },
+  "m47": {
+    "name": "香煎龙利鱼柳",
+    "signature": "c77edd9e7ec6438e0f11f964999716a0e51a91dc",
+    "source": "http://www.xiachufang.com/dish/119724898/",
+    "imageUrl": "https://img1.baidu.com/it/u=4027615930,3259234387&fm=253&app=138&f=JPEG?w=500&h=667",
+    "bytes": 90008,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:37.620Z"
+  },
+  "m46": {
+    "name": "三文鱼豆腐饼",
+    "signature": "04cc9de45787828bee45ebf5bbca8ef5aff941f5",
+    "source": "http://mwx.douguo.com/recipe/imgs/2397302?step=8&usc=.html.html.html.html.html.html.html.html.html.html.html",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/8/e/7/600_8edcd8175e4995ef0c39fbae0fbc7777.jpeg",
+    "bytes": 109292,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:38.084Z"
+  },
+  "m48": {
+    "name": "洋葱炒牛肉",
+    "signature": "0169ca0e357199e1a6dda90838fa8270c1b3c2c4",
+    "source": "https://www.xiachufang.com/dish/174441100/",
+    "imageUrl": "https://i2.chuimg.com/25ded751df894c899c020dd220d14426_1280w_960h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 79302,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:38.754Z"
+  },
+  "m49": {
+    "name": "芹菜炒牛肉",
+    "signature": "092221de489e24df0308a5d118b57be1839b9fd2",
+    "source": "https://www.xiachufang.com/recipe/104617803/",
+    "imageUrl": "https://i2.chuimg.com/ef1dfd1d60194e38ad4c390b95115c6d_1080w_864h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 91440,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:39.644Z"
+  },
+  "m50": {
+    "name": "芦笋炒鸡柳",
+    "signature": "76a5de067b73570f127f126e78504076c392c2c7",
+    "source": "http://www.xiachufang.com/recipe/139901/",
+    "imageUrl": "https://i2.chuimg.com/593bfc34871111e6b87c0242ac110003_459w_690h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 75196,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:40.292Z"
+  },
+  "m51": {
+    "name": "莲藕炒鸡丁",
+    "signature": "43f75ca747dc65075b586d9130ae647edd3b734e",
+    "source": "http://mwx.douguo.com/cookbook/2076635.html",
+    "imageUrl": "https://cp1.douguo.com/upload/recipe/e/c/8/750_ecb47fbb07a752413640f82a945530f8.jpg",
+    "bytes": 86730,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:40.827Z"
+  },
+  "m52": {
+    "name": "鸡丝拌黄瓜",
+    "signature": "8789ce8403bed2e918084de390da9d6cc2a4c4d7",
+    "source": "http://mwx.douguo.com/recipe/imgs/2518635?isapp=-1.html.html.html&step=4",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/f/a/c/600_faf686979511e089826fd93d3447caac.jpeg",
+    "bytes": 143618,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:41.485Z"
+  },
+  "m53": {
+    "name": "珍珠糯米丸子",
+    "signature": "81bfc4051fa89b0134294784d06468f6af16b51d",
+    "source": "http://mwx.douguo.com/recipe/imgs/1457089?step=2&usc=.html.html.html.html.html.html.html.html",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/7/7/c/600_77882b1d8b57593dce12ebf971a18cec.jpeg",
+    "bytes": 104804,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:42.013Z"
+  },
+  "m54": {
+    "name": "白菜肉卷",
+    "signature": "1061542b3fdbd5de3b1baf9383d691777a578375",
+    "source": "http://www.xiachufang.com/recipe/106567650/",
+    "imageUrl": "https://i2.chuimg.com/946547926c134dedb604b88f2ad2a230_684w_912h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 72793,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:43.273Z"
+  },
+  "m55": {
+    "name": "香菇肉末蒸豆腐",
+    "signature": "d9761b3ba65f72c3b74780c4c3fe8d841059aa23",
+    "source": "https://www.xiachufang.com/recipe/102335749/",
+    "imageUrl": "https://i2.chuimg.com/0b0584a2644e11e7bc9d0242ac110002_2000w_1500h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 54189,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:43.821Z"
+  },
+  "m56": {
+    "name": "木耳炒肉片",
+    "signature": "4491f13f6ea462109c7548e2b118ed563870fefd",
+    "source": "https://m.xiachufang.com/recipe/104411653/",
+    "imageUrl": "https://i2.chuimg.com/676080dc665b4587a1cff2666e142b8c_1080w_810h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 69233,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:44.361Z"
+  },
+  "m58": {
+    "name": "西葫芦炒蛋",
+    "signature": "4b4469dc0c6883544bc5351ca22d82dd7d0af2f3",
+    "source": "https://m.xiachufang.com/recipe/106880052/",
+    "imageUrl": "https://i2.chuimg.com/4b96d16aa1bd47d79c71490e9f2aa88d_750w_1000h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 95787,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:45.525Z"
+  },
+  "m57": {
+    "name": "丝瓜炒肉片",
+    "signature": "147b4819bf394962233fef5f3d94afd167d4f9e6",
+    "source": "http://www.xiachufang.com/dish/126642768/",
+    "imageUrl": "https://i2.chuimg.com/c2e3f8ee1dde11e7947d0242ac110002_1280w_1280h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 54039,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:45.539Z"
+  },
+  "m60": {
+    "name": "洋葱炒蛋",
+    "signature": "3118d3b9cfe02c7d913bf531a2c7f765163aa11f",
+    "source": "https://www.xiachufang.com/dish/127847526/",
+    "imageUrl": "https://i2.chuimg.com/a411e8fe32d811e7bc9d0242ac110002_1280w_1280h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 85238,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:46.973Z"
+  },
+  "m59": {
+    "name": "虾皮蒸蛋",
+    "signature": "10ffab88182b20ad6c2b36fb08b031672e272625",
+    "source": "http://www.xiachufang.com/recipe/103672809",
+    "imageUrl": "https://i2.chuimg.com/4ae1852078df4b928f86dd3e0f2ec689_2048w_1536h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 65026,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:47.013Z"
+  },
+  "m61": {
+    "name": "豆腐蒸蛋",
+    "signature": "e9dda6608b9a773b8f2201b60b1e07346a7811e1",
+    "source": "http://www.xiachufang.com/recipe/100470826",
+    "imageUrl": "https://i2.chuimg.com/dc85fd2e88f111e6b87c0242ac110003_640w_362h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 81202,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:48.390Z"
+  },
+  "m62": {
+    "name": "腐竹烧木耳",
+    "signature": "eb90cae469ec165a56eb4b6da4658ad09e25d42f",
+    "source": "http://www.xiachufang.com/recipe/100399765/",
+    "imageUrl": "https://i2.chuimg.com/aa31d462889f11e6a9a10242ac110002_640w_620h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 77233,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:48.873Z"
+  },
+  "m64": {
+    "name": "凉拌豆腐皮",
+    "signature": "31d6212e6db847ddbd4e960ad208496ace111762",
+    "source": "https://www.xiachufang.com/recipe/102322166/",
+    "imageUrl": "https://i2.chuimg.com/cd807e4258a511e7947d0242ac110002_2448w_3264h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 73885,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:50.110Z"
+  },
+  "m63": {
+    "name": "香煎豆腐",
+    "signature": "78200c8ad38985ebb95a9b910e48ed2e1d179984",
+    "source": "http://www.xiachufang.com/dish/111355292/",
+    "imageUrl": "https://i2.chuimg.com/8c076a3daea611e5bf92e0db5512b208.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 98272,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:51.139Z"
+  },
+  "m65": {
+    "name": "杏鲍菇炒彩椒",
+    "signature": "ec95756d23859a8b342c64aa12b756a439d9f7e6",
+    "source": "http://www.xiachufang.com/recipe/104161678/",
+    "imageUrl": "https://i2.chuimg.com/c7fcea9ccb4c4a4a874401cbd650c696_1242w_2208h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 70346,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:51.707Z"
+  },
+  "v18": {
+    "name": "白灼菜心",
+    "signature": "9bdaeb408c771f799075dc476b9f827f8647ae24",
+    "source": "http://www.xiachufang.com/dish/105068253/",
+    "imageUrl": "https://i2.chuimg.com/93a9cef89dab11e5973d9558c7c9d398.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 77611,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:52.957Z"
+  },
+  "v19": {
+    "name": "蒜蓉油麦菜",
+    "signature": "2cab0610b55be7cbcb18d38726da6a6808c5188e",
+    "source": "http://www.xiachufang.com/dish/145237587/",
+    "imageUrl": "https://i2.chuimg.com/4ac4a7c3508f40dab5989111c1a17751_1005w_1227h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 113697,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:53.028Z"
+  },
+  "v20": {
+    "name": "清炒豆苗",
+    "signature": "e4c76741d7c9d865596dff792a6da2e426d1f046",
+    "source": "http://www.douguo.com/cookbook/1516249.html",
+    "imageUrl": "",
+    "bytes": 48323,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.451Z"
+  },
+  "v21": {
+    "name": "清炒苋菜",
+    "signature": "4b61ac7a56cc085cfcf1dd582503174a98d13f6a",
+    "source": "http://www.xiachufang.com/dish/109361159/",
+    "imageUrl": "https://i2.chuimg.com/4f2d4fd1ac2311e5a6635315683b9d65.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 76425,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:54.529Z"
+  },
+  "v22": {
+    "name": "蒜蓉空心菜",
+    "signature": "03fbfaf3507f6e57623f5b6ca5d84195244cf0f9",
+    "source": "http://www.xiachufang.com/dish/103081304/",
+    "imageUrl": "https://i2.chuimg.com/ab26adeb97df11e5955e7b3efe509c1c.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 84266,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:56.058Z"
+  },
+  "v23": {
+    "name": "清炒芥蓝",
+    "signature": "5d0f78a8e9a8e6824cd65cb0572e2dc41a0d80a9",
+    "source": "http://www.xiachufang.com/dish/107405658/",
+    "imageUrl": "http://i5.xiachufang.com/image/600/2ac2fe5ee71511e4b77cb8ca3aeed2d7.jpg",
+    "bytes": 82387,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:56.142Z"
+  },
+  "v25": {
+    "name": "南瓜蒸百合",
+    "signature": "da662a1943c6b435481c56eca8caa825fbd02371",
+    "source": "http://www.xiachufang.com/dish/177073280/",
+    "imageUrl": "https://i2.chuimg.com/43de6223e36d47698dde08df219de2ab_1080w_1080h.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 66132,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:57.348Z"
+  },
+  "v24": {
+    "name": "荷塘小炒",
+    "signature": "cb8b1d6fdad8d9b202d678b197c06b9f10cf0c07",
+    "source": "http://www.xiachufang.com/dish/180307846/",
+    "imageUrl": "https://i2.chuimg.com/c57700276c0e4399b3cb72a4a63ff010_750w_1000h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 75355,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:57.422Z"
+  },
+  "v26": {
+    "name": "蒜蓉蒸茄子",
+    "signature": "3cccfa5fa619b945d78748dc265cc9bf7290fe98",
+    "source": "https://m.xiachufang.com/recipe/104538377/",
+    "imageUrl": "http://i1.chuimg.com/74629916f9ce4749903a7fb0aef0b5bf_1632w_1596h.jpg@2o_50sh_1pr_1l_800w_600h_1c_1e_90q_1wh.jpg",
+    "bytes": 92227,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:58.700Z"
+  },
+  "v28": {
+    "name": "凉拌木耳",
+    "signature": "1cd6fdcfe2fe7dde53d25ee3e5977be2f100e219",
+    "source": "http://www.xiachufang.com/dish/109222240/",
+    "imageUrl": "http://i5.xiachufang.com/image/600/35882e1e2e1311e58483e0db5512b208.jpg",
+    "bytes": 64522,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:04:59.952Z"
+  },
+  "v27": {
+    "name": "凉拌黄瓜",
+    "signature": "b7b1c11400acc5ad5d7ce782826a08d50e795015",
+    "source": "https://m.xiachufang.com/recipe/101840955/",
+    "imageUrl": "https://i2.chuimg.com/7ba8172a938311e6a9a10242ac110002_5918w_3928h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 119463,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:00.483Z"
+  },
+  "v29": {
+    "name": "蒜蓉豇豆",
+    "signature": "e34307b424c6620220092b382cf4cfd375e7cfb5",
+    "source": "https://m.xiachufang.com/recipe/103761694/",
+    "imageUrl": "https://i2.chuimg.com/a2dd29f4569b4b34a786c673bf6e77a5_2448w_2448h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 73434,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:01.027Z"
+  },
+  "v30": {
+    "name": "番茄炒菜花",
+    "signature": "489e8678ab39dda6cc89f015b40e274d32b6ca55",
+    "source": "https://m.douguo.com/cookbook/2451410.html?f=sx%3Ftimer",
+    "imageUrl": "https://cp1.douguo.com/upload/caiku/8/e/2/690x390_8e9ce41df8dc5b13b25de6871655e202.jpg",
+    "bytes": 136628,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:01.436Z"
+  },
+  "v31": {
+    "name": "清炒紫甘蓝",
+    "signature": "a77232173ec8881991fee29c3a21d6dfd6df0456",
+    "source": "https://m.xiachufang.com/recipe/100556316/",
+    "imageUrl": "https://i2.chuimg.com/5e0b2d06897411e6a9a10242ac110002_852w_1136h.jpg?imageView2/1/w/640/h/520/q/75/format/jpg",
+    "bytes": 93643,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:02.421Z"
+  },
+  "v32": {
+    "name": "清炒生菜",
+    "signature": "a73e1d11974a2fb7da3f3948ee7a8089b02fde20",
+    "source": "http://www.xiachufang.com/dish/90410",
+    "imageUrl": "https://i2.chuimg.com/6230a49a7cfc11e587b9b82a72e00100.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 70869,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:03.174Z"
+  },
+  "p29": {
+    "name": "虾皮紫菜汤",
+    "signature": "4051812380758978ae5cb1743e66460963d259c9",
+    "source": "http://www.xiachufang.com/dish/115679255/",
+    "imageUrl": "https://i2.chuimg.com/3813d40a01e211e6a5367b7136e7067b.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 63339,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:04.170Z"
+  },
+  "p30": {
+    "name": "番茄鸡蛋汤",
+    "signature": "fd2a2d058babc736b2044030d96fe59b50e439e7",
+    "source": "http://www.xiachufang.com/recipe/104776898/",
+    "imageUrl": "https://i2.chuimg.com/e09c8860eed44874a88309009a10b567_1080w_1080h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 82323,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:04.379Z"
+  },
+  "p31": {
+    "name": "青菜豆腐汤",
+    "signature": "88afb08aad49e1b01748a7834c617813a3e13d73",
+    "source": "http://www.xiachufang.com/dish/101611989/",
+    "imageUrl": "https://i2.chuimg.com/bec5ba3893a211e5b072576b28b77091.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 61357,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:05.671Z"
+  },
+  "p32": {
+    "name": "萝卜羊肉汤",
+    "signature": "a2b373135689cca451995f4637dfd30d35769a78",
+    "source": "https://www.xiachufang.com/dish/100926399/",
+    "imageUrl": "https://i2.chuimg.com/7db43163919c11e5b82b9307ee5f3a26.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 42708,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:06.454Z"
+  },
+  "p33": {
+    "name": "虫草花鸡汤",
+    "signature": "7e0ee249444bdf22a36de8e4066c4907ccba6056",
+    "source": "https://m.xiachufang.com/recipe/102384864/",
+    "imageUrl": "https://i2.chuimg.com/807e94246c3411e7947d0242ac110002_1776w_1184h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 81951,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:07.349Z"
+  },
+  "p34": {
+    "name": "茶树菇排骨汤",
+    "signature": "2508b1c617923f1ca99dc31313b998e48b6b8908",
+    "source": "http://www.xiachufang.com/recipe/103775116/",
+    "imageUrl": "https://i2.chuimg.com/9b8b8de9fdf34ef79ba5a30494c101e1_1280w_1024h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 68603,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:07.690Z"
+  },
+  "p35": {
+    "name": "黄豆排骨汤",
+    "signature": "4190a7760090df4a38d907c744bcb3c02fd3c1af",
+    "source": "http://www.jxcaipu.com/recipe/i8gc59bd.html",
+    "imageUrl": "",
+    "bytes": 19964,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  },
+  "p36": {
+    "name": "海带牛肉汤",
+    "signature": "3dca3a1b83551046d145f690b788252d9d23c974",
+    "source": "http://www.xiachufang.com/recipe/107047480/",
+    "imageUrl": "https://i2.chuimg.com/e034634158ad49b9af573455c1061d19_1080w_1920h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 78922,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:09.121Z"
+  },
+  "p37": {
+    "name": "丝瓜瘦肉汤",
+    "signature": "061bd7bbbd94f42e3bd0dcc393dd89f4f7b46525",
+    "source": "http://www.xiachufang.com/recipe/107362322/",
+    "imageUrl": "https://i2.chuimg.com/79500fe1167842c293ad6a6177eaa411_1170w_1497h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 90919,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:10.163Z"
+  },
+  "p38": {
+    "name": "菠菜猪肝汤",
+    "signature": "555f6bacf3ad17af42953b21e638bddc8d00934b",
+    "source": "https://www.xiachufang.com/dish/189690359/",
+    "imageUrl": "https://i2.chuimg.com/27a6501049344640a1d48ae9838c21b7_1228w_1228h.jpg?imageView2/2/w/600/interlace/1/q/75",
+    "bytes": 69303,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:11.615Z"
+  },
+  "p40": {
+    "name": "虾仁豆腐汤",
+    "signature": "f70b515e1120638e1f97da19e107eb7d9bb969a9",
+    "source": "http://www.xiachufang.com/recipe/103655352/",
+    "imageUrl": "https://i2.chuimg.com/9b4614c514434d19a27ce6dcca0b81ba_750w_600h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 75655,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:13.062Z"
+  },
+  "p39": {
+    "name": "番茄金针菇牛肉汤",
+    "signature": "a5ba9a3f6a4bd1025fe104abbcb48151f1fff5ab",
+    "source": "https://m.xiachufang.com/recipe/102162932/",
+    "imageUrl": "https://i2.chuimg.com/977782a0bd5011e6bc9d0242ac110002_960w_1280h.jpg?imageView2/1/w/640/h/520/q/90/format/jpg",
+    "bytes": 70805,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:13.466Z"
+  },
+  "p41": {
+    "name": "莲藕红枣汤",
+    "signature": "58d107e9ac0ca6d5391cc03b70249618be5c911e",
+    "source": "http://www.xiachufang.com/recipe/102180999",
+    "imageUrl": "https://i2.chuimg.com/1473bffed4b111e6947d0242ac110002_960w_1280h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 47664,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:14.380Z"
+  },
+  "p42": {
+    "name": "银耳雪梨汤",
+    "signature": "717f05d48bdbab7084a4e80edf2fada140a7e6aa",
+    "source": "https://www.xiachufang.com/dish/111374733/",
+    "imageUrl": "https://i2.chuimg.com/b688337cae8a11e5939fb82a72e00100.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 57726,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:15.726Z"
+  },
+  "p43": {
+    "name": "栗子莲藕排骨汤",
+    "signature": "41a9aff713de7c745175703058e626d7e67f3fe8",
+    "source": "https://www.xiachufang.com/recipe/106960940/",
+    "imageUrl": "https://i2.chuimg.com/bc2d98fb593f44f4a4726d791b892ddc_3414w_2560h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 78331,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:16.801Z"
+  },
+  "k21": {
+    "name": "藕粉桂花羹",
+    "signature": "9f3d1e70e2eed94d3b044c47a4eef801b8554a98",
+    "source": "http://mwx.douguo.com/recipe/imgs/3185598?ssc=.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html.html&step=4",
+    "imageUrl": "",
+    "bytes": 25616,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  },
+  "k22": {
+    "name": "赤小豆薏米水",
+    "signature": "2878baa617f5a4cf00ad4dea0e703b12d05abeb8",
+    "source": "https://m.xiachufang.com/recipe/103711653/",
+    "imageUrl": "https://i2.chuimg.com/2ccde8d4a87a4f2bae0c36313157a799_1280w_1024h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 61237,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:18.098Z"
+  },
+  "k23": {
+    "name": "红枣枸杞豆浆",
+    "signature": "d95660b030ae7cfd3d04dbfebbe2216a1cc03e48",
+    "source": "http://mwx.douguo.com/recipe/imgs/3015775?f=sx%3B",
+    "imageUrl": "",
+    "bytes": 32835,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  },
+  "k25": {
+    "name": "紫薯燕麦饼",
+    "signature": "03793d58b77e6330c8d47b9e74348d4aea53ae4b",
+    "source": "https://m.xiachufang.com/recipe/102771910/",
+    "imageUrl": "https://i2.chuimg.com/3605f89473ce48de843638353caaedf8_3024w_4032h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 123964,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:19.698Z"
+  },
+  "k24": {
+    "name": "花生核桃露",
+    "signature": "c1daae2c51b2c3625662439cff8bf2bcc3818143",
+    "source": "https://www.xiachufang.com/recipe/104357208/",
+    "imageUrl": "https://i2.chuimg.com/43c12135733d43efaaf5b60328faea29_600w_900h.jpg?imageView2/2/w/660/interlace/1/q/75",
+    "bytes": 32304,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:19.847Z"
+  },
+  "k26": {
+    "name": "香蕉燕麦饼",
+    "signature": "327fdf50aea7d94a6d80b7985ab1dfa763531b27",
+    "source": "http://www.xiachufang.com/dish/116068416/",
+    "imageUrl": "https://i2.chuimg.com/e782316b0c1811e693911707e4e0877b.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 109849,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:21.816Z"
+  },
+  "k27": {
+    "name": "南瓜蒸糕",
+    "signature": "b81ef5b319a6a8d1271f0956669c90e9be8f7e9d",
+    "source": "https://m.xiachufang.com/recipe/104076885/",
+    "imageUrl": "https://i2.chuimg.com/7d2b30caad6a472ab22ee1df20fcf217_1080w_864h.jpg?imageView2/1/w/800/h/600/q/90/format/jpg",
+    "bytes": 46420,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:21.922Z"
+  },
+  "k28": {
+    "name": "红枣玉米饼",
+    "signature": "6e3b19cea4b78237818f26d137947fb15431164e",
+    "source": "http://www.xiachufang.com/recipe/100104984/",
+    "imageUrl": "http://i2.chuimg.com/c8e65c62881c11e6b87c0242ac110003_650w_650h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 60302,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:22.793Z"
+  },
+  "k29": {
+    "name": "牛奶炖蛋",
+    "signature": "e983825e60f002782c4460c56610362b4b8bb762",
+    "source": "http://www.xiachufang.com/dish/103674696/",
+    "imageUrl": "http://i2.chuimg.com/0064688c99ba11e58bf137f1c0be7296.jpg?imageView2/2/w/600/interlace/1/q/90",
+    "bytes": 37973,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:22.999Z"
+  },
+  "k30": {
+    "name": "木瓜银耳羹",
+    "signature": "ac7e21911237cd911f682d8e96e16560ce6dcfd0",
+    "source": "https://m.xiachufang.com/recipe/103149616/",
+    "imageUrl": "https://i2.chuimg.com/61c3073e0d244d11a7f460dc5157d32f_1224w_839h.jpg?imageView2/1/w/640/h/520/q/90/format/jpg",
+    "bytes": 69739,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:24.078Z"
+  },
+  "k31": {
+    "name": "蒸橙子",
+    "signature": "947d2de2ccf0a62cad4792ae68d6b06a63cd0cc0",
+    "source": "https://www.xiachufang.com/recipe/100429778/",
+    "imageUrl": "https://i2.chuimg.com/3ab023a088c711e6b87c0242ac110003_852w_1136h.jpg?imageView2/2/w/660/interlace/1/q/90",
+    "bytes": 48511,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:24.436Z"
+  },
+  "k33": {
+    "name": "紫薯银耳羹",
+    "signature": "92e27ce706d705a3b69eef5919e52bd97df7973c",
+    "source": "http://www.xiachufang.com/dish/106023842/",
+    "imageUrl": "http://i1.xiachufang.com/image/600/66eb7388ab8411e4865eb8ca3aeed2d7.jpg",
+    "bytes": 72330,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:25.693Z"
+  },
+  "k32": {
+    "name": "核桃红枣糕",
+    "signature": "e6bc74dc2bbada3e7b0798ef11712708dc020a92",
+    "source": "https://m.xiachufang.com/recipe/102139679/",
+    "imageUrl": "https://i2.chuimg.com/ca69db6ea0df11e6947d0242ac110002_1280w_960h.jpg?imageView2/1/w/800/h/600/q/75/format/jpg",
+    "bytes": 68188,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:26.582Z"
+  },
+  "k34": {
+    "name": "山药牛奶糊",
+    "signature": "657778df263498eb0bff8500a1ae1750b576815b",
+    "source": "http://m.douguo.com/cookbook/1226136.html",
+    "imageUrl": "",
+    "bytes": 21619,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  },
+  "k35": {
+    "name": "红枣陈皮茶",
+    "signature": "3a1a84e54a4484468b244dd9cce5486a76cee4ed",
+    "source": "http://baijiahao.baidu.com/s?id=1835054667003918054&wfr=spider&for=pc",
+    "imageUrl": "https://t11.baidu.com/it/u=2750460638,268606088&fm=30&app=106&f=JPEG?w=640&h=853&s=9D30129B4123C2EE4E9AF8F403005021",
+    "bytes": 117871,
+    "width": 800,
+    "height": 600,
+    "fetchedAt": "2026-11-27T02:05:28.160Z"
+  },
+  "k36": {
+    "name": "花生黑豆浆",
+    "signature": "85918632d73325885b132ce2cdb13c7a8b8f3ffd",
+    "source": "http://item.m.jd.com/product/10061263527982.html?cu",
+    "imageUrl": "",
+    "bytes": 16912,
+    "width": 400,
+    "height": 300,
+    "fetchedAt": "2026-11-27T02:13:09.450Z"
+  }
+}

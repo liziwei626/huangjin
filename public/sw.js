@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'nuanyue-v4.2';
+const CACHE = 'nuanyue-v4.3';
 const CORE = ['/', '/styles.css', '/app.js', '/icon.svg', '/manifest.webmanifest', '/images/hero.jpg'];
 
 self.addEventListener('install', (event) => {
